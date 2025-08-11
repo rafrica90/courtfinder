@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a1628;
+  --foreground: #ffffff;
+  --primary: #00d9ff;
+  --primary-hover: #00a8cc;
+  --border: #1e3a5f;
+  --muted: #7a8b9a;
+  --accent: #00ff88;
+  --accent-hover: #00cc6a;
+  --text-secondary: #b8c5d6;
+  --text-muted: #6b7c8f;
+  --card-shadow: 0 4px 12px rgba(0,217,255,0.1);
+  --card-hover-shadow: 0 8px 24px rgba(0,217,255,0.2);
+  --gradient-start: #0a1628;
+  --gradient-mid: #0f2847;
+  --gradient-end: #1a3a5c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #050a15;
+    --foreground: #ffffff;
+    --primary: #00d9ff;
+    --primary-hover: #00a8cc;
+    --border: #1a2942;
+    --muted: #8a99aa;
+    --accent: #00ff88;
+    --accent-hover: #00cc6a;
+    --text-secondary: #a8b5c4;
+    --text-muted: #5b6c7f;
+    --card-shadow: 0 4px 12px rgba(0,217,255,0.15);
+    --card-hover-shadow: 0 8px 24px rgba(0,217,255,0.25);
+    --gradient-start: #050a15;
+    --gradient-mid: #0a1830;
+    --gradient-end: #0f2847;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.2s ease-out;
+}

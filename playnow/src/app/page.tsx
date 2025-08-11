@@ -1,0 +1,174 @@
+"use client";
+
+import Link from "next/link";
+import { sports, venues } from "@/lib/mockData";
+import SearchBar from "@/components/SearchBar";
+import VenueCard from "@/components/VenueCard";
+import { MapPin, Calendar, Users, ArrowRight } from "lucide-react";
+
+export default function Home() {
+  return (
+    <div className="bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c] min-h-screen">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#00d9ff]/20 via-transparent to-[#00ff88]/20"></div>
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-left">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
+                <span className="text-white">Find Courts.</span>
+                <br />
+                <span className="text-[#00d9ff]">Meet Players.</span>
+                <br />
+                <span className="text-[#00ff88]">Join Events.</span>
+              </h1>
+              <p className="text-xl text-[#b8c5d6] mb-10 leading-relaxed">
+                Discover courts near you, set up games, and connect with passionate players anytime, anywhere.
+              </p>
+              
+              {/* Main CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <Link
+                  href="/venues"
+                  className="group relative px-8 py-4 bg-[#00d9ff] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00a8cc] transition-all duration-300 shadow-lg hover:shadow-[#00d9ff]/30 hover:shadow-2xl flex items-center justify-center gap-2"
+                >
+                  <MapPin className="h-5 w-5" />
+                  Book a Court
+                  <span className="absolute inset-0 rounded-xl bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                </Link>
+                <Link
+                  href="/games/new"
+                  className="group relative px-8 py-4 bg-[#00ff88] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00cc6a] transition-all duration-300 shadow-lg hover:shadow-[#00ff88]/30 hover:shadow-2xl flex items-center justify-center gap-2"
+                >
+                  <Calendar className="h-5 w-5" />
+                  Create Game
+                  <span className="absolute inset-0 rounded-xl bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                </Link>
+              </div>
+
+              {/* Secondary Button */}
+              <Link
+                href="/venues"
+                className="inline-flex items-center gap-2 text-[#00d9ff] hover:text-[#00ff88] font-medium transition-colors"
+              >
+                <Users className="h-4 w-4" />
+                Find Other Players
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            {/* Search Section */}
+            <div className="lg:pl-12">
+              <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10">
+                <h3 className="text-xl font-semibold text-white mb-4">Quick Search</h3>
+                <SearchBar variant="hero" />
+                
+                {/* Quick sport filters */}
+                <div className="mt-6">
+                  <p className="text-sm text-[#b8c5d6] mb-3">Popular Sports:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {sports.map((sport) => (
+                      <Link
+                        key={sport.id}
+                        href={`/venues?sport=${sport.slug}`}
+                        className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg text-sm font-medium text-white hover:bg-[#00d9ff]/20 hover:text-[#00d9ff] transition-all border border-white/10 hover:border-[#00d9ff]/50"
+                      >
+                        {sport.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 bg-black/30 backdrop-blur-sm border-y border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+            <div className="group">
+              <div className="text-4xl font-bold text-[#00d9ff] group-hover:text-[#00ff88] transition-colors">500+</div>
+              <div className="text-sm text-[#b8c5d6] mt-2">Venues Available</div>
+            </div>
+            <div className="group">
+              <div className="text-4xl font-bold text-[#00d9ff] group-hover:text-[#00ff88] transition-colors">10,000+</div>
+              <div className="text-sm text-[#b8c5d6] mt-2">Active Players</div>
+            </div>
+            <div className="group">
+              <div className="text-4xl font-bold text-[#00d9ff] group-hover:text-[#00ff88] transition-colors">50+</div>
+              <div className="text-sm text-[#b8c5d6] mt-2">Cities Covered</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Venues Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-10">
+            <div>
+              <h2 className="text-3xl font-bold text-white">Popular Venues</h2>
+              <p className="text-[#b8c5d6] mt-2">Top-rated venues in your area</p>
+            </div>
+            <Link 
+              href="/venues" 
+              className="hidden sm:flex items-center gap-2 text-[#00d9ff] hover:text-[#00ff88] font-medium transition-colors"
+            >
+              View all venues
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {venues.slice(0, 6).map((venue) => (
+              <div key={venue.id} className="transform hover:scale-105 transition-transform duration-300">
+                <VenueCard venue={venue} />
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-10 sm:hidden">
+            <Link 
+              href="/venues" 
+              className="inline-flex items-center gap-2 text-[#00d9ff] hover:text-[#00ff88] font-medium transition-colors"
+            >
+              View all venues
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 bg-gradient-to-r from-[#00d9ff]/10 to-[#00ff88]/10 backdrop-blur-sm border-t border-white/10">
+        <div className="max-w-4xl mx-auto text-center px-4">
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+            Ready to Play?
+          </h2>
+          <p className="text-xl text-[#b8c5d6] mb-10">
+            Join thousands of players finding venues and games every day
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/venues"
+              className="group relative px-10 py-5 bg-[#00d9ff] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00a8cc] transition-all duration-300 shadow-lg hover:shadow-[#00d9ff]/30 hover:shadow-2xl"
+            >
+              Browse Venues
+              <span className="absolute inset-0 rounded-xl bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+            </Link>
+            <Link
+              href="/games/new"
+              className="group relative px-10 py-5 bg-transparent text-[#00ff88] rounded-xl font-bold text-lg border-2 border-[#00ff88] hover:bg-[#00ff88] hover:text-[#0a1628] transition-all duration-300"
+            >
+              Host a Game
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

@@ -1,0 +1,1196 @@
+{
+  "sydney_sports_venues": [
+    {
+      "venue_name": "City Community Tennis - Prince Alfred Park",
+      "address": "Chalmers Street, Prince Alfred Park, Surry Hills NSW 2010",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://play.tennis.com.au/citycommunitytennisprincealfredpark",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/__data/assets/image/prince-alfred-park-tennis.jpg",
+        "https://jensenstennis.intrac.com.au/images/prince-alfred-courts.jpg",
+        "https://www.citycommunitytenis.com.au/facility-images/prince-alfred-park.jpg"
+      ],
+      "price_estimate": "$30.30/hr weekdays, $37.20/hr evenings/weekends",
+      "amenities": "5 plexicushion courts, floodlights, pro shop, changerooms, cafe, parking",
+      "notes": "Australian Open surface, PIN access system, 6am-11pm daily"
+    },
+    {
+      "venue_name": "City Community Tennis - Alexandria Park",
+      "address": "Park Road, Alexandria NSW 2015",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.citycommunitytennis.com.au/locations",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/__data/assets/image/alexandria-park-tennis.jpg",
+        "https://www.citycommunitytennis.com.au/images/alexandria-courts.jpg"
+      ],
+      "price_estimate": "$30.30/hr weekdays, $37.20/hr evenings/weekends",
+      "amenities": "4 hard courts, floodlights, PIN access",
+      "notes": "Council-managed courts, online booking with PIN access"
+    },
+    {
+      "venue_name": "City Community Tennis - Beaconsfield Park",
+      "address": "York Road, Beaconsfield NSW 2015",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.citycommunitytennis.com.au/locations",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/__data/assets/image/beaconsfield-tennis.jpg"
+      ],
+      "price_estimate": "$30.30/hr weekdays, $37.20/hr evenings/weekends",
+      "amenities": "2 hard courts, floodlights",
+      "notes": "PIN access system, suitable for all skill levels"
+    },
+    {
+      "venue_name": "City Community Tennis - Turruwul Park",
+      "address": "Mentmore Avenue, Rosebery NSW 2018",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.citycommunitytennis.com.au/locations",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/__data/assets/image/turruwul-park-tennis.jpg"
+      ],
+      "price_estimate": "$30.30/hr weekdays, $37.20/hr evenings/weekends",
+      "amenities": "3 hard courts, floodlights, adjacent playground",
+      "notes": "Recently upgraded courts, PIN access"
+    },
+    {
+      "venue_name": "City Community Tennis - St James Park",
+      "address": "Elizabeth Street, Sydney NSW 2000",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.citycommunitytennis.com.au/locations",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/__data/assets/image/st-james-tennis.jpg"
+      ],
+      "price_estimate": "$30.30/hr weekdays, $37.20/hr evenings/weekends",
+      "amenities": "2 hard courts, CBD location",
+      "notes": "Heritage-listed park location, PIN access"
+    },
+    {
+      "venue_name": "Rushcutters Bay Park Tennis",
+      "address": "New Beach Road, Rushcutters Bay NSW 2011",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.citycommunitytennis.com.au/locations",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/__data/assets/image/rushcutters-tennis.jpg"
+      ],
+      "price_estimate": "$30.30/hr weekdays, $37.20/hr evenings/weekends",
+      "amenities": "4 hard courts, harbour views, floodlights",
+      "notes": "Waterfront location, popular venue"
+    },
+    {
+      "venue_name": "White City Tennis",
+      "address": "30 Alma Street, Paddington NSW 2021",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.whitecitytennis.com.au/court-hire",
+      "image_urls": [
+        "https://www.whitecitytennis.com.au/images/courts.jpg",
+        "https://www.whitecitytennis.com.au/gallery"
+      ],
+      "price_estimate": "$45/hr peak, $35/hr off-peak",
+      "amenities": "6 synthetic grass courts, pro shop, cafe, coaching",
+      "notes": "Historic venue, former Davis Cup location"
+    },
+    {
+      "venue_name": "Centennial Parklands Sports Centre",
+      "address": "Corner Anzac Parade and Lang Road, Moore Park NSW 2021",
+      "sports": ["tennis", "soccer", "netball", "basketball"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://parklandssports.com.au/online-court-bookings/",
+      "image_urls": [
+        "https://parklandssports.com.au/wp-content/uploads/facility.jpg",
+        "https://parklandssports.com.au/images/tennis-courts.jpg",
+        "https://parklandssports.com.au/images/soccer-fields.jpg"
+      ],
+      "price_estimate": "$30/hr off-peak, $37/hr peak times",
+      "amenities": "15 tennis courts, 8 FIFA-approved futsal fields, 200+ parking spaces, PIN access",
+      "notes": "Sydney's largest outdoor sports centre complex"
+    },
+    {
+      "venue_name": "Cooper Park Tennis Centre",
+      "address": "1 Bunna Place, Woollahra NSW 2025",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://play.tennis.com.au/cooperparktennis",
+      "image_urls": [
+        "https://cooperparktennis.com.au/wp-content/uploads/courts.jpg",
+        "https://cooperparktennis.com.au/gallery"
+      ],
+      "price_estimate": "$35-45/hr depending on time",
+      "amenities": "8 LED-lit synthetic grass courts, cafe, pro shop, parking",
+      "notes": "Set in 17.5 hectares of urban bushland"
+    },
+    {
+      "venue_name": "Lyne Park Tennis Centre",
+      "address": "New South Head Road, Rose Bay NSW 2029",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://lyneparktennis.com.au/book-a-court",
+      "image_urls": [
+        "https://lyneparktennis.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$40-50/hr",
+      "amenities": "10 synthetic grass courts, pro shop, cafe, coaching",
+      "notes": "Harbour views, premium Eastern Suburbs location"
+    },
+    {
+      "venue_name": "Trumper Park Tennis Centre",
+      "address": "Quarry Street, Paddington NSW 2021",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://play.tennis.com.au/trumperpark",
+      "image_urls": [
+        "https://www.woollahra.nsw.gov.au/__data/assets/image/trumper-park.jpg"
+      ],
+      "price_estimate": "$30-40/hr",
+      "amenities": "4 hard courts, floodlights, pro shop",
+      "notes": "Council-managed facility, central location"
+    },
+    {
+      "venue_name": "Marrickville District Lawn Tennis Club",
+      "address": "33 Centennial Street, Marrickville NSW 2044",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://play.tennis.com.au/MarrickvilleDistrictLawnTennisClub/court-hire/book-by-date",
+      "image_urls": [
+        "https://www.marrickvilletennisclub.org.au/images/courts.jpg",
+        "https://www.facebook.com/marrickvilletennis/photos"
+      ],
+      "price_estimate": "Members $20-28/hr, Non-members $24-32/hr",
+      "amenities": "7 synthetic grass courts, lights, restaurant, bar, pro shop",
+      "notes": "Historic club with Portuguese restaurant on-site"
+    },
+    {
+      "venue_name": "Parramatta City Tennis",
+      "address": "Victoria Road, Parramatta NSW 2150",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://play.tennis.com.au/ParramattaCityTennis",
+      "image_urls": [
+        "https://www.parramattatennis.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$25-35/hr",
+      "amenities": "12 hard courts, pro shop, coaching, parking",
+      "notes": "Large Western Sydney facility"
+    },
+    {
+      "venue_name": "North Sydney Tennis Centre",
+      "address": "1 Little Alfred Street, North Sydney NSW 2060",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.northsydneytennis.com.au/book",
+      "image_urls": [
+        "https://www.northsydney.nsw.gov.au/__data/assets/image/tennis-centre.jpg"
+      ],
+      "price_estimate": "$30-40/hr",
+      "amenities": "6 synthetic grass courts, floodlights, pro shop",
+      "notes": "Council facility, close to CBD"
+    },
+    {
+      "venue_name": "Collaroy Tennis Club",
+      "address": "Collaroy Plateau Park, Veterans Parade, Collaroy Plateau NSW 2097",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.northernbeaches.nsw.gov.au/things-to-do/recreation-area/collaroy-plateau-tennis-court",
+      "image_urls": [
+        "https://www.northernbeaches.nsw.gov.au/__data/assets/image/collaroy-tennis.jpg"
+      ],
+      "price_estimate": "$25-30/hr",
+      "amenities": "8 hard courts, clubhouse, parking",
+      "notes": "Northern Beaches council facility"
+    },
+    {
+      "venue_name": "UTS Moore Park Tennis",
+      "address": "Moore Park Road, Moore Park NSW 2021",
+      "sports": ["tennis", "futsal"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.uts.edu.au/about/sport-and-recreation/facilities/moore-park",
+      "image_urls": [
+        "https://www.uts.edu.au/__data/assets/image/moore-park-tennis.jpg"
+      ],
+      "price_estimate": "Student rates available",
+      "amenities": "4 hard courts, futsal field, changerooms",
+      "notes": "University facility, public booking available"
+    },
+    {
+      "venue_name": "Pickle Point Milperra",
+      "address": "Milperra Sports Complex, Milperra NSW 2214",
+      "sports": ["pickleball"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.picklepoint.com.au/",
+      "image_urls": [
+        "https://static.wixstatic.com/media/picklepoint-courts.jpg",
+        "https://www.picklepoint.com.au/gallery"
+      ],
+      "price_estimate": "From $20/hr",
+      "amenities": "8 outdoor courts, Australian Open surface, lighting, free parking",
+      "notes": "Sydney's biggest dedicated outdoor pickleball facility"
+    },
+    {
+      "venue_name": "Perry Park Recreation Centre",
+      "address": "1B Maddox Street, Alexandria NSW 2015",
+      "sports": ["pickleball", "basketball", "netball", "futsal"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/venues-facilities/perry-park-recreation-centre",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/__data/assets/image/perry-park.jpg"
+      ],
+      "price_estimate": "$8 per person casual sessions",
+      "amenities": "4 multipurpose indoor courts, equipment provided",
+      "notes": "Regular pickleball sessions Mon/Wed 11am-1pm"
+    },
+    {
+      "venue_name": "Play Pickle Alexandria",
+      "address": "Alexandria Park Community School, Alexandria NSW 2015",
+      "sports": ["pickleball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.playpickle.com.au/locations",
+      "image_urls": [
+        "https://www.playpickle.com.au/images/alexandria.jpg"
+      ],
+      "price_estimate": "$6-8 per session",
+      "amenities": "Indoor courts, equipment provided",
+      "notes": "Beginner-friendly sessions available"
+    },
+    {
+      "venue_name": "Margaret Whitlam Recreation Centre",
+      "address": "41 Flood Street, Bondi NSW 2026",
+      "sports": ["pickleball", "basketball", "volleyball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.waverley.nsw.gov.au/recreation/sports_fields/margaret_whitlam_recreation_centre",
+      "image_urls": [
+        "https://www.waverley.nsw.gov.au/__data/assets/image/mwrc.jpg"
+      ],
+      "price_estimate": "$30-50/hr court hire",
+      "amenities": "Multi-purpose indoor courts, changerooms, parking",
+      "notes": "Eastern Suburbs council facility"
+    },
+    {
+      "venue_name": "PCYC Northern Beaches (Dee Why)",
+      "address": "40 Kingsway, Dee Why NSW 2099",
+      "sports": ["pickleball", "futsal", "basketball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.pcycnsw.org.au/northern-beaches",
+      "image_urls": [
+        "https://www.pcycnsw.org.au/images/northern-beaches.jpg"
+      ],
+      "price_estimate": "$6-8 per session",
+      "amenities": "Indoor courts, equipment provided, parking",
+      "notes": "Home to Australia's largest pickleball club"
+    },
+    {
+      "venue_name": "Marrickville PCYC",
+      "address": "308 Marrickville Road, Marrickville NSW 2204",
+      "sports": ["pickleball", "basketball", "futsal"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.pcycnsw.org.au/marrickville",
+      "image_urls": [
+        "https://www.pcycnsw.org.au/images/marrickville.jpg"
+      ],
+      "price_estimate": "$8-10 per session",
+      "amenities": "Multi-purpose indoor courts, equipment available",
+      "notes": "Regular pickleball sessions"
+    },
+    {
+      "venue_name": "Concord Oval Recreation Centre",
+      "address": "Loftus Street, Concord NSW 2137",
+      "sports": ["pickleball", "basketball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.canadabay.nsw.gov.au/concord-oval",
+      "image_urls": [
+        "https://www.canadabay.nsw.gov.au/images/concord-oval.jpg"
+      ],
+      "price_estimate": "$25-35/hr",
+      "amenities": "Indoor courts, changerooms, parking",
+      "notes": "Inner West council facility"
+    },
+    {
+      "venue_name": "The Jar Pickleball Club",
+      "address": "Pyrmont NSW 2009",
+      "sports": ["pickleball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.thejar.com.au/pickleball",
+      "image_urls": [
+        "https://www.thejar.com.au/images/pickleball.jpg"
+      ],
+      "price_estimate": "$25-30 per session",
+      "amenities": "2 premium courts, bar, social area",
+      "notes": "Boutique pickleball venue with bar"
+    },
+    {
+      "venue_name": "Robyn Webster Sports Centre",
+      "address": "46 Holbeach Avenue, Tempe NSW 2044",
+      "sports": ["pickleball", "basketball", "netball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/robyn-webster",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/robyn-webster.jpg"
+      ],
+      "price_estimate": "$30-40/hr",
+      "amenities": "Multi-purpose indoor courts, changerooms",
+      "notes": "Inner West council facility"
+    },
+    {
+      "venue_name": "Camellia Indoor Sports Centre",
+      "address": "Grand Avenue, Camellia NSW 2142",
+      "sports": ["pickleball", "futsal", "basketball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.cityofparramatta.nsw.gov.au/camellia-indoor",
+      "image_urls": [
+        "https://www.cityofparramatta.nsw.gov.au/images/camellia.jpg"
+      ],
+      "price_estimate": "$35-45/hr",
+      "amenities": "Indoor courts, cafe, parking",
+      "notes": "Western Sydney facility"
+    },
+    {
+      "venue_name": "Bernie Mullane Sports Complex",
+      "address": "Marella Avenue, Kellyville NSW 2155",
+      "sports": ["pickleball", "basketball", "netball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.thehills.nsw.gov.au/bernie-mullane",
+      "image_urls": [
+        "https://www.thehills.nsw.gov.au/images/bernie-mullane.jpg"
+      ],
+      "price_estimate": "$40-50/hr",
+      "amenities": "6 indoor courts, changerooms, cafe",
+      "notes": "Hills District facility"
+    },
+    {
+      "venue_name": "Gunyama Park Synthetic Sportsfield",
+      "address": "Zetland Avenue, Zetland NSW 2017",
+      "sports": ["soccer", "futsal"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/venues-facilities/gunyama-park",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/__data/assets/image/gunyama.jpg"
+      ],
+      "price_estimate": "$186.20/hr non-commercial",
+      "amenities": "FIFA-sized synthetic field, lighting, changerooms",
+      "notes": "New facility with aquatic centre adjacent"
+    },
+    {
+      "venue_name": "Wentworth Park Sportsfields",
+      "address": "Wentworth Park Road, Glebe NSW 2037",
+      "sports": ["soccer", "rugby"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/__data/assets/image/wentworth.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Multiple fields, grandstand, function centre",
+      "notes": "Historic greyhound racing venue"
+    },
+    {
+      "venue_name": "Jubilee Oval",
+      "address": "Jubilee Avenue, Carlton NSW 2218",
+      "sports": ["soccer", "rugby"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.georgesriver.nsw.gov.au/jubilee-oval",
+      "image_urls": [
+        "https://www.georgesriver.nsw.gov.au/images/jubilee.jpg"
+      ],
+      "price_estimate": "$150-200/hr",
+      "amenities": "Main field, grandstand, lighting",
+      "notes": "Historic sporting ground"
+    },
+    {
+      "venue_name": "Hensley Athletic Field",
+      "address": "Dunc Gray Velodrome, Bass Hill NSW 2197",
+      "sports": ["soccer", "athletics"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.bankstown.nsw.gov.au/hensley-field",
+      "image_urls": [
+        "https://www.bankstown.nsw.gov.au/images/hensley.jpg"
+      ],
+      "price_estimate": "$100-150/hr",
+      "amenities": "Synthetic field, athletics track, lighting",
+      "notes": "Olympic legacy venue"
+    },
+    {
+      "venue_name": "Kikoff Football Alexandria",
+      "address": "99 Mitchell Road, Alexandria NSW 2015",
+      "sports": ["soccer", "futsal"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://kikoff.com.au/alexandria",
+      "image_urls": [
+        "https://kikoff.com.au/images/alexandria.jpg"
+      ],
+      "price_estimate": "$150-200/hr",
+      "amenities": "5-a-side pitches, equipment hire, changerooms",
+      "notes": "Premium indoor football facility"
+    },
+    {
+      "venue_name": "Ultimate Soccer Fairfield",
+      "address": "Vine Street, Fairfield NSW 2165",
+      "sports": ["soccer", "futsal"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.ultimatesoccer.com.au/fairfield",
+      "image_urls": [
+        "https://www.ultimatesoccer.com.au/images/fairfield.jpg"
+      ],
+      "price_estimate": "$120-180/hr",
+      "amenities": "Multiple 5/7-a-side pitches, cafe, parking",
+      "notes": "Weatherproof indoor facility"
+    },
+    {
+      "venue_name": "Sydney Football Centre",
+      "address": "Edwin Flack Avenue, Sydney Olympic Park NSW 2127",
+      "sports": ["soccer", "futsal"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.sydneyolympicpark.com.au/sydney-football-centre",
+      "image_urls": [
+        "https://www.sydneyolympicpark.com.au/images/football-centre.jpg"
+      ],
+      "price_estimate": "$200-300/hr",
+      "amenities": "FIFA-approved synthetic pitch, lighting",
+      "notes": "Olympic Park premium facility"
+    },
+    {
+      "venue_name": "Valentine Sports Park",
+      "address": "Parkholme Circuit, Glenwood NSW 2768",
+      "sports": ["soccer", "futsal"],
+      "indoor_outdoor": "both",
+      "booking_url": "https://www.footballnsw.com.au/valentine-sports-park",
+      "image_urls": [
+        "https://www.footballnsw.com.au/images/valentine.jpg"
+      ],
+      "price_estimate": "$150-250/hr",
+      "amenities": "5 fields (3 grass, 2 synthetic), futsal court",
+      "notes": "Football NSW headquarters"
+    },
+    {
+      "venue_name": "Club Marconi Synthetic Fields",
+      "address": "121 Prairie Vale Road, Bossley Park NSW 2176",
+      "sports": ["soccer"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.clubmarconi.com.au/field-hire",
+      "image_urls": [
+        "https://www.clubmarconi.com.au/images/fields.jpg"
+      ],
+      "price_estimate": "$180-250/hr",
+      "amenities": "2 FIFA-approved synthetic fields, lighting",
+      "notes": "Professional standard facilities"
+    },
+    {
+      "venue_name": "Tom Wills Community Field",
+      "address": "Grand Parade, Sydney Olympic Park NSW 2127",
+      "sports": ["soccer", "rugby", "multi-sport"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.sydneyolympicpark.com.au/tom-wills-field",
+      "image_urls": [
+        "https://www.sydneyolympicpark.com.au/images/tom-wills.jpg"
+      ],
+      "price_estimate": "$150-200/hr",
+      "amenities": "Multi-sport ground, lighting",
+      "notes": "Flexible community facility"
+    },
+    {
+      "venue_name": "Intrinsic Sports Revesby",
+      "address": "2B Brett Street, Revesby NSW 2212",
+      "sports": ["soccer", "futsal", "basketball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://intrinsicsports.com.au/",
+      "image_urls": [
+        "https://intrinsicsports.com.au/images/facility.jpg"
+      ],
+      "price_estimate": "$100-150/hr",
+      "amenities": "Indoor courts, cafe, parking",
+      "notes": "Multi-sport indoor facility"
+    },
+    {
+      "venue_name": "Five Dock Leisure Centre",
+      "address": "93 Park Road, Five Dock NSW 2046",
+      "sports": ["basketball", "netball", "futsal", "pickleball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.fdlc.com.au/",
+      "image_urls": [
+        "https://www.fdlc.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$45-60/hr",
+      "amenities": "3 indoor courts, gym, pool, cafe",
+      "notes": "Full service leisure centre"
+    },
+    {
+      "venue_name": "North Narrabeen Community & Tennis Centre",
+      "address": "7 Boondah Road, North Narrabeen NSW 2101",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.northernbeaches.nsw.gov.au/things-to-do/recreation-area/north-narrabeen-community-tennis-centre",
+      "image_urls": [
+        "https://www.northernbeaches.nsw.gov.au/images/north-narrabeen.jpg"
+      ],
+      "price_estimate": "$25-35/hr",
+      "amenities": "4 hard courts, clubhouse",
+      "notes": "Northern Beaches community facility"
+    },
+    {
+      "venue_name": "Cahill Park Tennis Courts",
+      "address": "Wilbar Avenue, Cronulla NSW 2230",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://bayside.bookable.net.au",
+      "image_urls": [
+        "https://www.bayside.nsw.gov.au/images/cahill-park.jpg"
+      ],
+      "price_estimate": "$20-30/hr",
+      "amenities": "6 hard courts, lighting",
+      "notes": "Bayside Council facility"
+    },
+    {
+      "venue_name": "Mosman Lawn Tennis Club",
+      "address": "11 Gouldsbury Street, Mosman NSW 2088",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.mosmanlawntennis.com.au/book",
+      "image_urls": [
+        "https://www.mosmanlawntennis.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$35-45/hr",
+      "amenities": "8 synthetic grass courts, pro shop, cafe",
+      "notes": "Historic North Shore club"
+    },
+    {
+      "venue_name": "Sutherland Waratah Tennis Courts",
+      "address": "Waratah Park, Sutherland NSW 2232",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://play.tennis.com.au/sutherlandwaratahtenniscourts",
+      "image_urls": [
+        "https://www.sutherlandshire.nsw.gov.au/images/waratah.jpg"
+      ],
+      "price_estimate": "$22-28/hr",
+      "amenities": "6 hard courts, lighting",
+      "notes": "Sutherland Shire facility"
+    },
+    {
+      "venue_name": "Burwood Tennis Courts",
+      "address": "Burwood Park, Burwood NSW 2134",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.burwood.nsw.gov.au/tennis",
+      "image_urls": [
+        "https://www.burwood.nsw.gov.au/images/tennis.jpg"
+      ],
+      "price_estimate": "$20-25/hr",
+      "amenities": "4 hard courts, lighting",
+      "notes": "Council courts in park setting"
+    },
+    {
+      "venue_name": "Cintra Park Tennis Centre",
+      "address": "383 Concord Road, Concord NSW 2137",
+      "sports": ["tennis", "pickleball"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cpsports.com.au/",
+      "image_urls": [
+        "https://www.cpsports.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$28-38/hr",
+      "amenities": "12 synthetic grass courts, pro shop, cafe",
+      "notes": "Large Inner West facility"
+    },
+    {
+      "venue_name": "Five Dock Park Tennis Centre",
+      "address": "Park Road, Five Dock NSW 2046",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.tennisvenues.com.au/booking/five-dock-tc",
+      "image_urls": [
+        "https://www.tennisvenues.com.au/images/five-dock.jpg"
+      ],
+      "price_estimate": "$25-35/hr",
+      "amenities": "8 hard courts, clubhouse, coaching",
+      "notes": "Canada Bay council facility"
+    },
+    {
+      "venue_name": "Birchgrove Tennis Club",
+      "address": "Louisa Road, Birchgrove NSW 2041",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.birchgrovetennis.com.au/",
+      "image_urls": [
+        "https://www.birchgrovetennis.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$30-40/hr",
+      "amenities": "4 synthetic grass courts, harbour views",
+      "notes": "Waterfront location"
+    },
+    {
+      "venue_name": "Haberfield Tennis Centre",
+      "address": "Dobroyd Parade, Haberfield NSW 2045",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.haberfieldtennis.com.au/",
+      "image_urls": [
+        "https://www.haberfieldtennis.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$28-35/hr",
+      "amenities": "6 synthetic grass courts, pro shop",
+      "notes": "Inner West community club"
+    },
+    {
+      "venue_name": "Strathfield Sports Club Tennis",
+      "address": "11 Florence Street, Strathfield NSW 2135",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://strathfieldsportsclub.com.au/tennis/book-a-court/",
+      "image_urls": [
+        "https://strathfieldsportsclub.com.au/images/tennis.jpg"
+      ],
+      "price_estimate": "$25-35/hr",
+      "amenities": "8 hard courts, clubhouse, restaurant",
+      "notes": "Full service sports club"
+    },
+    {
+      "venue_name": "Southend Tennis Centre",
+      "address": "50 Heffron Road, Maroubra NSW 2035",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://southendtenniscentre.com.au/",
+      "image_urls": [
+        "https://southendtenniscentre.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$30-40/hr",
+      "amenities": "6 hard courts, pro shop, coaching",
+      "notes": "Eastern Suburbs facility"
+    },
+    {
+      "venue_name": "Sylvania Waters Tennis Centre",
+      "address": "Belgrave Esplanade, Sylvania Waters NSW 2224",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.swtctennis.com.au/",
+      "image_urls": [
+        "https://www.swtctennis.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$25-32/hr",
+      "amenities": "7 synthetic grass courts, pro shop",
+      "notes": "Waterfront location in South Sydney"
+    },
+    {
+      "venue_name": "Croydon Tennis Centre",
+      "address": "45 Hennessy Street, Croydon NSW 2132",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://croydontenniscentre.com.au/court-hire",
+      "image_urls": [
+        "https://croydontenniscentre.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$22-30/hr",
+      "amenities": "6 hard courts, clubhouse",
+      "notes": "Inner West community facility"
+    },
+    {
+      "venue_name": "Wakehurst Tennis Club",
+      "address": "Boondah Road, Seaforth NSW 2092",
+      "sports": ["tennis", "futsal"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.wakehursttennis.com.au/book",
+      "image_urls": [
+        "https://www.wakehursttennis.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$28-38/hr",
+      "amenities": "10 courts (4 hard, 4 synthetic, 2 futsal), clubhouse",
+      "notes": "Large Northern Beaches complex"
+    },
+    {
+      "venue_name": "Eastside Tennis Centre",
+      "address": "1 Court Avenue, Kingsford NSW 2032",
+      "sports": ["tennis", "pickleball"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.tennisvenues.com.au/booking/eastside-tennis-centre",
+      "image_urls": [
+        "https://www.eastsidetennis.com.au/images/courts.jpg"
+      ],
+      "price_estimate": "$35-45/hr",
+      "amenities": "8 courts (various surfaces), pro shop, cafe, BBQ",
+      "notes": "Multiple surface types available"
+    },
+    {
+      "venue_name": "Tennis World Sydney Olympic Park",
+      "address": "2 Rod Laver Drive, Sydney Olympic Park NSW 2127",
+      "sports": ["tennis"],
+      "indoor_outdoor": "both",
+      "booking_url": "https://www.tennisworld.net.au/tennis-world-sydney/",
+      "image_urls": [
+        "https://www.tennisworld.net.au/images/sydney.jpg"
+      ],
+      "price_estimate": "$40-60/hr",
+      "amenities": "16 courts (2 indoor), Ken Rosewall Arena, gym, cafe",
+      "notes": "Premier tennis facility, hosts major events"
+    },
+    {
+      "venue_name": "Ryde Aquatic Leisure Centre",
+      "address": "504 Victoria Road, Ryde NSW 2112",
+      "sports": ["pickleball", "basketball", "volleyball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.ryde.nsw.gov.au/ralc",
+      "image_urls": [
+        "https://www.ryde.nsw.gov.au/images/ralc.jpg"
+      ],
+      "price_estimate": "$35-45/hr",
+      "amenities": "Indoor courts, pool, gym, cafe",
+      "notes": "Full aquatic and sports complex"
+    },
+    {
+      "venue_name": "Scarborough Park Tennis",
+      "address": "Mitchell Street, Glebe NSW 2037",
+      "sports": ["tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.citycommunitytennis.com.au/locations",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/scarborough.jpg"
+      ],
+      "price_estimate": "$30.30/hr weekdays, $37.20/hr evenings/weekends",
+      "amenities": "2 hard courts, lighting",
+      "notes": "City of Sydney facility"
+    },
+    {
+      "venue_name": "Toongabbie Sports Complex",
+      "address": "Bungaree Road, Toongabbie NSW 2146",
+      "sports": ["pickleball", "basketball", "netball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.blacktown.nsw.gov.au/toongabbie",
+      "image_urls": [
+        "https://www.blacktown.nsw.gov.au/images/toongabbie.jpg"
+      ],
+      "price_estimate": "$40-50/hr",
+      "amenities": "Indoor courts, changerooms, parking",
+      "notes": "Western Sydney council facility"
+    },
+    {
+      "venue_name": "Blacktown Leisure Centre Stanhope",
+      "address": "2 Sentry Drive, Stanhope Gardens NSW 2768",
+      "sports": ["pickleball", "basketball", "futsal"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.blacktown.nsw.gov.au/stanhope",
+      "image_urls": [
+        "https://www.blacktown.nsw.gov.au/images/stanhope.jpg"
+      ],
+      "price_estimate": "$45-55/hr",
+      "amenities": "Multiple indoor courts, gym, pool",
+      "notes": "Major Western Sydney complex"
+    },
+    {
+      "venue_name": "Michael Clarke Recreation Centre",
+      "address": "Carnes Hill Marketplace, Carnes Hill NSW 2171",
+      "sports": ["pickleball", "basketball", "netball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.liverpool.nsw.gov.au/michael-clarke",
+      "image_urls": [
+        "https://www.liverpool.nsw.gov.au/images/michael-clarke.jpg"
+      ],
+      "price_estimate": "$40-50/hr",
+      "amenities": "Indoor courts, cafe, parking",
+      "notes": "South-West Sydney facility"
+    },
+    {
+      "venue_name": "Mount Annan Leisure Centre",
+      "address": "Main Street, Mount Annan NSW 2567",
+      "sports": ["pickleball", "basketball", "netball"],
+      "indoor_outdoor": "indoor",
+      "booking_url": "https://www.camden.nsw.gov.au/mount-annan",
+      "image_urls": [
+        "https://www.camden.nsw.gov.au/images/mount-annan.jpg"
+      ],
+      "price_estimate": "$35-45/hr",
+      "amenities": "Indoor courts, gym, changerooms",
+      "notes": "South-West Sydney council facility"
+    },
+    {
+      "venue_name": "Alexandria Oval",
+      "address": "Buckland Street, Alexandria NSW 2015",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/alexandria-oval.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Grass field, pavilion",
+      "notes": "Traditional oval configuration"
+    },
+    {
+      "venue_name": "Turrella Reserve",
+      "address": "Turrella Street, Turrella NSW 2205",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.bayside.nsw.gov.au/sports-grounds",
+      "image_urls": [
+        "https://www.bayside.nsw.gov.au/images/turrella.jpg"
+      ],
+      "price_estimate": "$80-120/hr",
+      "amenities": "Grass field, amenities block",
+      "notes": "Bayside Council ground"
+    },
+    {
+      "venue_name": "Waterloo Oval",
+      "address": "Elizabeth Street, Waterloo NSW 2017",
+      "sports": ["soccer", "rugby"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/waterloo-oval.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Grass field, changerooms",
+      "notes": "Inner city sports ground"
+    },
+    {
+      "venue_name": "Jubilee Park",
+      "address": "Jubilee Avenue, Glebe NSW 2037",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/jubilee-park.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Multiple fields, pavilion",
+      "notes": "Large park complex"
+    },
+    {
+      "venue_name": "Erskineville Oval",
+      "address": "Bridge Street, Erskineville NSW 2043",
+      "sports": ["soccer", "rugby"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/erskineville.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Grass field, grandstand",
+      "notes": "Historic inner city ground"
+    },
+    {
+      "venue_name": "Federal Park",
+      "address": "Chapman Road, Annandale NSW 2038",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/federal-park.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Grass field, playground adjacent",
+      "notes": "Community sports ground"
+    },
+    {
+      "venue_name": "Sydney Park",
+      "address": "Sydney Park Road, Alexandria NSW 2015",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/sydney-park.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Multiple fields, wetlands, cycling track",
+      "notes": "Large urban park"
+    },
+    {
+      "venue_name": "Alan Davidson Oval",
+      "address": "Wellington Street, Waterloo NSW 2017",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/alan-davidson.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Synthetic wicket, grass field",
+      "notes": "Named after Australian cricketer"
+    },
+    {
+      "venue_name": "Prince Alfred Park",
+      "address": "Chalmers Street, Surry Hills NSW 2010",
+      "sports": ["soccer", "tennis"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/prince-alfred.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Pool complex, tennis courts, playground",
+      "notes": "Multi-sport park facility"
+    },
+    {
+      "venue_name": "Beaman Park",
+      "address": "Beaman Street, Earlwood NSW 2206",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.canterbury-bankstown.nsw.gov.au/beaman-park",
+      "image_urls": [
+        "https://www.cbcity.nsw.gov.au/images/beaman.jpg"
+      ],
+      "price_estimate": "$80-120/hr",
+      "amenities": "Grass field, amenities block",
+      "notes": "Canterbury-Bankstown facility"
+    },
+    {
+      "venue_name": "Camperdown Memorial Rest Park",
+      "address": "Federation Road, Camperdown NSW 2050",
+      "sports": ["soccer"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/camperdown.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Small field, playground",
+      "notes": "Local community ground"
+    },
+    {
+      "venue_name": "Redfern Park",
+      "address": "Elizabeth Street, Redfern NSW 2016",
+      "sports": ["soccer", "basketball"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/redfern-park.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Sports field, basketball courts",
+      "notes": "Historic Aboriginal sporting ground"
+    },
+    {
+      "venue_name": "Victoria Park",
+      "address": "City Road, Camperdown NSW 2050",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/victoria-park.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Large fields, pool, lake",
+      "notes": "University of Sydney adjacent"
+    },
+    {
+      "venue_name": "Mahon Park",
+      "address": "Kellick Street, Waterloo NSW 2017",
+      "sports": ["soccer"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/mahon-park.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Small field, playground",
+      "notes": "Local community ground"
+    },
+    {
+      "venue_name": "Rosebery Park",
+      "address": "Dalmeny Avenue, Rosebery NSW 2018",
+      "sports": ["soccer"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/rosebery-park.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Sports field, playground",
+      "notes": "Recently upgraded facility"
+    },
+    {
+      "venue_name": "Reg Bartley Oval",
+      "address": "Bowden Street, Rushcutters Bay NSW 2011",
+      "sports": ["soccer", "rugby"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.cityofsydney.nsw.gov.au/sports-facility-booking-services/book-sports-field",
+      "image_urls": [
+        "https://www.cityofsydney.nsw.gov.au/images/reg-bartley.jpg"
+      ],
+      "price_estimate": "From $7.50+ per booking",
+      "amenities": "Grass field, harbour views",
+      "notes": "Premium Eastern Suburbs location"
+    },
+    {
+      "venue_name": "Tempe Reserve",
+      "address": "Holbeach Avenue, Tempe NSW 2044",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/tempe-reserve",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/tempe.jpg"
+      ],
+      "price_estimate": "$100-150/hr",
+      "amenities": "Multiple fields, Cooks River adjacent",
+      "notes": "Large sporting complex"
+    },
+    {
+      "venue_name": "Robson Park",
+      "address": "Haberfield Road, Haberfield NSW 2045",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/robson-park",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/robson.jpg"
+      ],
+      "price_estimate": "$80-120/hr",
+      "amenities": "Grass field, pavilion",
+      "notes": "Inner West sports ground"
+    },
+    {
+      "venue_name": "Algie Park",
+      "address": "Hawthorne Parade, Haberfield NSW 2045",
+      "sports": ["soccer"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/algie-park",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/algie.jpg"
+      ],
+      "price_estimate": "$80-120/hr",
+      "amenities": "Small field, playground",
+      "notes": "Local community ground"
+    },
+    {
+      "venue_name": "Pioneers Memorial Park",
+      "address": "Balmain Road, Leichhardt NSW 2040",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/pioneers-park",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/pioneers.jpg"
+      ],
+      "price_estimate": "$80-120/hr",
+      "amenities": "Grass field, grandstand",
+      "notes": "Historic sporting ground"
+    },
+    {
+      "venue_name": "Blackmore Oval",
+      "address": "Balmain Road, Leichhardt NSW 2040",
+      "sports": ["soccer", "rugby"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/blackmore-oval",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/blackmore.jpg"
+      ],
+      "price_estimate": "$100-150/hr",
+      "amenities": "Main field, grandstand",
+      "notes": "Traditional rugby league ground"
+    },
+    {
+      "venue_name": "Leichhardt Oval",
+      "address": "Mary Street, Lilyfield NSW 2040",
+      "sports": ["soccer", "rugby"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/leichhardt-oval",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/leichhardt.jpg"
+      ],
+      "price_estimate": "$200-300/hr",
+      "amenities": "Stadium, lighting, grandstands",
+      "notes": "Historic professional sports venue"
+    },
+    {
+      "venue_name": "Birchgrove Oval",
+      "address": "Birchgrove Road, Birchgrove NSW 2041",
+      "sports": ["soccer", "rugby"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/birchgrove-oval",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/birchgrove-oval.jpg"
+      ],
+      "price_estimate": "$100-150/hr",
+      "amenities": "Grass field, harbour views",
+      "notes": "Waterfront sporting ground"
+    },
+    {
+      "venue_name": "Easton Park",
+      "address": "Grove Street, Balmain NSW 2041",
+      "sports": ["soccer"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/easton-park",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/easton.jpg"
+      ],
+      "price_estimate": "$80-120/hr",
+      "amenities": "Small field, playground",
+      "notes": "Local Balmain ground"
+    },
+    {
+      "venue_name": "Gladstone Park",
+      "address": "Darling Street, Balmain NSW 2041",
+      "sports": ["soccer"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/gladstone-park",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/gladstone.jpg"
+      ],
+      "price_estimate": "$80-120/hr",
+      "amenities": "Small field, harbour views",
+      "notes": "Waterfront location"
+    },
+    {
+      "venue_name": "King George Park",
+      "address": "Manning Road, Rozelle NSW 2039",
+      "sports": ["soccer", "rugby"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/king-george-park",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/king-george.jpg"
+      ],
+      "price_estimate": "$100-150/hr",
+      "amenities": "Large field, pavilion",
+      "notes": "Major Inner West ground"
+    },
+    {
+      "venue_name": "Callan Park",
+      "address": "Balmain Road, Rozelle NSW 2039",
+      "sports": ["soccer", "rugby"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/callan-park",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/callan.jpg"
+      ],
+      "price_estimate": "$80-120/hr",
+      "amenities": "Multiple fields, heritage buildings",
+      "notes": "Historic parklands"
+    },
+    {
+      "venue_name": "Arlington Recreation Ground",
+      "address": "Grosvenor Crescent, Dulwich Hill NSW 2203",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/arlington",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/arlington.jpg"
+      ],
+      "price_estimate": "$100-150/hr",
+      "amenities": "Grass field, pavilion",
+      "notes": "Inner West sports ground"
+    },
+    {
+      "venue_name": "Johnson Park",
+      "address": "New Canterbury Road, Dulwich Hill NSW 2203",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/johnson-park",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/johnson.jpg"
+      ],
+      "price_estimate": "$80-120/hr",
+      "amenities": "Grass field, playground",
+      "notes": "Community sports ground"
+    },
+    {
+      "venue_name": "Marrickville Park",
+      "address": "Illawarra Road, Marrickville NSW 2204",
+      "sports": ["soccer", "cricket"],
+      "indoor_outdoor": "outdoor",
+      "booking_url": "https://www.innerwest.nsw.gov.au/marrickville-park",
+      "image_urls": [
+        "https://www.innerwest.nsw.gov.au/images/marrickville-park.jpg"
+      ],
+      "price_estimate": "$100-150/hr",
+      "amenities": "Multiple fields, grandstand",
+      "notes": "Large park complex"
+    }
+  ]
+}

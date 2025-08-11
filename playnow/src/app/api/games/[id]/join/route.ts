@@ -1,0 +1,125 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getSupabaseServiceClient } from "@/lib/supabase/server";
+
+// POST /api/games/[id]/join - Join a game
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id: gameId } = await params;
+
+  try {
+    const body = await req.json();
+    const { userId } = body;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID required' }, { status: 400 });
+    }
+
+    const supabase = getSupabaseServiceClient();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
+    // First check if the game exists and get current participant count
+    const { data: game, error: gameError } = await supabase
+      .from('games')
+      .select(`
+        *,
+        participants (id, status)
+      `)
+      .eq('id', gameId)
+      .single();
+
+    if (gameError || !game) {
+      return NextResponse.json({ error: 'Game not found' }, { status: 404 });
+    }
+
+    // Check if user is already a participant
+    const { data: existingParticipant, error: participantError } = await supabase
+      .from('participants')
+      .select('id, status')
+      .eq('game_id', gameId)
+      .eq('user_id', userId)
+      .single();
+
+    if (existingParticipant) {
+      return NextResponse.json({ 
+        error: 'Already joined this game',
+        status: existingParticipant.status 
+      }, { status: 400 });
+    }
+
+    // Count current participants with 'joined' status
+    const joinedParticipants = game.participants.filter(p => p.status === 'joined').length;
+    const status = joinedParticipants < game.max_players ? 'joined' : 'waitlist';
+
+    // Add the participant
+    const { data: participant, error } = await supabase
+      .from('participants')
+      .insert({
+        game_id: gameId,
+        user_id: userId,
+        status
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error joining game:', error);
+      return NextResponse.json({ error: 'Failed to join game' }, { status: 500 });
+    }
+
+    return NextResponse.json({ 
+      participant,
+      message: status === 'joined' ? 'Successfully joined game!' : 'Added to waitlist'
+    }, { status: 201 });
+  } catch (error) {
+    console.error('Error in POST /api/games/[id]/join:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// DELETE /api/games/[id]/join - Leave a game
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id: gameId } = await params;
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID required' }, { status: 400 });
+    }
+
+    const supabase = getSupabaseServiceClient();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
+    // Remove the participant
+    const { error } = await supabase
+      .from('participants')
+      .delete()
+      .eq('game_id', gameId)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error leaving game:', error);
+      return NextResponse.json({ error: 'Failed to leave game' }, { status: 500 });
+    }
+
+    // TODO: In a full implementation, you might want to:
+    // 1. Move someone from waitlist to joined if a spot opened up
+    // 2. Send notifications to waitlisted users
+    // 3. Update game status if minimum players not met
+
+    return NextResponse.json({ message: 'Successfully left the game' });
+  } catch (error) {
+    console.error('Error in DELETE /api/games/[id]/join:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

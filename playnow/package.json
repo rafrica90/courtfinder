@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "import:venues": "node -r dotenv/config scripts/import-venues.mjs"
+    "import:venues": "node -r dotenv/config scripts/import-venues.mjs",
+    "security:check": "npm audit && npm run lint && npm run build",
+    "deploy:prepare": "chmod +x railway-deploy.sh && ./railway-deploy.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.54.0",

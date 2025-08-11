@@ -5,10 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { sports as availableSports } from "@/lib/mockData";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { MapPin, Calendar, Users, Globe, FileText, DollarSign } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/lib/api-client";
 
 export default function NewGameClient() {
   const router = useRouter();
   const sp = useSearchParams();
+  const { user } = useAuth();
   const preselectedVenueId = sp.get('venueId') || '';
   const preselectedSport = sp.get('sport') || '';
   const preselectedLocation = sp.get('location') || '';
@@ -24,6 +27,8 @@ export default function NewGameClient() {
   const [locationFilter, setLocationFilter] = useState(preselectedLocation);
   const [allVenues, setAllVenues] = useState<any[]>([]);
   const [isLoadingVenues, setIsLoadingVenues] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -41,8 +46,10 @@ export default function NewGameClient() {
               setAllVenues(data);
               return;
             }
-          } catch (supabaseError) {
-            console.warn('Supabase venues fetch failed:', supabaseError);
+                      } catch (supabaseError) {
+              if (process.env.NODE_ENV === 'development') {
+                console.warn('Supabase venues fetch failed:', supabaseError);
+              }
           }
         }
         
@@ -52,14 +59,18 @@ export default function NewGameClient() {
           setAllVenues(venues as any[]);
         }
       } catch (error) {
-        console.error('Error loading venues:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error loading venues:', error);
+        }
         // Final fallback to mock data
         if (isMounted) {
           try {
             const { venues } = await import('@/lib/mockData');
             setAllVenues(venues as any[]);
           } catch (mockError) {
-            console.error('Failed to load mock data:', mockError);
+            if (process.env.NODE_ENV === 'development') {
+              console.error('Failed to load mock data:', mockError);
+            }
             setAllVenues([]);
           }
         }
@@ -73,9 +84,43 @@ export default function NewGameClient() {
     };
   }, []);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push(`/games?created=1`);
+    
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+    
+    setSubmitting(true);
+    setError(null);
+    
+    try {
+      const { data, error } = await api.games.create({
+        venueId,
+        startTime,
+        minPlayers,
+        maxPlayers,
+        visibility,
+        notes,
+        costInstructions: costPerPlayer ? `$${costPerPlayer} per player` : undefined
+      });
+      
+      if (error) {
+        setError(error);
+        setSubmitting(false);
+        return;
+      }
+      
+      if (data?.game?.id) {
+        router.push(`/games/${data.game.id}?created=1`);
+      } else {
+        router.push(`/games?created=1`);
+      }
+    } catch (err) {
+      setError('Failed to create game. Please try again.');
+      setSubmitting(false);
+    }
   };
 
   const normalizedSport = sportFilter.trim().toLowerCase();
@@ -320,20 +365,41 @@ export default function NewGameClient() {
             </div>
           </div>
 
+          {/* Error display */}
+          {error && (
+            <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+              <p className="text-red-500 text-sm">{error}</p>
+            </div>
+          )}
+
+          {/* Authentication notice */}
+          {!user && (
+            <div className="p-4 bg-[#00d9ff]/10 border border-[#00d9ff]/30 rounded-lg">
+              <p className="text-[#00d9ff] text-sm">
+                You need to sign in to create a game.{' '}
+                <a href="/sign-in" className="underline hover:text-[#00ff88]">
+                  Sign in now
+                </a>
+              </p>
+            </div>
+          )}
+
           {/* Actions */}
           <div className="flex gap-4">
             <button 
               type="button"
               onClick={() => router.back()}
               className="flex-1 px-6 py-3 border border-white/20 text-[#b8c5d6] rounded-lg hover:bg-white/10 transition-colors font-semibold"
+              disabled={submitting}
             >
               Cancel
             </button>
             <button 
               type="submit" 
-              className="flex-1 px-6 py-3 bg-[#00ff88] text-[#0a1628] rounded-lg hover:bg-[#00cc6a] transition-colors font-bold shadow-lg hover:shadow-[#00ff88]/30"
+              className="flex-1 px-6 py-3 bg-[#00ff88] text-[#0a1628] rounded-lg hover:bg-[#00cc6a] transition-colors font-bold shadow-lg hover:shadow-[#00ff88]/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={submitting || !user}
             >
-              Create Game
+              {submitting ? 'Creating...' : 'Create Game'}
             </button>
           </div>
         </form>

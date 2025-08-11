@@ -39,13 +39,17 @@ export async function GET(
       .single();
 
     if (error) {
-      console.error('Error fetching game:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching game:', error);
+      }
       return NextResponse.json({ error: 'Game not found' }, { status: 404 });
     }
 
     return NextResponse.json({ game });
   } catch (error) {
-    console.error('Error in GET /api/games/[id]:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error in GET /api/games/[id]:', error);
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -58,6 +62,13 @@ export async function PUT(
   const { id } = await params;
 
   try {
+    // Get authenticated user from middleware
+    const authenticatedUserId = req.headers.get('x-user-id');
+    
+    if (!authenticatedUserId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+    
     const body = await req.json();
     const {
       startTime,
@@ -65,8 +76,7 @@ export async function PUT(
       maxPlayers,
       visibility,
       notes,
-      costInstructions,
-      hostUserId // For authorization
+      costInstructions
     } = body;
 
     const supabase = getSupabaseServiceClient();
@@ -85,8 +95,8 @@ export async function PUT(
       return NextResponse.json({ error: 'Game not found' }, { status: 404 });
     }
 
-    if (existingGame.host_user_id !== hostUserId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    if (existingGame.host_user_id !== authenticatedUserId) {
+      return NextResponse.json({ error: 'Unauthorized - only the host can update the game' }, { status: 403 });
     }
 
     // Update the game
@@ -105,13 +115,17 @@ export async function PUT(
       .single();
 
     if (error) {
-      console.error('Error updating game:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error updating game:', error);
+      }
       return NextResponse.json({ error: 'Failed to update game' }, { status: 500 });
     }
 
     return NextResponse.json({ game });
   } catch (error) {
-    console.error('Error in PUT /api/games/[id]:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error in PUT /api/games/[id]:', error);
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -124,11 +138,11 @@ export async function DELETE(
   const { id } = await params;
 
   try {
-    const { searchParams } = new URL(req.url);
-    const hostUserId = searchParams.get('hostUserId');
-
-    if (!hostUserId) {
-      return NextResponse.json({ error: 'Host user ID required' }, { status: 400 });
+    // Get authenticated user from middleware
+    const authenticatedUserId = req.headers.get('x-user-id');
+    
+    if (!authenticatedUserId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const supabase = getSupabaseServiceClient();
@@ -147,8 +161,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Game not found' }, { status: 404 });
     }
 
-    if (existingGame.host_user_id !== hostUserId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    if (existingGame.host_user_id !== authenticatedUserId) {
+      return NextResponse.json({ error: 'Unauthorized - only the host can delete the game' }, { status: 403 });
     }
 
     // Delete the game (participants will be deleted via cascade)
@@ -158,13 +172,17 @@ export async function DELETE(
       .eq('id', id);
 
     if (error) {
-      console.error('Error deleting game:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error deleting game:', error);
+      }
       return NextResponse.json({ error: 'Failed to delete game' }, { status: 500 });
     }
 
     return NextResponse.json({ message: 'Game deleted successfully' });
   } catch (error) {
-    console.error('Error in DELETE /api/games/[id]:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error in DELETE /api/games/[id]:', error);
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,29 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
 
 export default function SignInPage() {
-  const supabase = getSupabaseBrowserClient();
   const router = useRouter();
+  const { signIn, user } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!supabase) {
-      setErrorMsg("Supabase client not initialized.");
-      return;
-    }
 
     setLoading(true);
     setErrorMsg("");
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await signIn(email, password);
 
     setLoading(false);
 
@@ -76,10 +80,10 @@ export default function SignInPage() {
             {loading ? "Signing in..." : "Sign In"}
           </button>
           <p className="mt-4 text-sm text-center text-[#b8c5d6]">
-            Don't have an account? {" "}
-            <a href="/sign-up" className="text-[#00d9ff] hover:underline">
+            Don&apos;t have an account? {" "}
+            <Link href="/sign-up" className="text-[#00d9ff] hover:underline">
               Create one
-            </a>
+            </Link>
           </p>
         </form>
       </div>

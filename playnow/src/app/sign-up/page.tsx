@@ -1,37 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
 
 export default function SignUpPage() {
-  const supabase = getSupabaseBrowserClient();
   const router = useRouter();
+  const { signUp, user } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!supabase) {
-      setErrorMsg("Supabase client not initialized.");
+
+    // Basic password validation
+    if (password.length < 6) {
+      setErrorMsg("Password must be at least 6 characters long");
       return;
     }
 
     setLoading(true);
     setErrorMsg("");
+    setSuccessMsg("");
 
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await signUp(email, password);
 
     setLoading(false);
 
     if (error) {
       setErrorMsg(error.message);
     } else {
-      // Supabase may require email confirmation; still redirect
-      router.push("/");
+      // Show success message
+      setSuccessMsg("Account created successfully! Check your email for confirmation.");
+      // Redirect after a short delay
+      setTimeout(() => router.push("/"), 2000);
     }
   };
 
@@ -67,6 +81,7 @@ export default function SignUpPage() {
             />
           </div>
           {errorMsg && <p className="text-sm text-red-500">{errorMsg}</p>}
+          {successMsg && <p className="text-sm text-green-500">{successMsg}</p>}
           <button
             type="submit"
             disabled={loading}
@@ -77,9 +92,9 @@ export default function SignUpPage() {
         </form>
         <p className="mt-4 text-sm text-center text-[#b8c5d6]">
           Already have an account? {" "}
-          <a href="/sign-in" className="text-[#00d9ff] hover:underline">
+          <Link href="/sign-in" className="text-[#00d9ff] hover:underline">
             Sign in
-          </a>
+          </Link>
         </p>
       </div>
     </div>

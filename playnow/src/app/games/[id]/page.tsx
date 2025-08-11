@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Calendar, MapPin, Users, Clock, DollarSign, Star, ArrowLeft, Edit, UserMinus, UserPlus, AlertTriangle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/lib/api-client";
 
 // Mock data for a specific game (this would come from API in production)
 const mockGameData = {
@@ -65,13 +67,17 @@ const mockGameData = {
 
 export default function GameDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const { user } = useAuth();
   const [gameData, setGameData] = useState(mockGameData);
-  const [currentUserId] = useState("user2"); // Mock current user
+  const currentUserId = user?.id || null;
   const [isJoined, setIsJoined] = useState(
-    gameData.participants.some(p => p.userId === "user2") || 
-    gameData.waitlist.some(p => p.userId === "user2")
+    currentUserId ? (
+      gameData.participants.some(p => p.userId === currentUserId) || 
+      gameData.waitlist.some(p => p.userId === currentUserId)
+    ) : false
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const isHost = gameData.hostUserId === currentUserId;
   const currentParticipant = [...gameData.participants, ...gameData.waitlist]
@@ -83,17 +89,23 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
     const fetchGameData = async () => {
       try {
         const gameId = (await params).id;
-        const response = await fetch(`/api/games/${gameId}`);
+        const { data, error } = await api.games.get(gameId);
         
-        if (response.ok) {
-          const data = await response.json();
+        if (error) {
+          setError(error);
+          return;
+        }
+        
+        if (data?.game) {
           // Transform API data to match our component structure
           // In production, you'd map the actual API response
-          console.log('Fetched game data:', data);
           // setGameData(transformedData);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Fetched game data:', data.game);
+          }
         }
       } catch (error) {
-        console.error('Error fetching game data:', error);
+        setError('Failed to load game details');
       }
     };
 
@@ -101,28 +113,34 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
   }, [params]);
 
   const handleJoinGame = async () => {
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+    
     setIsLoading(true);
+    setError(null);
+    
     try {
       const gameId = (await params).id;
-      const response = await fetch(`/api/games/${gameId}/join`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: currentUserId }),
-      });
+      const { data, error } = await api.games.join(gameId);
 
-      if (response.ok) {
-        const data = await response.json();
+      if (error) {
+        setError(error);
+        setIsLoading(false);
+        return;
+      }
+      
+      if (data) {
         setIsJoined(true);
         
         // Update local game data to reflect the join
-        if (data.participant.status === 'joined') {
+        if (data.participant?.status === 'joined') {
           setGameData(prev => ({
             ...prev,
             participants: [...prev.participants, {
               id: data.participant.id,
-              userId: currentUserId,
+              userId: currentUserId || '',
               name: "You", // In production, would fetch user name
               status: 'joined' as const,
               joinedAt: new Date().toISOString()
@@ -133,54 +151,50 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
             ...prev,
             waitlist: [...prev.waitlist, {
               id: data.participant.id,
-              userId: currentUserId,
+              userId: currentUserId || '',
               name: "You", // In production, would fetch user name
               status: 'waitlist' as const,
               joinedAt: new Date().toISOString()
             }]
           }));
         }
-      } else {
-        const error = await response.json();
-        console.error('Failed to join game:', error.error);
-        // In production, show error toast
       }
     } catch (error) {
-      console.error('Error joining game:', error);
-      // In production, show error toast
+      setError('Failed to join game. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleLeaveGame = async () => {
+    if (!user) return;
+    
     setIsLoading(true);
+    setError(null);
+    
     try {
       const gameId = (await params).id;
-      const response = await fetch(`/api/games/${gameId}/join?userId=${currentUserId}`, {
-        method: 'DELETE',
-      });
+      const { error } = await api.games.leave(gameId);
 
-      if (response.ok) {
-        setIsJoined(false);
-        
-        // Update local game data to remove the user
-        setGameData(prev => ({
-          ...prev,
-          participants: prev.participants.filter(p => p.userId !== currentUserId),
-          waitlist: prev.waitlist.filter(p => p.userId !== currentUserId)
-        }));
-        
-        // Optionally refresh the page to get latest data
-        router.refresh();
-      } else {
-        const error = await response.json();
-        console.error('Failed to leave game:', error.error);
-        // In production, show error toast
+      if (error) {
+        setError(error);
+        setIsLoading(false);
+        return;
       }
+      
+      setIsJoined(false);
+        
+      // Update local game data to remove the user
+      setGameData(prev => ({
+        ...prev,
+        participants: prev.participants.filter(p => p.userId !== currentUserId),
+        waitlist: prev.waitlist.filter(p => p.userId !== currentUserId)
+      }));
+      
+      // Optionally refresh the page to get latest data
+      router.refresh();
     } catch (error) {
-      console.error('Error leaving game:', error);
-      // In production, show error toast
+      setError('Failed to leave game. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -197,6 +211,13 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
           <ArrowLeft className="h-5 w-5" />
           Back to My Bookings
         </Link>
+
+        {/* Error display */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+            <p className="text-red-500 text-sm">{error}</p>
+          </div>
+        )}
 
         {/* Game Header */}
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 mb-6">

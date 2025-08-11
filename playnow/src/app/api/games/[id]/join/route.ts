@@ -9,12 +9,14 @@ export async function POST(
   const { id: gameId } = await params;
 
   try {
-    const body = await req.json();
-    const { userId } = body;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 400 });
+    // Get authenticated user from middleware
+    const authenticatedUserId = req.headers.get('x-user-id');
+    
+    if (!authenticatedUserId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
+    
+    const userId = authenticatedUserId;
 
     const supabase = getSupabaseServiceClient();
     if (!supabase) {
@@ -51,7 +53,7 @@ export async function POST(
     }
 
     // Count current participants with 'joined' status
-    const joinedParticipants = game.participants.filter(p => p.status === 'joined').length;
+    const joinedParticipants = game.participants.filter((p: any) => p.status === 'joined').length;
     const status = joinedParticipants < game.max_players ? 'joined' : 'waitlist';
 
     // Add the participant
@@ -66,7 +68,9 @@ export async function POST(
       .single();
 
     if (error) {
-      console.error('Error joining game:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error joining game:', error);
+      }
       return NextResponse.json({ error: 'Failed to join game' }, { status: 500 });
     }
 
@@ -75,7 +79,9 @@ export async function POST(
       message: status === 'joined' ? 'Successfully joined game!' : 'Added to waitlist'
     }, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/games/[id]/join:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error in POST /api/games/[id]/join:', error);
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -88,12 +94,14 @@ export async function DELETE(
   const { id: gameId } = await params;
 
   try {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId');
-
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 400 });
+    // Get authenticated user from middleware
+    const authenticatedUserId = req.headers.get('x-user-id');
+    
+    if (!authenticatedUserId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
+    
+    const userId = authenticatedUserId;
 
     const supabase = getSupabaseServiceClient();
     if (!supabase) {
@@ -108,7 +116,9 @@ export async function DELETE(
       .eq('user_id', userId);
 
     if (error) {
-      console.error('Error leaving game:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error leaving game:', error);
+      }
       return NextResponse.json({ error: 'Failed to leave game' }, { status: 500 });
     }
 
@@ -119,7 +129,9 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Successfully left the game' });
   } catch (error) {
-    console.error('Error in DELETE /api/games/[id]/join:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error in DELETE /api/games/[id]/join:', error);
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

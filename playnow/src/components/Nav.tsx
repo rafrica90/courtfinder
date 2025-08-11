@@ -2,41 +2,16 @@
 
 import Link from "next/link";
 import { Menu, User, Calendar, MapPin, LogOut } from "lucide-react";
-import { useState, useEffect } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Nav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const supabase = getSupabaseBrowserClient();
-  const router = useRouter();
-
-  // Fetch user and subscribe to auth changes
-  useEffect(() => {
-    if (!supabase) return;
-
-    // Get current user
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data?.user ?? null);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase]);
+  const { user, signOut } = useAuth();
 
   const handleSignOut = async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
-    router.refresh();
+    await signOut();
+    setMobileMenuOpen(false);
   };
 
   return (

@@ -114,7 +114,7 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
               <p className="text-[#b8c5d6] leading-relaxed">
                 Welcome to {venue.name}, one of the premier sports facilities in {venue.city}. 
                 Our venue offers top-quality courts with professional-grade surfaces, perfect for players 
-                of all skill levels. Whether you're looking for a casual game or serious training, 
+                of all skill levels. Whether you&apos;re looking for a casual game or serious training, 
                 we have everything you need for an excellent playing experience.
               </p>
             </div>
@@ -123,7 +123,7 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
               <h2 className="text-xl font-semibold mb-4 text-white">Amenities</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {venue.amenities.map((amenity, i) => (
+                {venue.amenities.map((amenity: string, i: number) => (
                   <div key={i} className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-[#00ff88] rounded-full" />
                     <span className="text-[#b8c5d6]">{amenity}</span>

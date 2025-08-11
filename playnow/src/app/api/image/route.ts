@@ -2,6 +2,29 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+// Domain allowlist for image proxying to prevent SSRF attacks
+function isAllowedImageDomain(hostname: string): boolean {
+  const allowedDomains = process.env.ALLOWED_IMAGE_DOMAINS?.split(',') || [
+    // Common CDN and image hosting services
+    'images.unsplash.com',
+    'cdn.pixabay.com',
+    'i.imgur.com',
+    'res.cloudinary.com',
+    'storage.googleapis.com',
+    '*.supabase.co',
+    '*.supabase.in',
+    // Add your specific allowed domains here
+  ];
+
+  return allowedDomains.some(domain => {
+    if (domain.startsWith('*.')) {
+      const baseDomain = domain.slice(2);
+      return hostname === baseDomain || hostname.endsWith(`.${baseDomain}`);
+    }
+    return hostname === domain;
+  });
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -17,6 +40,11 @@ export async function GET(request: Request) {
     }
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       return NextResponse.json({ error: "Unsupported protocol" }, { status: 400 });
+    }
+
+    // Check if the domain is allowed
+    if (!isAllowedImageDomain(parsed.hostname)) {
+      return NextResponse.json({ error: "Domain not allowed" }, { status: 403 });
     }
 
     const upstream = await fetch(parsed.toString(), {

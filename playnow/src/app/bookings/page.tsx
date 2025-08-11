@@ -140,7 +140,7 @@ export default function BookingsPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">My Bookings</h1>
-          <p className="text-[#b8c5d6]">Manage your hosted games and view games you've joined</p>
+          <p className="text-[#b8c5d6]">Manage your hosted games and view games you&apos;ve joined</p>
         </div>
 
         {/* Success Message */}
@@ -166,7 +166,7 @@ export default function BookingsPage() {
                 : 'text-[#b8c5d6] hover:text-white hover:bg-white/10'
             }`}
           >
-            Games I'm Hosting ({userGames.hosted.length})
+            Games I&apos;m Hosting ({userGames.hosted.length})
           </button>
           <button
             onClick={() => setActiveTab('joined')}
@@ -176,7 +176,7 @@ export default function BookingsPage() {
                 : 'text-[#b8c5d6] hover:text-white hover:bg-white/10'
             }`}
           >
-            Games I've Joined ({userGames.joined.length})
+            Games I&apos;ve Joined ({userGames.joined.length})
           </button>
         </div>
 

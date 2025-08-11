@@ -13,7 +13,14 @@ function isAllowedImageDomain(hostname: string): boolean {
     'storage.googleapis.com',
     '*.supabase.co',
     '*.supabase.in',
-    // Add your specific allowed domains here
+    // Australian venue image domains
+    'www.cityofsydney.nsw.gov.au',
+    'www.innerwest.nsw.gov.au',
+    'www.cbcity.nsw.gov.au',
+    'www.thehills.nsw.gov.au',
+    'www.footballnsw.com.au',
+    'www.wakehursttennis.com.au',
+    'www.whitecitytennis.com.au',
   ];
 
   return allowedDomains.some(domain => {

@@ -83,6 +83,28 @@ function AccountPageInner() {
     })();
   }, [user, supabase, userEmail]);
 
+  // Prefill from pending profile captured at signup
+  useEffect(() => {
+    if (!initialLoading) {
+      try {
+        const raw = localStorage.getItem('pendingProfile');
+        if (raw) {
+          const p = JSON.parse(raw || '{}');
+          if (p) {
+            setDisplayName((v) => v || p.displayName || '');
+            setPhone((v) => v || p.phone || '');
+            setCountryCode((v) => v || (p.countryCode || '').toUpperCase());
+            setLocation((v) => v || p.location || '');
+            setCity((v) => v || p.city || '');
+            setState((v) => v || p.state || '');
+            setSuburb((v) => v || p.suburb || '');
+          }
+          localStorage.removeItem('pendingProfile');
+        }
+      } catch {}
+    }
+  }, [initialLoading]);
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!user || !supabase) return;
@@ -388,7 +410,16 @@ function AccountPageInner() {
         </section>
 
         <section className="space-y-4">
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                try { (async () => { await (getSupabaseBrowserClient()?.auth.signOut()); })(); } catch {}
+              }}
+              className="px-4 py-2 rounded-lg border border-white/10 text-[#b8c5d6] hover:bg-white/10"
+            >
+              Sign out
+            </button>
             <button
               type="submit"
               disabled={saving}

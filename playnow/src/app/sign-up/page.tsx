@@ -11,6 +11,10 @@ export default function SignUpPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("AU");
+  const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -30,10 +34,23 @@ export default function SignUpPage() {
       setErrorMsg("Password must be at least 6 characters long");
       return;
     }
+    if (!displayName.trim()) { setErrorMsg("Name is required"); return; }
+    if (!phone.trim()) { setErrorMsg("Mobile is required"); return; }
+    if (!location.trim()) { setErrorMsg("Location is required"); return; }
 
     setLoading(true);
     setErrorMsg("");
     setSuccessMsg("");
+
+    // Stash profile so `/account` can prefill after email confirmation
+    try {
+      localStorage.setItem('pendingProfile', JSON.stringify({
+        displayName,
+        phone,
+        countryCode,
+        location,
+      }));
+    } catch {}
 
     const { error } = await signUp(email, password);
 
@@ -54,6 +71,51 @@ export default function SignUpPage() {
       <div className="w-full max-w-md bg-[#0d1b31] p-8 rounded-lg shadow-lg border border-white/10">
         <h1 className="text-2xl font-bold text-white mb-6">Create Account</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm text-[#b8c5d6] mb-1">Name</label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+              className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-[#b8c5d6] mb-1">Mobile</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+              className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-[#b8c5d6] mb-1">Country</label>
+            <select
+              value={countryCode}
+              onChange={(e) => setCountryCode(e.target.value)}
+              className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
+            >
+              <option value="AU">Australia</option>
+              <option value="NZ">New Zealand</option>
+              <option value="US">United States</option>
+              <option value="GB">United Kingdom</option>
+              <option value="CA">Canada</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm text-[#b8c5d6] mb-1">Location</label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              required
+              className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
+              placeholder="Suburb, postcode or city"
+            />
+          </div>
           <div>
             <label htmlFor="email" className="block text-sm text-[#b8c5d6] mb-1">
               Email

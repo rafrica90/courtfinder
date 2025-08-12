@@ -242,12 +242,12 @@ function AccountPageInner() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">Postcode</label>
+              <label className="block text-sm text-[#b8c5d6] mb-1">Location</label>
               <input
                 type="text"
                 value={location}
                 onChange={async (e) => {
-                  const v = e.target.value.replace(/[^0-9]/g, '');
+                  const v = e.target.value;
                   setLocation(v);
                   if (v.trim().length < 3) {
                     setSuggestions([]);
@@ -255,13 +255,17 @@ function AccountPageInner() {
                     setSuggestLoading(false);
                     return;
                   }
+                  const isDigits = /^[0-9\s-]+$/.test(v.trim());
                   if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
                   debounceTimerRef.current = setTimeout(async () => {
                     try {
                       if (suggestAbortRef.current) suggestAbortRef.current.abort();
                       suggestAbortRef.current = new AbortController();
                       setSuggestLoading(true);
-                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(v)}`, { signal: suggestAbortRef.current.signal });
+                      const url = isDigits
+                        ? `/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(v)}`
+                        : `/api/geocode/suggest?country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(v)}`;
+                      const res = await fetch(url, { signal: suggestAbortRef.current.signal });
                       const json = await res.json();
                       if (json?.suggestions && json.suggestions.length > 0) {
                         setSuggestions(json.suggestions);
@@ -282,7 +286,11 @@ function AccountPageInner() {
                   if (location.trim().length >= 3) {
                     try {
                       setSuggestLoading(true);
-                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(location)}`);
+                      const isDigits = /^[0-9\s-]+$/.test(location.trim());
+                      const url = isDigits
+                        ? `/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(location)}`
+                        : `/api/geocode/suggest?country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(location)}`;
+                      const res = await fetch(url);
                       const json = await res.json();
                       if (json?.suggestions && json.suggestions.length > 0) {
                         setSuggestions(json.suggestions);
@@ -294,7 +302,7 @@ function AccountPageInner() {
                 }}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
-                placeholder="e.g., 2150"
+                placeholder="Suburb, postcode or city"
                 required
               />
               {showSuggestions && (
@@ -314,7 +322,8 @@ function AccountPageInner() {
                               const json = await res.json();
                               if (json.location) {
                                 const loc = json.location;
-                                setLocation(loc.postalCode || '');
+                                // Keep input showing the postal code if available, otherwise label
+                                setLocation(loc.postalCode || s.label || '');
                                 setCity(loc.city || '');
                                 setCountryCode(loc.countryCode ? loc.countryCode.substring(0,2): countryCode);
                                 setState(loc.state || '');
@@ -324,7 +333,7 @@ function AccountPageInner() {
                             }
                           } catch {}
                           // fallback
-                          setLocation(s.postalCode || '');
+                          setLocation(s.postalCode || s.label || '');
                           setCity(s.city || '');
                           setCountryCode(s.countryCode || countryCode);
                           setState(s.state || '');

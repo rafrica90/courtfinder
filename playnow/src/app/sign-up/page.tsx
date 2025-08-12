@@ -7,7 +7,17 @@ import Link from "next/link";
 
 type Suggestion = { id?: string; label: string; city: string; countryCode: string; suburb: string; state: string; postalCode?: string };
 
-const COUNTRY_TO_DIAL: Record<string, string> = { AU: "+61", NZ: "+64", US: "+1", GB: "+44", CA: "+1" };
+const COUNTRY_TO_DIAL: Record<string, string> = {
+  AU: "+61", NZ: "+64", US: "+1", GB: "+44", CA: "+1",
+  IE: "+353", DE: "+49", FR: "+33", ES: "+34", IT: "+39",
+  NL: "+31", SE: "+46", NO: "+47", DK: "+45", FI: "+358",
+  CH: "+41", AT: "+43", BE: "+32", PT: "+351", SG: "+65",
+  MY: "+60", ID: "+62", PH: "+63", TH: "+66", VN: "+84",
+  JP: "+81", KR: "+82", CN: "+86", HK: "+852",
+  IN: "+91", AE: "+971", SA: "+966", IL: "+972", TR: "+90",
+  BR: "+55", MX: "+52", AR: "+54", CL: "+56", CO: "+57", PE: "+51",
+  ZA: "+27"
+};
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -183,7 +193,7 @@ export default function SignUpPage() {
                               setCity(loc.city || "");
                               setStateValue(loc.state || "");
                               setSuburb(loc.suburb || "");
-                              setCountryCode((loc.countryCode || '').toUpperCase());
+                              setCountryCode(((loc.countryCode || countryCode) as string).toUpperCase());
                               return;
                             }
                           }
@@ -192,7 +202,7 @@ export default function SignUpPage() {
                         setCity(s.city || "");
                         setStateValue(s.state || "");
                         setSuburb(s.suburb || "");
-                        setCountryCode((s.countryCode || '').toUpperCase());
+                        setCountryCode(((s.countryCode || countryCode) as string).toUpperCase());
                       }}
                       className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"
                     >
@@ -212,7 +222,7 @@ export default function SignUpPage() {
           <div>
             <label className="block text-sm text-[#b8c5d6] mb-1">Mobile</label>
             <div className="flex">
-              <span className="inline-flex items-center px-3 rounded-l-md border border-white/10 bg-[#0a1628] text-white select-none">
+              <span className="inline-flex items-center px-3 rounded-l-md border border-white/10 bg-[#0a1628] text-white select-none min-w-[64px] justify-center">
                 {COUNTRY_TO_DIAL[countryCode] || "+"}
               </span>
               <input
@@ -234,7 +244,7 @@ export default function SignUpPage() {
           </div>
         );
       case 3:
-        return (
+  return (
           <div>
             <label className="block text-sm text-[#b8c5d6] mb-1">Email</label>
             <input

@@ -11,6 +11,7 @@ type EnvConfig = {
   NODE_ENV: 'development' | 'production' | 'test';
   ALLOWED_IMAGE_DOMAINS?: string;
   ALLOWED_REDIRECT_DOMAINS?: string;
+  HERE_API_KEY?: string; // server-side only
 };
 
 class EnvValidationError extends Error {
@@ -73,6 +74,11 @@ export function validateEnv(): EnvConfig {
     });
   }
 
+  // HERE API key is optional; warn in development if missing when related endpoints are used
+  if (process.env.NODE_ENV !== 'production' && !process.env.HERE_API_KEY) {
+    // no-op: optional feature; just a soft warning in dev logs
+  }
+
   if (errors.length > 0) {
     throw new EnvValidationError(
       `Environment validation failed:\n${errors.join('\n')}`
@@ -87,6 +93,7 @@ export function validateEnv(): EnvConfig {
     NODE_ENV: (process.env.NODE_ENV as EnvConfig['NODE_ENV']) || 'development',
     ALLOWED_IMAGE_DOMAINS: process.env.ALLOWED_IMAGE_DOMAINS,
     ALLOWED_REDIRECT_DOMAINS: process.env.ALLOWED_REDIRECT_DOMAINS,
+    HERE_API_KEY: process.env.HERE_API_KEY,
   };
 }
 

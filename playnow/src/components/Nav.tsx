@@ -2,13 +2,26 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, User, Calendar, LogOut } from "lucide-react";
+import { Menu, User, Calendar } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePathname } from "next/navigation";
+import AccountMenu from "@/components/AccountMenu";
 
 export default function Nav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const pathname = usePathname();
+
+  const baseLinkClass =
+    "transition-colors font-medium text-[#b8c5d6] hover:text-[#00d9ff]";
+
+  const activeLinkClass = "text-[#00d9ff]";
+
+  const isVenues = pathname.startsWith("/venues");
+  const isFindGames = pathname === "/games";
+  const isHostGame = pathname === "/games/new";
+  const isBookings = pathname === "/bookings";
 
   const handleSignOut = async () => {
     await signOut();
@@ -43,21 +56,24 @@ export default function Nav() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <Link 
-              href="/venues" 
-              className="text-[#b8c5d6] hover:text-[#00d9ff] transition-colors font-medium"
+            <Link
+              href="/venues"
+              className={`${baseLinkClass} ${isVenues ? activeLinkClass : ""}`}
+              aria-current={isVenues ? "page" : undefined}
             >
               Browse Venues
             </Link>
-            <Link 
-              href="/games" 
-              className="text-[#b8c5d6] hover:text-[#00d9ff] transition-colors font-medium"
+            <Link
+              href="/games"
+              className={`${baseLinkClass} ${isFindGames ? activeLinkClass : ""}`}
+              aria-current={isFindGames ? "page" : undefined}
             >
               Find Games
             </Link>
-            <Link 
-              href="/games/new" 
-              className="text-[#b8c5d6] hover:text-[#00d9ff] transition-colors font-medium"
+            <Link
+              href="/games/new"
+              className={`${baseLinkClass} ${isHostGame ? activeLinkClass : ""}`}
+              aria-current={isHostGame ? "page" : undefined}
             >
               Host a Game
             </Link>
@@ -65,22 +81,19 @@ export default function Nav() {
 
           {/* Right side actions */}
           <div className="flex items-center gap-4">
-            <Link 
+            <Link
               href="/bookings"
-              className="hidden md:flex items-center gap-2 px-4 py-2 border border-[#00d9ff]/30 rounded-lg hover:bg-[#00d9ff]/10 transition-colors text-[#00d9ff]"
+              className={`hidden md:flex items-center gap-2 px-4 py-2 border border-[#00d9ff]/30 rounded-lg hover:bg-[#00d9ff]/10 transition-colors ${
+                isBookings ? "bg-[#00d9ff]/10 text-[#00d9ff]" : "text-[#00d9ff]"
+              }`}
+              aria-current={isBookings ? "page" : undefined}
             >
               <Calendar className="h-4 w-4" />
               <span className="text-sm font-medium">My Bookings</span>
             </Link>
             
             {user ? (
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 px-4 py-2 bg-transparent border border-[#00ff88]/30 text-[#00ff88] rounded-lg hover:bg-[#00ff88]/10 transition-colors font-semibold"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="text-sm font-medium hidden sm:inline">Sign Out</span>
-              </button>
+              <AccountMenu />
             ) : (
               <Link
                 href="/sign-in"
@@ -106,31 +119,45 @@ export default function Nav() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-white/10 animate-slide-down bg-[#0a1628]/95 backdrop-blur-md">
           <div className="px-4 py-3 space-y-2">
-            <Link 
-              href="/venues" 
-              className="block py-2 text-[#b8c5d6] hover:text-[#00d9ff] transition-colors"
+            <Link
+              href="/venues"
+              className={`block py-2 ${
+                isVenues ? "text-[#00d9ff]" : "text-[#b8c5d6] hover:text-[#00d9ff]"
+              } transition-colors`}
               onClick={() => setMobileMenuOpen(false)}
+              aria-current={isVenues ? "page" : undefined}
             >
               Browse Venues
             </Link>
-            <Link 
-              href="/games" 
-              className="block py-2 text-[#b8c5d6] hover:text-[#00d9ff] transition-colors"
+            <Link
+              href="/games"
+              className={`block py-2 ${
+                isFindGames
+                  ? "text-[#00d9ff]"
+                  : "text-[#b8c5d6] hover:text-[#00d9ff]"
+              } transition-colors`}
               onClick={() => setMobileMenuOpen(false)}
+              aria-current={isFindGames ? "page" : undefined}
             >
               Find Games
             </Link>
-            <Link 
-              href="/games/new" 
-              className="block py-2 text-[#b8c5d6] hover:text-[#00d9ff] transition-colors"
+            <Link
+              href="/games/new"
+              className={`block py-2 ${
+                isHostGame ? "text-[#00d9ff]" : "text-[#b8c5d6] hover:text-[#00d9ff]"
+              } transition-colors`}
               onClick={() => setMobileMenuOpen(false)}
+              aria-current={isHostGame ? "page" : undefined}
             >
               Host a Game
             </Link>
-            <Link 
-              href="/bookings" 
-              className="block py-2 text-[#b8c5d6] hover:text-[#00d9ff] transition-colors"
+            <Link
+              href="/bookings"
+              className={`block py-2 ${
+                isBookings ? "text-[#00d9ff]" : "text-[#b8c5d6] hover:text-[#00d9ff]"
+              } transition-colors`}
               onClick={() => setMobileMenuOpen(false)}
+              aria-current={isBookings ? "page" : undefined}
             >
               My Bookings
             </Link>

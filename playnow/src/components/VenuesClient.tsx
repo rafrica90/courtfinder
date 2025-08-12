@@ -15,8 +15,6 @@ interface Venue {
   latitude?: number;
   longitude?: number;
   amenities: string[];
-  priceEstimate?: number;
-  priceEstimateText?: string;
   photos: string[];
   imageUrls: string[];
   bookingUrl: string;
@@ -43,17 +41,17 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     
     // Get filter states from URL (consistent with VenueFilters.tsx)
     const params = new URLSearchParams(window.location.search);
-    const urlPriceRanges = params.get('priceRanges')?.split(',') || [];
     const urlVenueTypes = params.get('venueTypes')?.split(',') || [];
-    const urlAmenities = params.get('amenities')?.split(',') || [];
 
     let currentFilteredVenues = initialVenues;
 
-    // Apply sport filter
+    // Apply sport filter (be resilient to null/undefined/non-array sports)
     if (sport) {
-      currentFilteredVenues = currentFilteredVenues.filter(venue => 
-        venue.sports?.map(s => s.toLowerCase()).includes(sport.toLowerCase())
-      );
+      currentFilteredVenues = currentFilteredVenues.filter((venue) => {
+        const sportsArray = Array.isArray(venue.sports) ? venue.sports : [];
+        const normalized = sportsArray.map((s) => String(s).toLowerCase());
+        return normalized.includes(sport.toLowerCase());
+      });
     }
 
     // Apply search query filter
@@ -69,9 +67,7 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
 
     // Apply other filters from URL
     const activeFilters: FilterState = {
-      priceRanges: urlPriceRanges,
-      venueTypes: urlVenueTypes,
-      amenities: urlAmenities
+      venueTypes: urlVenueTypes
     };
 
     const newlyFiltered = applyFilters(currentFilteredVenues, activeFilters);
@@ -80,46 +76,12 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     setVenues(newlyFiltered);
   }, [searchedVenueName, sport, initialVenues]);
 
-  const extractPriceFromText = (text?: string): number => {
-    if (!text) return 0;
-    // Extract first number from price text like "$30/hr" or "$25-35/hr"
-    const match = text.match(/\$?(\d+(?:\.\d+)?)/);
-    return match ? parseFloat(match[1]) : 0;
-  };
+  // Removed price parsing utilities
 
-  const matchesAmenity = (venueAmenities: string[], filterAmenity: string): boolean => {
-    const amenityMap: { [key: string]: string[] } = {
-      'parking': ['parking', 'car park', 'free parking'],
-      'locker-room': ['locker room', 'lockers', 'changerooms', 'changing rooms'],
-      'lights': ['lights', 'lighting', 'floodlights', 'led', 'lit'],
-      'pro-shop': ['pro shop', 'shop', 'retail', 'equipment'],
-      'cafe': ['cafe', 'restaurant', 'food', 'bar', 'dining'],
-      'changerooms': ['changerooms', 'changing rooms', 'locker room', 'facilities']
-    };
-
-    const searchTerms = amenityMap[filterAmenity] || [filterAmenity];
-    const amenitiesText = venueAmenities.join(' ').toLowerCase();
-    
-    return searchTerms.some(term => amenitiesText.includes(term.toLowerCase()));
-  };
+  
 
   const applyFilters = (venues: Venue[], filters: FilterState): Venue[] => {
     return venues.filter(venue => {
-      // Price range filter
-      if (filters.priceRanges.length > 0) {
-        const price = venue.priceEstimate || extractPriceFromText(venue.priceEstimateText);
-        const matchesPriceRange = filters.priceRanges.some(range => {
-          switch (range) {
-            case 'under-25': return price < 25;
-            case '25-50': return price >= 25 && price <= 50;
-            case '50-100': return price >= 50 && price <= 100;
-            case 'over-100': return price > 100;
-            default: return true;
-          }
-        });
-        if (!matchesPriceRange) return false;
-      }
-
       // Venue type filter
       if (filters.venueTypes.length > 0) {
         const matchesVenueType = filters.venueTypes.some(type => {
@@ -129,13 +91,7 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
         if (!matchesVenueType) return false;
       }
 
-      // Amenities filter
-      if (filters.amenities.length > 0) {
-        const matchesAmenities = filters.amenities.every(amenity => 
-          matchesAmenity(venue.amenities, amenity)
-        );
-        if (!matchesAmenities) return false;
-      }
+      
 
       return true;
     });

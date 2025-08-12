@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { sports as availableSports } from "@/lib/mockData";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { MapPin, Calendar, Users, Globe, FileText, DollarSign } from "lucide-react";
@@ -107,6 +108,7 @@ export default function NewGameClient() {
       });
       
       if (error) {
+        console.error('Game creation error:', error);
         setError(error);
         setSubmitting(false);
         return;
@@ -118,7 +120,8 @@ export default function NewGameClient() {
         router.push(`/games?created=1`);
       }
     } catch (err) {
-      setError('Failed to create game. Please try again.');
+      console.error('Unexpected error creating game:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create game. Please try again.');
       setSubmitting(false);
     }
   };
@@ -153,7 +156,7 @@ export default function NewGameClient() {
   const selectedVenue = allVenues.find((v: any) => v.id === venueId);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c] py-8">
+    <div className="min-h-screen py-8">
       <div className="max-w-3xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
@@ -222,9 +225,6 @@ export default function NewGameClient() {
                   <div className="text-sm">
                     <p className="font-medium text-white">{selectedVenue.name}</p>
                     <p className="text-[#b8c5d6]">{selectedVenue.address}, {selectedVenue.city}</p>
-                    <p className="text-[#00ff88] font-medium mt-1">
-                      Estimated: ${selectedVenue.priceEstimate}/hour
-                    </p>
                   </div>
                 </div>
               )}
@@ -368,7 +368,13 @@ export default function NewGameClient() {
           {/* Error display */}
           {error && (
             <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-              <p className="text-red-500 text-sm">{error}</p>
+              <p className="text-red-500 text-sm font-medium mb-2">Failed to create game</p>
+              <p className="text-red-400 text-sm">{error}</p>
+              {error.includes('Authentication') && (
+                <p className="text-red-400 text-sm mt-2">
+                  Please <Link href="/sign-in" className="underline hover:text-red-300">sign in</Link> and try again.
+                </p>
+              )}
             </div>
           )}
 

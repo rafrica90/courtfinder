@@ -18,7 +18,8 @@ export type SportKey =
 const stockImagesBySport: Record<SportKey, string[]> = {
   // Single canonical image for each of these sports
   tennis: [
-    "https://images.unsplash.com/photo-1622279457486-62dbd3a24f50?w=800&q=80",
+    // Tennis image (Unsplash CDN)
+    "https://images.unsplash.com/photo-1595435742656-5272d0b3fa82?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHRlbm5pc3xlbnwwfHwwfHx8Mg%3D%3D",
   ],
   soccer: [
     "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&q=80",
@@ -30,7 +31,8 @@ const stockImagesBySport: Record<SportKey, string[]> = {
     "https://images.unsplash.com/photo-1519861531473-9200262188bf?w=800&q=80",
   ],
   pickleball: [
-    "https://images.unsplash.com/photo-1613153739112-2f6b2e6bdd59?w=800&q=80",
+    // Pickleball court overhead (Unsplash CDN)
+    "https://images.unsplash.com/photo-1693142517898-2f986215e412?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8cGlja2xlYmFsbHxlbnwwfHwwfHx8MA%3D%3D",
   ],
   swimming: [
     "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800&q=80",

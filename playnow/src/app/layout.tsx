@@ -27,11 +27,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c]`}
       >
         <AuthProvider>
           <Nav />
-          {children}
+          <main className="flex-grow">{children}</main>
+          <footer className="border-t border-white/10 bg-[#0a1628]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 text-center text-sm text-[#b8c5d6]">
+              Run by <span className="font-semibold text-white">BitNifty</span> · 2025
+            </div>
+          </footer>
         </AuthProvider>
       </body>
     </html>

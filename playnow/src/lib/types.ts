@@ -14,8 +14,6 @@ export type Venue = {
   latitude: number;
   longitude: number;
   amenities: string[];
-  priceEstimate?: number;
-  priceEstimateText?: string;
   photos: string[];
   imageUrls?: string[];
   bookingUrl: string;
@@ -50,6 +48,10 @@ export type Profile = {
   displayName: string;
   sportsPreferences: string[]; // sport slugs
   skillLevel?: "beginner" | "intermediate" | "advanced" | "pro";
+  phone?: string;
+  location?: string;
+  city?: string;
+  countryCode?: string; // ISO-3166-1 alpha-2
 };
 
 export type Click = {

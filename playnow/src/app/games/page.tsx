@@ -1,75 +1,7 @@
 import Link from "next/link";
-import { Calendar, MapPin, Users, Clock, DollarSign, Filter } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, Filter } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
-
-// Mock data for games
-const mockGames = [
-  {
-    id: "g1",
-    sport: "Tennis",
-    venue: "Central Park Tennis Center",
-    address: "123 Park Ave, New York",
-    date: "Today",
-    time: "6:00 PM",
-    duration: "2 hours",
-    playersJoined: 3,
-    maxPlayers: 4,
-    costPerPlayer: 15,
-    hostName: "Alex Johnson",
-    hostRating: 4.8,
-    level: "Intermediate",
-    visibility: "public" as const,
-  },
-  {
-    id: "g2",
-    sport: "Pickleball",
-    venue: "Brooklyn Pickleball Club",
-    address: "456 Court St, New York",
-    date: "Tomorrow",
-    time: "10:00 AM",
-    duration: "1.5 hours",
-    playersJoined: 2,
-    maxPlayers: 6,
-    costPerPlayer: 10,
-    hostName: "Sarah Chen",
-    hostRating: 4.9,
-    level: "All Levels",
-    visibility: "public" as const,
-  },
-  {
-    id: "g3",
-    sport: "Soccer",
-    venue: "Mission Soccer Fields",
-    address: "789 Valencia St, San Francisco",
-    date: "Sunday",
-    time: "3:00 PM",
-    duration: "2 hours",
-    playersJoined: 8,
-    maxPlayers: 14,
-    costPerPlayer: 20,
-    hostName: "Mike Rodriguez",
-    hostRating: 4.7,
-    level: "Advanced",
-    visibility: "public" as const,
-  },
-  {
-    id: "g4",
-    sport: "Tennis",
-    venue: "Riverside Courts",
-    address: "321 River Rd, New York",
-    date: "Saturday",
-    time: "8:00 AM",
-    duration: "1 hour",
-    playersJoined: 1,
-    maxPlayers: 2,
-    costPerPlayer: 25,
-    hostName: "Emma Wilson",
-    hostRating: 5.0,
-    level: "Beginner",
-    visibility: "public" as const,
-  },
-];
 
 export default async function GamesPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[]>> }) {
   const sp = searchParams ? await searchParams : undefined;
@@ -77,7 +9,40 @@ export default async function GamesPage({ searchParams }: { searchParams?: Promi
   
   // Try to fetch games from Supabase
   const supabase = getSupabaseServiceClient();
-  let games = mockGames; // Default to mock data
+  type GameListItem = {
+    id: string;
+    sport: string;
+    venue: string;
+    address: string;
+    date: string;
+    time: string;
+    duration: string;
+    playersJoined: number;
+    maxPlayers: number;
+    costPerPlayer: number;
+    hostName: string;
+    hostRating: number;
+    level: string;
+    visibility: string;
+  };
+
+  // Result items coming back from Supabase query
+  type RawGame = {
+    id: string;
+    sport?: string | null;
+    venues?: { id: string; name?: string | null; address?: string | null; city?: string | null } | null;
+    date: string;
+    time: string;
+    duration?: number | null;
+    participants?: { id: string; user_id: string; status?: string | null }[] | null;
+    max_players: number;
+    cost_per_player: number;
+    host_name?: string | null;
+    skill_level?: string | null;
+    visibility?: string | null;
+  };
+
+  let games: GameListItem[] = [];
   
   if (supabase) {
     try {
@@ -103,29 +68,30 @@ export default async function GamesPage({ searchParams }: { searchParams?: Promi
       
       if (data && !error && data.length > 0) {
         // Transform Supabase data to match our UI format
-        games = data.map((game: any) => ({
+        const rows: RawGame[] = (data ?? []) as unknown as RawGame[];
+        games = rows.map((game) => ({
           id: game.id,
-          sport: game.sport || 'Tennis',
-          venue: game.venues?.name || 'Unknown Venue',
-          address: game.venues ? `${game.venues.address}, ${game.venues.city}` : 'Unknown Location',
+          sport: game.sport ?? 'Tennis',
+          venue: game.venues?.name ?? 'Unknown Venue',
+          address: game.venues ? `${game.venues.address ?? ''}, ${game.venues.city ?? ''}` : 'Unknown Location',
           date: new Date(game.date).toLocaleDateString('en-US', { 
             weekday: 'long',
             month: 'short',
             day: 'numeric'
           }),
           time: game.time,
-          duration: `${game.duration || 2} hours`,
-          playersJoined: game.participants?.filter((p: any) => p.status === 'joined').length || 0,
+          duration: `${game.duration ?? 2} hours`,
+          playersJoined: (game.participants ?? []).filter((p) => p.status === 'joined').length || 0,
           maxPlayers: game.max_players,
           costPerPlayer: game.cost_per_player,
-          hostName: game.host_name || 'Anonymous',
+          hostName: game.host_name ?? 'Anonymous',
           hostRating: 4.5, // Would need to fetch from profiles
-          level: game.skill_level || 'All Levels',
-          visibility: game.visibility || 'public',
+          level: game.skill_level ?? 'All Levels',
+          visibility: game.visibility ?? 'public',
         }));
       }
     } catch (error) {
-      // If there's an error, just use mock data
+      // Keep empty list on error in production; optionally log in dev
       if (process.env.NODE_ENV === 'development') {
         console.error('Error fetching games:', error);
       }
@@ -133,7 +99,7 @@ export default async function GamesPage({ searchParams }: { searchParams?: Promi
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c]">
+    <div className="min-h-screen">
       {/* Search Header */}
       <div className="bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10 sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

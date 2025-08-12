@@ -89,10 +89,18 @@ export async function POST(req: NextRequest) {
     const authenticatedUserId = req.headers.get('x-user-id');
     
     if (!authenticatedUserId) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+      if (process.env.NODE_ENV === 'development') {
+        console.error('No authenticated user ID in request headers');
+      }
+      return NextResponse.json({ error: 'Authentication required. Please sign in to create a game.' }, { status: 401 });
     }
     
     const body = await req.json();
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Creating game with user ID:', authenticatedUserId);
+      console.log('Request body:', body);
+    }
     const {
       venueId,
       startTime,
@@ -121,17 +129,82 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
+    // Parse the start time to get date and time separately
+    let dateStr, timeStr;
+    try {
+      const startDateTime = new Date(startTime);
+      if (isNaN(startDateTime.getTime())) {
+        throw new Error('Invalid date/time format');
+      }
+      dateStr = startDateTime.toISOString().split('T')[0]; // YYYY-MM-DD
+      
+      // Format time properly for PostgreSQL time column
+      const hours = startDateTime.getHours().toString().padStart(2, '0');
+      const minutes = startDateTime.getMinutes().toString().padStart(2, '0');
+      const seconds = startDateTime.getSeconds().toString().padStart(2, '0');
+      timeStr = `${hours}:${minutes}:${seconds}`; // HH:MM:SS
+    } catch (dateError) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error parsing date/time:', dateError, 'Input was:', startTime);
+      }
+      return NextResponse.json({ error: 'Invalid date/time format. Please select a valid date and time.' }, { status: 400 });
+    }
+    
+    // Parse cost from cost instructions if provided
+    let costPerPlayer = 0;
+    if (costInstructions) {
+      const match = costInstructions.match(/\$(\d+)/);
+      if (match) {
+        costPerPlayer = parseInt(match[1]);
+      }
+    }
+
+    // Get venue details to extract sport (with error handling)
+    let sport = 'Tennis'; // Default sport
+    let venueName = '';
+    
+    try {
+      const { data: venue } = await supabase
+        .from('venues')
+        .select('sports, name')
+        .eq('id', venueId)
+        .single();
+      
+      if (venue) {
+        // Get the first sport from the venue or use default
+        sport = venue.sports?.[0] || 'Tennis';
+        venueName = venue.name || '';
+      }
+    } catch (venueError) {
+      // If venue lookup fails, continue with defaults
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Could not fetch venue details:', venueError);
+      }
+    }
+    
+    // Get user's email for host name (could also use a profile display name if available)
+    const userEmail = req.headers.get('x-user-email');
+    const hostName = userEmail ? userEmail.split('@')[0] : 'Anonymous Host';
+
     const { data: game, error } = await supabase
       .from('games')
       .insert({
         venue_id: venueId,
         host_user_id: hostUserId,
         start_time: startTime,
+        date: dateStr,
+        time: timeStr,
         min_players: minPlayers,
         max_players: maxPlayers,
         visibility,
         notes,
-        cost_instructions: costInstructions
+        cost_instructions: costInstructions,
+        cost_per_player: costPerPlayer,
+        duration: 2, // Default 2 hours
+        skill_level: 'All Levels', // Default skill level
+        status: 'active',
+        sport: sport,
+        host_name: hostName
       })
       .select()
       .single();
@@ -139,8 +212,40 @@ export async function POST(req: NextRequest) {
     if (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('Error creating game:', error);
+        console.error('Game data attempted:', {
+          venue_id: venueId,
+          host_user_id: hostUserId,
+          start_time: startTime,
+          date: dateStr,
+          time: timeStr,
+          sport,
+          host_name: hostName
+        });
       }
-      return NextResponse.json({ error: 'Failed to create game' }, { status: 500 });
+      
+      // Return more specific error message
+      let errorMessage = 'Failed to create game';
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      return NextResponse.json({ error: errorMessage }, { status: 500 });
+    }
+
+    // Automatically add the host as a participant
+    if (game && game.id) {
+      const { error: participantError } = await supabase
+        .from('participants')
+        .insert({
+          game_id: game.id,
+          user_id: hostUserId,
+          status: 'joined'
+        });
+      
+      if (participantError && process.env.NODE_ENV === 'development') {
+        console.warn('Could not add host as participant:', participantError);
+        // Don't fail the whole request, the game was still created
+      }
     }
 
     return NextResponse.json({ game }, { status: 201 });

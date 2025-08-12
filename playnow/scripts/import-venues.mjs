@@ -136,9 +136,6 @@ function normalizeVenue(raw) {
   const amenities = typeof raw.amenities === 'string'
     ? raw.amenities.split(',').map(s => s.trim()).filter(Boolean)
     : Array.isArray(raw.amenities) ? raw.amenities : [];
-  const priceText = raw.price_estimate ? String(raw.price_estimate) : null;
-  const priceNumMatch = priceText ? priceText.replace(/[,]/g, '').match(/\$?(\d+(?:\.\d+)?)/) : null;
-  const priceEstimate = priceNumMatch ? Number(priceNumMatch[1]) : null;
   const notes = raw.notes ? String(raw.notes) : null;
   return {
     name,
@@ -149,8 +146,6 @@ function normalizeVenue(raw) {
     booking_url: bookingUrl,
     image_urls: imageUrls,
     amenities,
-    price_estimate: priceEstimate,
-    price_estimate_text: priceText,
     notes,
     is_public: true,
   };

@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MapPin, Calendar, Users, Search } from "lucide-react";
-import { sports as availableSports } from "@/lib/mockData";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { sports } from "@/lib/mockData";
 
 interface SearchBarProps {
   variant?: "hero" | "compact";
@@ -19,6 +19,9 @@ export default function SearchBar({ variant = "hero" }: SearchBarProps) {
   const [players, setPlayers] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  // Use the imported sports data
+  const availableSports = sports;
 
   // Load venues and derive available cities just like the Host Game page
   const [allVenues, setAllVenues] = useState<any[]>([]);

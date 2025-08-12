@@ -17,8 +17,8 @@ export default function VenueCard({ venue }: VenueCardProps) {
   const stockImage = getStockImageForVenue(venue);
   const initialRaw = stockImage;
   const isHttp = typeof initialRaw === "string" && /^(https?:)\/\//i.test(initialRaw);
-  // For well-known image CDNs (Unsplash, Pixabay, Pexels) use direct URL to avoid proxy failures.
-  const isTrustedCdn = typeof initialRaw === "string" && /(images\.unsplash\.com|cdn\.pixabay\.com|images\.pexels\.com)/i.test(initialRaw);
+  // For well-known image CDNs use direct URL; route others via proxy. We proxy Pixabay to avoid hotlink issues.
+  const isTrustedCdn = typeof initialRaw === "string" && /(images\.unsplash\.com|images\.pexels\.com)/i.test(initialRaw);
   // Route unknown remote images via our proxy to avoid CORS and noisy network errors
   const initialSrc = isHttp && !isTrustedCdn ? `/api/image?url=${encodeURIComponent(initialRaw)}` : initialRaw;
   const [imgSrc, setImgSrc] = useState<string | undefined>(initialSrc);
@@ -38,11 +38,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
               }}
             />
           ) : null}
-          {(venue.priceEstimate || venue.priceEstimateText) && (
-            <div className="absolute top-3 right-3 bg-[#00ff88] text-[#0a1628] px-3 py-1 rounded-full text-sm font-bold">
-              {venue.priceEstimate ? `$${venue.priceEstimate}/hr` : venue.priceEstimateText}
-            </div>
-          )}
+          {/* Hourly rate badge removed */}
           <div className="absolute bottom-3 left-3 bg-[#00d9ff]/90 text-[#0a1628] px-2 py-1 rounded text-xs font-bold">
             {venue.indoorOutdoor === "indoor" ? "Indoor" : venue.indoorOutdoor === "outdoor" ? "Outdoor" : "Indoor & Outdoor"}
           </div>
@@ -65,23 +61,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
             </div>
           </div>
           
-          {venue.amenities.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {venue.amenities.slice(0, 3).map((amenity, i) => (
-                <span
-                  key={i}
-                  className="text-xs px-2 py-1 bg-white/10 rounded-full text-[#b8c5d6] border border-white/10"
-                >
-                  {amenity}
-                </span>
-              ))}
-              {venue.amenities.length > 3 && (
-                <span className="text-xs px-2 py-1 bg-white/10 rounded-full text-[#7a8b9a] border border-white/10">
-                  +{venue.amenities.length - 3} more
-                </span>
-              )}
-            </div>
-          )}
+          {/* Amenities badges intentionally removed from cards */}
         </div>
       </article>
     </Link>

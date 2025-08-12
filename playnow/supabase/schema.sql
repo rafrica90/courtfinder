@@ -16,7 +16,6 @@ create table if not exists venues (
   latitude double precision,
   longitude double precision,
   amenities text[] default '{}',
-  price_estimate numeric,
   photos text[] default '{}',
   booking_url text not null,
   terms text,
@@ -25,7 +24,6 @@ create table if not exists venues (
   -- New fields to support richer venue data and multi-sport
   sports text[] default '{}',
   notes text,
-  price_estimate_text text,
   image_urls text[] default '{}'
 );
 
@@ -96,8 +94,6 @@ returns table (
   latitude double precision,
   longitude double precision,
   amenities text[],
-  price_estimate numeric,
-  price_estimate_text text,
   photos text[],
   image_urls text[],
   booking_url text,
@@ -117,8 +113,6 @@ begin
     v.latitude,
     v.longitude,
     v.amenities,
-    v.price_estimate,
-    v.price_estimate_text,
     v.photos,
     v.image_urls,
     v.booking_url,

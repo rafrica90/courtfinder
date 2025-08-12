@@ -25,7 +25,6 @@ export async function GET(
           city,
           sports,
           amenities,
-          price_estimate,
           booking_url
         ),
         participants (

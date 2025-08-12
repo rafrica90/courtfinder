@@ -68,49 +68,150 @@ const mockGameData = {
 export default function GameDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { user } = useAuth();
-  const [gameData, setGameData] = useState(mockGameData);
+  const [gameData, setGameData] = useState<typeof mockGameData | null>(null);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const currentUserId = user?.id || null;
-  const [isJoined, setIsJoined] = useState(
-    currentUserId ? (
-      gameData.participants.some(p => p.userId === currentUserId) || 
-      gameData.waitlist.some(p => p.userId === currentUserId)
-    ) : false
-  );
+  const [isJoined, setIsJoined] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const isHost = gameData.hostUserId === currentUserId;
-  const currentParticipant = [...gameData.participants, ...gameData.waitlist]
-    .find(p => p.userId === currentUserId);
-  const spotsLeft = gameData.maxPlayers - gameData.participants.length;
+  const isHost = gameData?.hostUserId === currentUserId;
+  const currentParticipant = gameData ? [...gameData.participants, ...gameData.waitlist]
+    .find(p => p.userId === currentUserId) : null;
+  const spotsLeft = gameData ? gameData.maxPlayers - gameData.participants.length : 0;
 
   // Fetch actual game data on mount
   useEffect(() => {
     const fetchGameData = async () => {
+      setIsDataLoading(true);
       try {
         const gameId = (await params).id;
         const { data, error } = await api.games.get(gameId);
         
         if (error) {
           setError(error);
+          setIsDataLoading(false);
           return;
         }
         
         if (data?.game) {
           // Transform API data to match our component structure
-          // In production, you'd map the actual API response
-          // setGameData(transformedData);
+          const game = data.game;
+          
+          // Parse participants into joined and waitlist
+          const joinedParticipants = (game.participants || [])
+            .filter((p: any) => p.status === 'joined')
+            .map((p: any) => ({
+              id: p.id,
+              userId: p.user_id,
+              name: p.user_id === game.host_user_id ? (game.host_name || 'Host') : `Player ${p.id.slice(0, 4)}`,
+              status: 'joined' as const,
+              joinedAt: p.created_at
+            }));
+          
+          const waitlistParticipants = (game.participants || [])
+            .filter((p: any) => p.status === 'waitlist')
+            .map((p: any) => ({
+              id: p.id,
+              userId: p.user_id,
+              name: `Player ${p.id.slice(0, 4)}`,
+              status: 'waitlist' as const,
+              joinedAt: p.created_at
+            }));
+          
+          // Format date and time
+          let formattedDate = 'TBD';
+          let formattedTime = 'TBD';
+          
+          if (game.start_time) {
+            const startDate = new Date(game.start_time);
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            if (startDate.toDateString() === today.toDateString()) {
+              formattedDate = 'Today';
+            } else if (startDate.toDateString() === tomorrow.toDateString()) {
+              formattedDate = 'Tomorrow';
+            } else {
+              formattedDate = startDate.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric'
+              });
+            }
+            
+            formattedTime = startDate.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true
+            });
+          } else if (game.date && game.time) {
+            // Use separate date and time fields if available
+            const gameDate = new Date(game.date);
+            formattedDate = gameDate.toLocaleDateString('en-US', { 
+              weekday: 'long',
+              month: 'short',
+              day: 'numeric'
+            });
+            
+            // Parse time string (HH:MM:SS)
+            const [hours, minutes] = game.time.split(':');
+            const hour = parseInt(hours);
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+            formattedTime = `${displayHour}:${minutes} ${period}`;
+          }
+          
+          const transformedData = {
+            id: game.id,
+            sport: game.sport || 'Tennis',
+            venue: {
+              id: game.venue_id || game.venues?.id || '',
+              name: game.venues?.name || 'Unknown Venue',
+              address: game.venues ? `${game.venues.address || ''}, ${game.venues.city || ''}` : 'Unknown Location',
+              amenities: game.venues?.amenities || [],
+              bookingUrl: game.venues?.booking_url || ''
+            },
+            hostUserId: game.host_user_id,
+            hostName: game.host_name || 'Anonymous Host',
+            hostRating: 4.5, // Would need to fetch from profiles
+            startTime: game.start_time,
+            date: formattedDate,
+            time: formattedTime,
+            duration: `${game.duration || 2} hours`,
+            minPlayers: game.min_players || 2,
+            maxPlayers: game.max_players || 4,
+            visibility: game.visibility || 'public',
+            notes: game.notes || '',
+            costInstructions: game.cost_instructions || (game.cost_per_player ? `$${game.cost_per_player} per person` : ''),
+            level: game.skill_level || 'All Levels',
+            participants: joinedParticipants,
+            waitlist: waitlistParticipants
+          };
+          
+          setGameData(transformedData);
+          
+          // Check if current user is joined
+          if (currentUserId) {
+            const isUserJoined = game.participants?.some((p: any) => p.user_id === currentUserId);
+            setIsJoined(isUserJoined || false);
+          }
+          
           if (process.env.NODE_ENV === 'development') {
-            console.log('Fetched game data:', data.game);
+            console.log('Transformed game data:', transformedData);
           }
         }
       } catch (error) {
+        console.error('Error fetching game:', error);
         setError('Failed to load game details');
+      } finally {
+        setIsDataLoading(false);
       }
     };
 
     fetchGameData();
-  }, [params]);
+  }, [params, currentUserId]);
 
   const handleJoinGame = async () => {
     if (!user) {
@@ -200,8 +301,80 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
     }
   };
 
+  const handleEditGame = async () => {
+    const gameId = (await params).id;
+    router.push(`/games/${gameId}/edit`);
+  };
+
+  const handleCancelGame = async () => {
+    if (!confirm('Are you sure you want to cancel this game? This action cannot be undone.')) {
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const gameId = (await params).id;
+      const { error } = await api.games.delete(gameId);
+
+      if (error) {
+        setError(error);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Redirect to bookings page after successful cancellation
+      router.push('/bookings');
+    } catch (error) {
+      setError('Failed to cancel game. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Show loading state
+  if (isDataLoading) {
+    return (
+      <div className="min-h-screen">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Link 
+            href="/bookings"
+            className="inline-flex items-center gap-2 text-[#00d9ff] hover:text-white mb-6 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            Back to My Bookings
+          </Link>
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#00d9ff] border-t-transparent"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if no game data loaded
+  if (!gameData) {
+    return (
+      <div className="min-h-screen">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Link 
+            href="/bookings"
+            className="inline-flex items-center gap-2 text-[#00d9ff] hover:text-white mb-6 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            Back to My Bookings
+          </Link>
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6">
+            <p className="text-red-500">{error || 'Game not found'}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c]">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <Link 
@@ -263,13 +436,19 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
             <div className="flex flex-col gap-3 lg:w-48">
               {isHost ? (
                 <>
-                  <button className="px-4 py-2 bg-[#00d9ff] text-[#0a1628] rounded-lg hover:bg-[#00a8cc] transition-colors font-bold flex items-center justify-center gap-2">
+                  <button 
+                    onClick={handleEditGame}
+                    disabled={isLoading}
+                    className="px-4 py-2 bg-[#00d9ff] text-[#0a1628] rounded-lg hover:bg-[#00a8cc] transition-colors font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                     <Edit className="h-4 w-4" />
                     Edit Game
                   </button>
-                  <button className="px-4 py-2 border border-red-500 text-red-400 rounded-lg hover:bg-red-500/10 transition-colors font-medium flex items-center justify-center gap-2">
+                  <button 
+                    onClick={handleCancelGame}
+                    disabled={isLoading}
+                    className="px-4 py-2 border border-red-500 text-red-400 rounded-lg hover:bg-red-500/10 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                     <AlertTriangle className="h-4 w-4" />
-                    Cancel Game
+                    {isLoading ? 'Cancelling...' : 'Cancel Game'}
                   </button>
                 </>
               ) : (
@@ -331,7 +510,13 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                   <DollarSign className="h-5 w-5 text-[#00d9ff]" />
                   <div>
                     <p className="text-sm text-[#7a8b9a]">Cost</p>
-                    <p className="text-white font-medium">$15/player</p>
+                    <p className="text-white font-medium">
+                      {gameData.costInstructions ? 
+                        (gameData.costInstructions.includes('$') ? 
+                          gameData.costInstructions.match(/\$\d+/)?.[0] + '/player' : 
+                          'See payment info') : 
+                        'Free'}
+                    </p>
                   </div>
                 </div>
               </div>

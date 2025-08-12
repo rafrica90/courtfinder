@@ -109,7 +109,7 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c]">
+    <div className="min-h-screen">
       {/* Search Header */}
       <div className="bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10 sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -129,8 +129,6 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
             latitude: venue.latitude,
             longitude: venue.longitude,
             amenities: venue.amenities || [],
-            priceEstimate: venue.price_estimate ?? undefined,
-            priceEstimateText: venue.price_estimate_text ?? undefined,
             photos: venue.photos || [],
             imageUrls: venue.image_urls || venue.imageUrls || [],
             bookingUrl: venue.booking_url,

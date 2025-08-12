@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 import { MapPin, Clock, Shield, Users, Heart, Share2 } from "lucide-react";
 import VenueImage from "@/components/VenueImage";
-import { getStockImageForVenue, GENERIC_PLACEHOLDER } from "@/lib/sport-images";
+import { getStockImageForVenue, GENERIC_PLACEHOLDER, getPrimarySport } from "@/lib/sport-images";
 
 export default async function VenueDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -28,11 +28,18 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
   // Always show a stock image matched to sport
   const mainImage: string | undefined = getStockImageForVenue(venue);
   const fallbackImage = GENERIC_PLACEHOLDER;
-  const isTrustedCdn = typeof mainImage === 'string' && /(images\.unsplash\.com|cdn\.pixabay\.com|images\.pexels\.com)/i.test(mainImage);
+  // Proxy Pixabay due to potential hotlink restrictions; allow Unsplash and Pexels direct
+  const isTrustedCdn = typeof mainImage === 'string' && /(images\.unsplash\.com|images\.pexels\.com)/i.test(mainImage);
   const heroSrc = mainImage && !isTrustedCdn ? `/api/image?url=${encodeURIComponent(mainImage)}` : mainImage;
 
+  // Determine primary sport for display badge
+  const primarySport = getPrimarySport(venue);
+  const displaySport = primarySport
+    ? primarySport.charAt(0).toUpperCase() + primarySport.slice(1)
+    : "Sport";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c]">
+    <div className="min-h-screen">
       {/* Hero Image Section */}
       <div className="relative h-96 bg-[#0f2847]">
           <VenueImage
@@ -61,7 +68,7 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
                 {venue.indoorOutdoor === "indoor" ? "Indoor" : venue.indoorOutdoor === "outdoor" ? "Outdoor" : "Indoor & Outdoor"}
               </span>
               <span className="px-3 py-1 bg-[#00d9ff] text-[#0a1628] rounded-full text-sm font-bold">
-                Tennis
+                {displaySport}
               </span>
             </div>
             <h1 className="text-4xl font-bold text-white mb-2">{venue.name}</h1>
@@ -118,30 +125,7 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
               </p>
             </div>
 
-            {/* Amenities */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-              <h2 className="text-xl font-semibold mb-4 text-white">Amenities</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {venue.amenities.map((amenity: string, i: number) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-[#00ff88] rounded-full" />
-                    <span className="text-[#b8c5d6]">{amenity}</span>
-                  </div>
-                ))}
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-[#00ff88] rounded-full" />
-                  <span className="text-[#b8c5d6]">Parking Available</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-[#00ff88] rounded-full" />
-                  <span className="text-[#b8c5d6]">Equipment Rental</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-[#00ff88] rounded-full" />
-                  <span className="text-[#b8c5d6]">Water Fountain</span>
-                </div>
-              </div>
-            </div>
+            {/* Amenities intentionally removed */}
 
             {/* Gallery removed as requested */}
 
@@ -157,18 +141,7 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
           {/* Booking Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 sticky top-24">
-              <div className="mb-6">
-                <div className="flex items-baseline gap-2 mb-2">
-                  {venue.priceEstimate || venue.priceEstimateText ? (
-                    <>
-                      <span className="text-3xl font-bold text-[#00ff88]">
-                        {venue.priceEstimate ? `$${venue.priceEstimate}` : venue.priceEstimateText}
-                      </span>
-                      {venue.priceEstimate && <span className="text-[#b8c5d6]"> per hour</span>}
-                    </>
-                  ) : null}
-                </div>
-              </div>
+              {/* Hourly rate removed from sidebar */}
 
               {/* Book Now button - handle both bookingUrl (camelCase) and booking_url (snake_case) */}
               {(venue.bookingUrl || venue.booking_url) ? (

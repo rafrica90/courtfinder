@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION search_venues(
   indoor_outdoor_filter TEXT DEFAULT NULL,
   city_filter TEXT DEFAULT NULL
 )
-RETURNS TABLE (
+  RETURNS TABLE (
   id UUID,
   name TEXT,
   address TEXT,
@@ -27,8 +27,7 @@ RETURNS TABLE (
   description TEXT,
   notes TEXT,
   indoor_outdoor TEXT,
-  image_urls TEXT[],
-  price_per_hour NUMERIC,
+    image_urls TEXT[],
   created_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ
 ) 
@@ -57,7 +56,6 @@ BEGIN
     v.notes,
     v.indoor_outdoor,
     v.image_urls,
-    v.price_per_hour,
     v.created_at,
     v.updated_at
   FROM venues v

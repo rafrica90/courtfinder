@@ -2,80 +2,39 @@
 
 import Link from "next/link";
 import { Calendar, MapPin, Users, Clock, DollarSign, Plus, Edit, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { api } from "@/lib/api-client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
-// Mock data for user's games (this would come from API/database in production)
-const initialMockUserGames = {
-  hosted: [
-    {
-      id: "g1",
-      sport: "Tennis",
-      venue: "Central Park Tennis Center",
-      address: "123 Park Ave, New York",
-      date: "Today",
-      time: "6:00 PM",
-      duration: "2 hours",
-      playersJoined: 3,
-      maxPlayers: 4,
-      costPerPlayer: 15,
-      level: "Intermediate",
-      status: "active" as const,
-      notes: "Bring your own racket!",
-    },
-    {
-      id: "g5",
-      sport: "Pickleball",
-      venue: "Brooklyn Pickleball Club",
-      address: "456 Court St, New York",
-      date: "Saturday",
-      time: "2:00 PM",
-      duration: "1.5 hours",
-      playersJoined: 1,
-      maxPlayers: 4,
-      costPerPlayer: 12,
-      level: "All Levels",
-      status: "active" as const,
-    },
-  ],
-  joined: [
-    {
-      id: "g2",
-      sport: "Soccer",
-      venue: "Mission Soccer Fields",
-      address: "789 Valencia St, San Francisco",
-      date: "Sunday",
-      time: "3:00 PM",
-      duration: "2 hours",
-      playersJoined: 8,
-      maxPlayers: 14,
-      costPerPlayer: 20,
-      hostName: "Mike Rodriguez",
-      hostRating: 4.7,
-      level: "Advanced",
-      status: "confirmed" as const,
-    },
-    {
-      id: "g3",
-      sport: "Tennis",
-      venue: "Riverside Courts",
-      address: "321 River Rd, New York",
-      date: "Tomorrow",
-      time: "8:00 AM",
-      duration: "1 hour",
-      playersJoined: 2,
-      maxPlayers: 2,
-      costPerPlayer: 25,
-      hostName: "Emma Wilson",
-      hostRating: 5.0,
-      level: "Beginner",
-      status: "confirmed" as const,
-    },
-  ],
+type GameData = {
+  id: string;
+  sport: string;
+  venue: string;
+  venueId: string;
+  address: string;
+  date: string;
+  time: string;
+  duration: string;
+  playersJoined: number;
+  maxPlayers: number;
+  costPerPlayer: number;
+  level: string;
+  status: string;
+  notes?: string;
+  hostName?: string;
+  hostRating?: number;
 };
 
 export default function BookingsPage() {
+  const router = useRouter();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'hosted' | 'joined'>('hosted');
-  const [userGames, setUserGames] = useState(initialMockUserGames);
+  const [userGames, setUserGames] = useState<{hosted: GameData[], joined: GameData[]}>({
+    hosted: [],
+    joined: []
+  });
+  const [loading, setLoading] = useState(true);
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     gameId: string;
@@ -83,6 +42,72 @@ export default function BookingsPage() {
     gameName: string;
   } | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Fetch user's games from the API
+  useEffect(() => {
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+    
+    fetchUserGames();
+  }, [user, router]);
+
+  const fetchUserGames = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    
+    try {
+      // Fetch both hosted and joined games in parallel
+      const [hostedResponse, joinedResponse] = await Promise.all([
+        api.games.listUserGames('hosted'),
+        api.games.listUserGames('joined')
+      ]);
+
+      if (hostedResponse.error) {
+        console.error('Error fetching hosted games:', hostedResponse.error);
+      }
+      
+      if (joinedResponse.error) {
+        console.error('Error fetching joined games:', joinedResponse.error);
+      }
+
+      // Transform the data to match our UI format
+      const transformGame = (game: any): GameData => ({
+        id: game.id,
+        sport: game.sport || 'Tennis',
+        venue: game.venues?.name || 'Unknown Venue',
+        venueId: game.venue_id,
+        address: game.venues ? `${game.venues.address || ''}, ${game.venues.city || ''}` : 'Unknown Location',
+        date: game.date ? new Date(game.date).toLocaleDateString('en-US', { 
+          weekday: 'long',
+          month: 'short',
+          day: 'numeric'
+        }) : 'TBD',
+        time: game.time || 'TBD',
+        duration: `${game.duration || 2} hours`,
+        playersJoined: (game.participants || []).filter((p: any) => p.status === 'joined').length || 0,
+        maxPlayers: game.max_players || 4,
+        costPerPlayer: game.cost_per_player || 0,
+        level: game.skill_level || 'All Levels',
+        status: game.status || 'active',
+        notes: game.notes,
+        hostName: game.host_name || 'Anonymous',
+        hostRating: 4.5 // Would need to fetch from profiles
+      });
+
+      setUserGames({
+        hosted: hostedResponse.data?.games?.map(transformGame) || [],
+        joined: joinedResponse.data?.games?.map(transformGame) || []
+      });
+    } catch (error) {
+      console.error('Error fetching games:', error);
+      setErrorMessage('Failed to load your games. Please try refreshing the page.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const currentGames = activeTab === 'hosted' ? userGames.hosted : userGames.joined;
 
@@ -107,35 +132,61 @@ export default function BookingsPage() {
   };
 
   // Confirm the action (cancel or leave)
-  const confirmAction = () => {
+  const confirmAction = async () => {
     if (!confirmDialog) return;
 
-    if (confirmDialog.action === 'cancel') {
-      // Remove the game from hosted games
-      setUserGames(prev => ({
-        ...prev,
-        hosted: prev.hosted.filter(game => game.id !== confirmDialog.gameId)
-      }));
-      setSuccessMessage(`Successfully canceled ${confirmDialog.gameName} game`);
-    } else {
-      // Remove the game from joined games
-      setUserGames(prev => ({
-        ...prev,
-        joined: prev.joined.filter(game => game.id !== confirmDialog.gameId)
-      }));
-      setSuccessMessage(`Successfully left ${confirmDialog.gameName} game`);
-    }
-
-    setConfirmDialog(null);
+    setErrorMessage(null);
     
-    // Clear success message after 3 seconds
-    setTimeout(() => {
-      setSuccessMessage(null);
-    }, 3000);
+    try {
+      if (confirmDialog.action === 'cancel') {
+        // Call API to delete the game
+        const response = await api.games.delete(confirmDialog.gameId);
+        
+        if (response.error) {
+          setErrorMessage(response.error);
+          setConfirmDialog(null);
+          return;
+        }
+        
+        // Remove the game from hosted games
+        setUserGames(prev => ({
+          ...prev,
+          hosted: prev.hosted.filter(game => game.id !== confirmDialog.gameId)
+        }));
+        setSuccessMessage(`Successfully canceled ${confirmDialog.gameName} game`);
+      } else {
+        // Call API to leave the game
+        const response = await api.games.leave(confirmDialog.gameId);
+        
+        if (response.error) {
+          setErrorMessage(response.error);
+          setConfirmDialog(null);
+          return;
+        }
+        
+        // Remove the game from joined games
+        setUserGames(prev => ({
+          ...prev,
+          joined: prev.joined.filter(game => game.id !== confirmDialog.gameId)
+        }));
+        setSuccessMessage(`Successfully left ${confirmDialog.gameName} game`);
+      }
+
+      setConfirmDialog(null);
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (error) {
+      console.error('Error performing action:', error);
+      setErrorMessage('Failed to perform action. Please try again.');
+      setConfirmDialog(null);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c]">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -150,6 +201,19 @@ export default function BookingsPage() {
             <button 
               onClick={() => setSuccessMessage(null)}
               className="hover:text-white transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {errorMessage && (
+          <div className="mb-6 bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg flex items-center justify-between">
+            <span className="font-medium">{errorMessage}</span>
+            <button 
+              onClick={() => setErrorMessage(null)}
+              className="hover:text-red-300 transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
@@ -182,7 +246,12 @@ export default function BookingsPage() {
 
         {/* Games List */}
         <div className="space-y-6">
-          {currentGames.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#00d9ff] border-t-transparent"></div>
+              <p className="text-[#b8c5d6] mt-4">Loading your games...</p>
+            </div>
+          ) : currentGames.length === 0 ? (
             <div className="text-center py-16">
               <Calendar className="h-16 w-16 text-[#7a8b9a] mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">

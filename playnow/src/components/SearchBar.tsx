@@ -12,6 +12,7 @@ interface SearchBarProps {
 
 export default function SearchBar({ variant = "hero" }: SearchBarProps) {
   const router = useRouter();
+  const [venueName, setVenueName] = useState("");
   const [sport, setSport] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
@@ -69,6 +70,7 @@ export default function SearchBar({ variant = "hero" }: SearchBarProps) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
+    if (venueName) params.set("venueName", venueName);
     if (sport) params.set("sport", sport);
     if (location) params.set("location", location);
     if (date) params.set("date", date);
@@ -79,6 +81,18 @@ export default function SearchBar({ variant = "hero" }: SearchBarProps) {
   if (variant === "compact") {
     return (
       <form onSubmit={handleSearch} className="flex gap-2 p-4 bg-white/5 backdrop-blur-sm rounded-lg shadow-sm border border-white/10">
+        <div className="relative flex-1">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-[#00d9ff]" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search venue name..."
+            value={venueName}
+            onChange={(e) => setVenueName(e.target.value)}
+            className="w-full pl-10 pr-3 py-2 bg-white/10 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00d9ff] focus:border-transparent text-white placeholder-gray-400"
+          />
+        </div>
         <select
           value={sport}
           onChange={(e) => setSport(e.target.value)}

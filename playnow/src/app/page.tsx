@@ -18,14 +18,14 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-left">
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
-                <span className="text-white">Find Courts.</span>
+                <span className="text-white">Discover.</span>
                 <br />
-                <span className="text-[#00d9ff]">Meet Players.</span>
+                <span className="text-[#00d9ff]">Connect.</span>
                 <br />
-                <span className="text-[#00ff88]">Join Events.</span>
+                <span className="text-[#00ff88]">Game On.</span>
               </h1>
               <p className="text-xl text-[#b8c5d6] mb-10 leading-relaxed">
-                Discover courts near you, set up games, and connect with passionate players anytime, anywhere.
+                From pickup games to tournaments – find your perfect match in minutes.
               </p>
               
               {/* Main CTA Buttons */}

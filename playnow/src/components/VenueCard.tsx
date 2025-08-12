@@ -4,30 +4,18 @@ import Link from "next/link";
 import { MapPin, Star, Clock, Users } from "lucide-react";
 import { Venue } from "@/lib/types";
 import { useMemo, useState } from "react";
+import { getStockImageForVenue, GENERIC_PLACEHOLDER } from "@/lib/sport-images";
 
 interface VenueCardProps {
   venue: Venue;
 }
 
 export default function VenueCard({ venue }: VenueCardProps) {
-  const candidateImages: string[] = useMemo(() => (
-    [
-      ...(Array.isArray(venue.imageUrls) ? venue.imageUrls : []),
-      ...(Array.isArray((venue as any).image_urls) ? (venue as any).image_urls : []),
-      ...(Array.isArray(venue.photos) ? venue.photos : []),
-    ].filter((u) => typeof u === "string" && u.trim().length > 0)
-  ), [venue]);
+  // Always use deterministic stock image per venue to avoid broken sources
+  const candidateImages: string[] = useMemo(() => [getStockImageForVenue(venue)], [venue]);
 
-  const primarySport = (Array.isArray(venue.sports) && venue.sports[0]) || venue.sportId || "generic";
-  const sportKey = String(primarySport).toLowerCase();
-  const sportPlaceholders: Record<string, string> = {
-    tennis: "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=60",
-    pickleball: "https://images.unsplash.com/photo-1620594909782-4c45f8322c2c?auto=format&fit=crop&w=800&q=60",
-    soccer: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=800&q=60",
-  };
-  const genericPlaceholder = "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=800&q=60";
-
-  const initialRaw = candidateImages.length > 0 ? candidateImages[0] : (sportPlaceholders[sportKey] || genericPlaceholder);
+  const stockImage = getStockImageForVenue(venue);
+  const initialRaw = stockImage;
   const isHttp = typeof initialRaw === "string" && /^(https?:)\/\//i.test(initialRaw);
   // Route unknown remote images via our proxy to avoid CORS and noisy network errors
   const initialSrc = isHttp ? `/api/image?url=${encodeURIComponent(initialRaw)}` : initialRaw;
@@ -43,7 +31,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
               alt={venue.name}
               className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
               onError={() => {
-                const fallbackRaw = sportPlaceholders[sportKey] || genericPlaceholder;
+                const fallbackRaw = stockImage || GENERIC_PLACEHOLDER;
                 setImgSrc(fallbackRaw);
               }}
             />

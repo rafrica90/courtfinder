@@ -34,31 +34,33 @@ const sportImageMap = {
 
 // Function to get appropriate images for a venue
 function getVenueImages(venue, index) {
-  // Check if we have a specific mapping for this venue
-  if (venueImages.venue_specific_mapping[venue.venue_name]) {
-    return [venueImages.venue_specific_mapping[venue.venue_name]];
-  }
+  // Always use stock images. If a specific mapping exists, prefer it for the first image.
+  const firstSpecific = venueImages.venue_specific_mapping[venue.venue_name];
 
-  // Determine the sport type
+  // Determine the sport key
   let sportType = 'default';
-  if (venue.sports && venue.sports.length > 0) {
-    const sport = venue.sports[0].toLowerCase();
-    if (sportImageMap[sport]) {
-      sportType = sport;
-    }
+  if (Array.isArray(venue.sports) && venue.sports.length > 0) {
+    const s = String(venue.sports[0]).toLowerCase();
+    if (sportImageMap[s]) sportType = s;
+  } else if (venue.sport_id) {
+    const s = String(venue.sport_id).toLowerCase();
+    if (sportImageMap[s]) sportType = s;
   }
 
-  // Get images for this sport type
   const availableImages = sportImageMap[sportType] || sportImageMap.default;
-  
-  // Return 1-3 images, cycling through available images
+
+  // Build 1-3 images, cycling deterministically from the index to vary by venue
   const numImages = Math.min(3, availableImages.length);
   const images = [];
   for (let i = 0; i < numImages; i++) {
     const imageIndex = (index + i) % availableImages.length;
     images.push(availableImages[imageIndex]);
   }
-  
+
+  if (firstSpecific) {
+    images[0] = firstSpecific;
+  }
+
   return images;
 }
 
@@ -71,7 +73,7 @@ venuesData.sydney_sports_venues = venuesData.sydney_sports_venues.map((venue) =>
   return {
     ...venue,
     image_urls: workingImages,
-    // Keep original URLs as backup_urls for reference
+    // Overwrite all photos with chosen stock set; keep originals as backup
     backup_urls: venue.image_urls
   };
 });

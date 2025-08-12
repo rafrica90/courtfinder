@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 import { MapPin, Clock, Shield, Users, Heart, Share2 } from "lucide-react";
 import VenueImage from "@/components/VenueImage";
+import { getStockImageForVenue, GENERIC_PLACEHOLDER } from "@/lib/sport-images";
 
 export default async function VenueDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -24,19 +25,20 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
 
   // Derive images with graceful fallback to an Unsplash placeholder
   const imageUrls: string[] = venue.image_urls || venue.imageUrls || [];
-  const mainImage: string | undefined = imageUrls[0];
-  const fallbackImage = "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=60";
+  // Always show a stock image matched to sport
+  const mainImage: string | undefined = getStockImageForVenue(venue);
+  const fallbackImage = GENERIC_PLACEHOLDER;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c]">
       {/* Hero Image Section */}
       <div className="relative h-96 bg-[#0f2847]">
-        <VenueImage
-          src={mainImage ? `/api/image?url=${encodeURIComponent(mainImage)}` : fallbackImage}
-          alt={venue.name}
-          fallbackSrc={fallbackImage}
-          className="w-full h-full object-cover opacity-90"
-        />
+          <VenueImage
+            src={mainImage ? `/api/image?url=${encodeURIComponent(mainImage)}` : fallbackImage}
+            alt={venue.name}
+            fallbackSrc={fallbackImage}
+            className="w-full h-full object-cover opacity-90"
+          />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         
         {/* Action buttons */}

@@ -34,6 +34,8 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
   const [allVenues] = useState<Venue[]>(initialVenues);
   const [filteredVenues, setFilteredVenues] = useState<Venue[]>(initialVenues);
   const [venues, setVenues] = useState<Venue[]>(initialVenues);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   // Apply server-provided name query again on the client to guarantee filtering
   useEffect(() => {
@@ -97,6 +99,39 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     });
   };
 
+  // Ask for user location on load and store it for distance sorting
+  useEffect(() => {
+    if (!('geolocation' in navigator)) {
+      setLocationError('Geolocation not supported');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocationError(null);
+      },
+      (err) => {
+        setLocationError(err.message || 'Location permission denied');
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, []);
+
+  const requestLocation = () => {
+    if (!('geolocation' in navigator)) {
+      setLocationError('Geolocation not supported');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocationError(null);
+      },
+      (err) => setLocationError(err.message || 'Unable to fetch location'),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
   const handleFiltersChange = (filters: FilterState) => {
     const filtered = applyFilters(allVenues, filters);
     setFilteredVenues(filtered);
@@ -129,9 +164,21 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
               {searchedVenueName && ` matching "${searchedVenueName}"`}
               {sport && ` for ${sport}`}
             </p>
+            <div className="mt-2 text-xs text-[#7a8b9a] flex items-center gap-2">
+              {userLocation ? (
+                <span>Using your location for distance</span>
+              ) : (
+                <>
+                  <button onClick={requestLocation} className="underline hover:text-white">
+                    Use my location
+                  </button>
+                  {locationError && <span className="text-red-400">({locationError})</span>}
+                </>
+              )}
+            </div>
           </div>
 
-          <VenueSort venues={filteredVenues} onSortedVenues={handleSortedVenues} />
+          <VenueSort venues={filteredVenues} onSortedVenues={handleSortedVenues} userLocation={userLocation ?? undefined} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

@@ -14,9 +14,10 @@ interface Venue {
 interface VenueSortProps {
   venues: Venue[];
   onSortedVenues: (sortedVenues: Venue[]) => void;
+  userLocation?: { lat: number; lng: number };
 }
 
-export default function VenueSort({ venues, onSortedVenues }: VenueSortProps) {
+export default function VenueSort({ venues, onSortedVenues, userLocation }: VenueSortProps) {
   const [sortBy, setSortBy] = useState<string>("recommended");
 
   // Removed price-based sorting utilities
@@ -32,9 +33,32 @@ export default function VenueSort({ venues, onSortedVenues }: VenueSortProps) {
         return sorted.sort((a, b) => b.name.localeCompare(a.name));
       
       case "distance":
-        // For now, just sort by name since we don't have user location
-        // TODO: Implement geolocation-based sorting
-        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+        if (!userLocation) {
+          return sorted.sort((a, b) => a.name.localeCompare(b.name));
+        }
+        const toRad = (deg: number) => (deg * Math.PI) / 180;
+        const haversineKm = (lat1?: number, lon1?: number, lat2?: number, lon2?: number): number => {
+          if (
+            typeof lat1 !== 'number' || typeof lon1 !== 'number' ||
+            typeof lat2 !== 'number' || typeof lon2 !== 'number'
+          ) {
+            return Number.POSITIVE_INFINITY;
+          }
+          const R = 6371; // km
+          const dLat = toRad(lat2 - lat1);
+          const dLon = toRad(lon2 - lon1);
+          const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          return R * c;
+        };
+        return sorted.sort((a, b) => {
+          const da = haversineKm(userLocation.lat, userLocation.lng, a.latitude, a.longitude);
+          const db = haversineKm(userLocation.lat, userLocation.lng, b.latitude, b.longitude);
+          return da - db;
+        });
       
       case "recommended":
       default:

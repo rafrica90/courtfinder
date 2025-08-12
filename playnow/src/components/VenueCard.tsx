@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Star, Clock, Users } from "lucide-react";
+import { MapPin, Clock } from "lucide-react";
 import { Venue } from "@/lib/types";
 import { useMemo, useState } from "react";
 import { getStockImageForVenue, GENERIC_PLACEHOLDER } from "@/lib/sport-images";
@@ -57,11 +57,6 @@ export default function VenueCard({ venue }: VenueCardProps) {
           </div>
           
           <div className="flex items-center gap-3 text-sm mb-3">
-            <div className="flex items-center gap-1">
-              <Star className="h-4 w-4 fill-[#00ff88] text-[#00ff88]" />
-              <span className="font-medium text-white">4.5</span>
-              <span className="text-[#7a8b9a]">(127)</span>
-            </div>
             <div className="flex items-center gap-1 text-[#7a8b9a]">
               <Clock className="h-4 w-4" />
               <span>Open now</span>

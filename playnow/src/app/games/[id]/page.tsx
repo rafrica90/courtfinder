@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Calendar, MapPin, Users, Clock, DollarSign, Star, ArrowLeft, Edit, UserMinus, UserPlus, AlertTriangle } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, DollarSign, ArrowLeft, Edit, UserMinus, UserPlus, AlertTriangle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -255,10 +255,6 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                     Hosted by {gameData.hostName}
                     {isHost && <span className="text-[#00ff88] ml-1">(You)</span>}
                   </p>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 fill-[#00ff88] text-[#00ff88]" />
-                    <span className="text-xs text-[#7a8b9a]">{gameData.hostRating}</span>
-                  </div>
                 </div>
               </div>
             </div>

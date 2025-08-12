@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Calendar, MapPin, Users, Clock, DollarSign, Star, Filter } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, DollarSign, Filter } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 
@@ -306,10 +306,6 @@ export default async function GamesPage({ searchParams }: { searchParams?: Promi
                           </div>
                           <div>
                             <p className="text-sm text-white">Hosted by {game.hostName}</p>
-                            <div className="flex items-center gap-1">
-                              <Star className="h-3 w-3 fill-[#00ff88] text-[#00ff88]" />
-                              <span className="text-xs text-[#7a8b9a]">{game.hostRating}</span>
-                            </div>
                           </div>
                         </div>
 

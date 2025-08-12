@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Calendar, MapPin, Users, Clock, DollarSign, Star, Plus, Edit, X } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, DollarSign, Plus, Edit, X } from "lucide-react";
 import { useState } from "react";
 
 // Mock data for user's games (this would come from API/database in production)
@@ -278,10 +278,6 @@ export default function BookingsPage() {
                         </div>
                         <div>
                           <p className="text-sm text-white">Hosted by {game.hostName}</p>
-                          <div className="flex items-center gap-1">
-                            <Star className="h-3 w-3 fill-[#00ff88] text-[#00ff88]" />
-                            <span className="text-xs text-[#7a8b9a]">{game.hostRating}</span>
-                          </div>
                         </div>
                       </div>
                     )}

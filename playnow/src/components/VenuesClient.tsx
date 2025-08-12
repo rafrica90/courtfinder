@@ -40,23 +40,45 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
   // Apply server-provided name query again on the client to guarantee filtering
   useEffect(() => {
     const query = (searchedVenueName ?? "").toString().trim().toLowerCase().replace(/\+/g, " ");
-    if (query.length === 0) {
-      setFilteredVenues(allVenues);
-      setVenues(allVenues);
-      return;
+    
+    // Get filter states from URL (consistent with VenueFilters.tsx)
+    const params = new URLSearchParams(window.location.search);
+    const urlPriceRanges = params.get('priceRanges')?.split(',') || [];
+    const urlVenueTypes = params.get('venueTypes')?.split(',') || [];
+    const urlAmenities = params.get('amenities')?.split(',') || [];
+
+    let currentFilteredVenues = initialVenues;
+
+    // Apply sport filter
+    if (sport) {
+      currentFilteredVenues = currentFilteredVenues.filter(venue => 
+        venue.sports?.map(s => s.toLowerCase()).includes(sport.toLowerCase())
+      );
     }
 
-    const matchesQuery = (text?: string) => (text ?? "").toLowerCase().includes(query);
+    // Apply search query filter
+    if (query.length > 0) {
+      const matchesQuery = (text?: string) => (text ?? "").toLowerCase().includes(query);
+      currentFilteredVenues = currentFilteredVenues.filter(v =>
+        matchesQuery(v.name) ||
+        matchesQuery(v.address) ||
+        matchesQuery(v.city) ||
+        matchesQuery(v.notes)
+      );
+    }
 
-    const filteredByName = allVenues.filter(v =>
-      matchesQuery(v.name) ||
-      matchesQuery(v.address) ||
-      matchesQuery(v.city) ||
-      matchesQuery(v.notes)
-    );
-    setFilteredVenues(filteredByName);
-    setVenues(filteredByName);
-  }, [searchedVenueName, allVenues]);
+    // Apply other filters from URL
+    const activeFilters: FilterState = {
+      priceRanges: urlPriceRanges,
+      venueTypes: urlVenueTypes,
+      amenities: urlAmenities
+    };
+
+    const newlyFiltered = applyFilters(currentFilteredVenues, activeFilters);
+    
+    setFilteredVenues(newlyFiltered);
+    setVenues(newlyFiltered);
+  }, [searchedVenueName, sport, initialVenues]);
 
   const extractPriceFromText = (text?: string): number => {
     if (!text) return 0;

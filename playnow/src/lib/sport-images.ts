@@ -18,10 +18,10 @@ export type SportKey =
 const stockImagesBySport: Record<SportKey, string[]> = {
   // Single canonical image for each of these sports
   tennis: [
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+    "https://images.unsplash.com/photo-1622279457486-62dbd3a24f50?w=800&q=80",
   ],
   soccer: [
-    "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=800&q=80",
+    "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&q=80",
   ],
   basketball: [
     "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80",

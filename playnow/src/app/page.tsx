@@ -67,26 +67,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-black/30 backdrop-blur-sm border-y border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-            <div className="group">
-              <div className="text-4xl font-bold text-[#00d9ff] group-hover:text-[#00ff88] transition-colors">500+</div>
-              <div className="text-sm text-[#b8c5d6] mt-2">Venues Available</div>
-            </div>
-            <div className="group">
-              <div className="text-4xl font-bold text-[#00d9ff] group-hover:text-[#00ff88] transition-colors">10,000+</div>
-              <div className="text-sm text-[#b8c5d6] mt-2">Active Players</div>
-            </div>
-            <div className="group">
-              <div className="text-4xl font-bold text-[#00d9ff] group-hover:text-[#00ff88] transition-colors">50+</div>
-              <div className="text-sm text-[#b8c5d6] mt-2">Cities Covered</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Popular Venues Section */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

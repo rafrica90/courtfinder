@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
-import { MapPin, Clock, Star, Shield, Users, Calendar, ChevronRight, Heart, Share2, Phone, Mail, Globe } from "lucide-react";
+import { MapPin, Clock, Shield, Users, Heart, Share2 } from "lucide-react";
 import VenueImage from "@/components/VenueImage";
 
 export default async function VenueDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -65,10 +65,6 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
               <div className="flex items-center gap-1">
                 <MapPin className="h-4 w-4 text-[#00d9ff]" />
                  <span>{venue.address}{venue.city ? `, ${venue.city}` : ""}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-[#00ff88] text-[#00ff88]" />
-                <span>4.5 (127 reviews)</span>
               </div>
             </div>
           </div>
@@ -168,40 +164,6 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
                     </>
                   ) : null}
                 </div>
-                <div className="flex items-center gap-1 text-sm">
-                  <Star className="h-4 w-4 fill-[#00ff88] text-[#00ff88]" />
-                  <span className="font-medium text-white">4.5</span>
-                  <span className="text-[#7a8b9a]">(127 reviews)</span>
-                </div>
-              </div>
-
-              <div className="space-y-3 mb-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-[#00d9ff]">Date</label>
-                  <input 
-                    type="date" 
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff] focus:bg-white/20"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-[#00d9ff]">Time</label>
-                  <select className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff] focus:bg-white/20">
-                    <option>Select time</option>
-                    <option>6:00 AM - 7:00 AM</option>
-                    <option>7:00 AM - 8:00 AM</option>
-                    <option>8:00 AM - 9:00 AM</option>
-                    <option>9:00 AM - 10:00 AM</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-[#00d9ff]">Duration</label>
-                  <select className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff] focus:bg-white/20">
-                    <option>1 hour</option>
-                    <option>2 hours</option>
-                    <option>3 hours</option>
-                    <option>4 hours</option>
-                  </select>
-                </div>
               </div>
 
               {/* Book Now button - handle both bookingUrl (camelCase) and booking_url (snake_case) */}
@@ -227,24 +189,6 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
               >
                 Host a Game Here
               </Link>
-
-              <div className="mt-6 pt-6 border-t border-white/10">
-                <h3 className="font-semibold mb-3 text-white">Contact Venue</h3>
-                <div className="space-y-2 text-sm">
-                  <a href="tel:+1234567890" className="flex items-center gap-2 text-[#b8c5d6] hover:text-[#00d9ff] transition-colors">
-                    <Phone className="h-4 w-4" />
-                    <span>(123) 456-7890</span>
-                  </a>
-                  <a href="mailto:info@venue.com" className="flex items-center gap-2 text-[#b8c5d6] hover:text-[#00d9ff] transition-colors">
-                    <Mail className="h-4 w-4" />
-                    <span>info@venue.com</span>
-                  </a>
-                  <a href="#" className="flex items-center gap-2 text-[#b8c5d6] hover:text-[#00d9ff] transition-colors">
-                    <Globe className="h-4 w-4" />
-                    <span>Visit website</span>
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
         </div>

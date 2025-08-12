@@ -75,7 +75,17 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
         ? bySearch.filter((v: any) => Array.isArray(v.sports) && v.sports.includes(sport))
         : bySearch;
     } else {
-      filtered = data;
+      // RPC succeeded, but we still need to filter by venue name if provided
+      let rpcFiltered = data;
+      
+      if (venueName) {
+        const nameQuery = venueName.toLowerCase();
+        rpcFiltered = rpcFiltered.filter((v: any) => 
+          v.name?.toLowerCase().includes(nameQuery)
+        );
+      }
+      
+      filtered = rpcFiltered;
     }
   } else {
     // Fallback to mock data in dev without env

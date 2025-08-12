@@ -110,6 +110,12 @@ export default function SearchBar({ variant = "hero" }: SearchBarProps) {
             onChange={(e) => setVenueName(e.target.value)}
             onFocus={() => venueName && setShowSuggestions(true)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSearch(e as any);
+              }
+            }}
             className="w-full pl-10 pr-3 py-2 bg-white/10 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00d9ff] focus:border-transparent text-white placeholder-gray-400"
           />
           {showSuggestions && suggestions.length > 0 && (

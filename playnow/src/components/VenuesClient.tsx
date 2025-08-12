@@ -37,6 +37,27 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
   const [filteredVenues, setFilteredVenues] = useState<Venue[]>(initialVenues);
   const [venues, setVenues] = useState<Venue[]>(initialVenues);
 
+  // Apply server-provided name query again on the client to guarantee filtering
+  useEffect(() => {
+    const query = (searchedVenueName ?? "").toString().trim().toLowerCase().replace(/\+/g, " ");
+    if (query.length === 0) {
+      setFilteredVenues(allVenues);
+      setVenues(allVenues);
+      return;
+    }
+
+    const matchesQuery = (text?: string) => (text ?? "").toLowerCase().includes(query);
+
+    const filteredByName = allVenues.filter(v =>
+      matchesQuery(v.name) ||
+      matchesQuery(v.address) ||
+      matchesQuery(v.city) ||
+      matchesQuery(v.notes)
+    );
+    setFilteredVenues(filteredByName);
+    setVenues(filteredByName);
+  }, [searchedVenueName, allVenues]);
+
   const extractPriceFromText = (text?: string): number => {
     if (!text) return 0;
     // Extract first number from price text like "$30/hr" or "$25-35/hr"

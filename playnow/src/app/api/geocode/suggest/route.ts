@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
     }
 
     const data = (await res.json()) as { items?: HereSuggestItem[] };
-    const suggestions = (data.items || [])
+    let suggestions = (data.items || [])
       .filter((it) => !!(it.title || it.address?.label))
       .slice(0, 5)
       .map((it) => {
@@ -199,6 +199,9 @@ export async function GET(req: NextRequest) {
 
         return { id: it.id, label, city, countryCode, suburb, state };
       });
+
+    // Enforce suburb-only: keep only entries that have a suburb value
+    suggestions = suggestions.filter((s) => typeof s.suburb === 'string' && s.suburb.trim().length > 0);
 
     return NextResponse.json({ suggestions });
   } catch (err) {

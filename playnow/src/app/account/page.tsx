@@ -84,6 +84,11 @@ function AccountPageInner() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!user || !supabase) return;
+    // Require suburb for location accuracy
+    if (!suburb || suburb.trim().length === 0) {
+      setError("Please choose a suburb from suggestions");
+      return;
+    }
     setSaving(true);
     setMessage(null);
     setError(null);
@@ -187,7 +192,7 @@ function AccountPageInner() {
               />
             </div>
             <div className="relative">
-              <label className="block text-sm text-[#b8c5d6] mb-1">Search Location</label>
+              <label className="block text-sm text-[#b8c5d6] mb-1">Search Location (suburb)</label>
               <input
                 type="text"
                 value={location}
@@ -306,7 +311,6 @@ function AccountPageInner() {
                           setCity(s.city || '');
                           setCountryCode(s.countryCode || '');
                           setState(s.state || '');
-                          // If only a city was typed/selected, leave suburb blank
                           setSuburb(s.suburb || '');
                         }
                       }}
@@ -321,7 +325,7 @@ function AccountPageInner() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-[#b8c5d6] mb-1">City</label>
               <input
@@ -356,7 +360,7 @@ function AccountPageInner() {
               />
             </div>
             <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">State</label>
+              <label className="block text-sm text-[#b8c5d6] mb-1">State (required)</label>
               <input
                 type="text"
                 value={state}

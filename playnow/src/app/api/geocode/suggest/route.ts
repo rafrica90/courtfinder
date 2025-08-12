@@ -287,8 +287,8 @@ export async function GET(req: NextRequest) {
         return okCountry && (hasPc || labelHasPc);
       });
     } else {
-      // Default: keep only suburb-type entries to avoid city-only
-      suggestions = suggestions.filter((s) => typeof s.suburb === 'string' && s.suburb.trim().length > 0);
+      // For general search, allow any locality/address types and just enforce country filter
+      suggestions = suggestions.filter((s) => !filterCountry || s.countryCode === filterCountry);
     }
 
     return NextResponse.json({ suggestions });

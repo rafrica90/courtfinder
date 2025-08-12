@@ -99,7 +99,15 @@ export default function SignUpPage() {
     if (step === 1) return location.trim().length >= 3 && !!countryCode; // require country from selection
     if (step === 2) return validPhone(phone, countryCode);
     if (step === 3) return /@/.test(email);
-    if (step === 4) return password.length >= 8 && !/(password|123456|qwerty)/i.test(password) && (!email || password.toLowerCase().indexOf(email.split("@")[0]?.toLowerCase()) === -1);
+    if (step === 4) {
+      const local = (email.split("@")[0] || "").toLowerCase();
+      const pwd = password.toLowerCase();
+      return (
+        password.length >= 8 &&
+        !/(password|123456|qwerty)/i.test(password) &&
+        (!email || !pwd.includes(local))
+      );
+    }
     return false;
   }, [step, displayName, countryCode, phone, location, email, password]);
 
@@ -312,7 +320,7 @@ export default function SignUpPage() {
       <div className="fixed inset-0 bg-black/60" />
       <div className="relative w-full max-w-md bg-[#0d1b31] p-6 sm:p-8 rounded-lg shadow-xl border border-white/10">
         <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">Create Account</h1>
-        <p className="text-sm text-[#b8c5d6] mb-4">Step {step + 1} of 6</p>
+        <p className="text-sm text-[#b8c5d6] mb-4">Step {step + 1} of {totalSteps}</p>
 
         {renderStep()}
 
@@ -328,10 +336,10 @@ export default function SignUpPage() {
           >
             Back
           </button>
-          {step < 5 ? (
+          {step < totalSteps - 1 ? (
             <button
               type="button"
-              onClick={() => setStep((s) => Math.min(5, s + 1))}
+              onClick={() => setStep((s) => Math.min(totalSteps - 1, s + 1))}
               disabled={!canNext || loading}
               className="px-4 py-2 rounded-lg bg-[#00d9ff] text-[#0a1628] hover:bg-[#00bfe0] disabled:opacity-50"
             >

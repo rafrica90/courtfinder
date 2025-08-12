@@ -91,10 +91,7 @@ function AccountPageInner() {
     if (!email.trim()) { setError('Email is required'); return; }
     if (!phone.trim()) { setError('Mobile is required'); return; }
     if (!countryCode.trim()) { setError('Country is required'); return; }
-    if (!location || location.trim().length < 3) { setError('Please enter a valid postcode and pick from suggestions'); return; }
-    if (!city.trim()) { setError('City is required (select a postcode suggestion)'); return; }
-    if (!state.trim()) { setError('State is required (select a postcode suggestion)'); return; }
-    if (!suburb.trim()) { setError('Suburb is required (select a postcode suggestion)'); return; }
+    if (!location || location.trim().length < 3) { setError('Please enter a valid postcode or location'); return; }
     setSaving(true);
     setMessage(null);
     setError(null);
@@ -360,7 +357,6 @@ function AccountPageInner() {
                 readOnly
                 className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
                 placeholder="e.g., Sydney"
-                required
               />
             </div>
             <div>
@@ -371,7 +367,6 @@ function AccountPageInner() {
                 readOnly
                 className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
                 placeholder="e.g., NSW"
-                required
               />
             </div>
           </div>
@@ -385,7 +380,6 @@ function AccountPageInner() {
               readOnly
               className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
               placeholder="e.g., Parramatta"
-              required
             />
           </div>
           {/* Duplicate postcode block removed */}

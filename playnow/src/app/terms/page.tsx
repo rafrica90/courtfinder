@@ -3,8 +3,8 @@ export default function TermsPage() {
     <main className="mx-auto max-w-3xl px-6 py-12 space-y-10">
       <header>
         <h1 className="text-3xl font-semibold">Terms of Service</h1>
-        <p className="mt-2 text-[var(--text-secondary)]"><strong>Effective date:</strong> [Month Day, Year]</p>
-        <p className="mt-4 text-[var(--text-secondary)]">Welcome to FindDDDDD (the "Service"). By using the Service at [domain], you agree to these Terms of Service and our Privacy Policy. If you do not agree, please discontinue use.</p>
+        <p className="mt-2 text-[var(--text-secondary)]"><strong>Effective date:</strong> August 12, 2025</p>
+        <p className="mt-4 text-[var(--text-secondary)]">Welcome to CourtFinder (the "Service"). By using the Service at courtfinder.app, you agree to these Terms of Service and our Privacy Policy. If you do not agree, please discontinue use.</p>
       </header>
 
       <section className="space-y-3">
@@ -53,7 +53,7 @@ export default function TermsPage() {
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Indemnification</h2>
-        <p className="text-[var(--text-secondary)]">You agree to indemnify and hold [Your Company Name] and its affiliates harmless from claims, losses, and expenses (including reasonable attorneys' fees) arising from your use of the Service or violation of these Terms.</p>
+        <p className="text-[var(--text-secondary)]">You agree to indemnify and hold CourtFinder and its affiliates harmless from claims, losses, and expenses (including reasonable attorneys' fees) arising from your use of the Service or violation of these Terms.</p>
       </section>
 
       <section className="space-y-3">
@@ -63,12 +63,12 @@ export default function TermsPage() {
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Governing Law; Dispute Resolution</h2>
-        <p className="text-[var(--text-secondary)]">These Terms are governed by the laws of [Jurisdiction], without regard to conflict-of-law principles. Disputes will be resolved in the courts located in [Venue], unless otherwise required by applicable law. Where permitted, you agree to waive class actions and to resolve disputes individually.</p>
+        <p className="text-[var(--text-secondary)]">Governing law and forum will be determined by applicable law. Where permitted, disputes will be resolved on an individual basis and not as a class, consolidated, or representative action.</p>
       </section>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">DMCA</h2>
-        <p className="text-[var(--text-secondary)]">If you believe content infringes your copyright, please send a notice to our designated agent: [DMCA Agent Name], [Address], [Email].</p>
+        <p className="text-[var(--text-secondary)]">If you believe content infringes your copyright, please send a notice to our designated agent at admin@bitnifty.com.au.</p>
       </section>
 
       <section className="space-y-3">
@@ -78,7 +78,7 @@ export default function TermsPage() {
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Contact</h2>
-        <p className="text-[var(--text-secondary)]">Questions about these Terms: [email]</p>
+        <p className="text-[var(--text-secondary)]">Questions about these Terms: admin@bitnifty.com.au</p>
       </section>
     </main>
   );

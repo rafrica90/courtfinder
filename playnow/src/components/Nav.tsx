@@ -61,7 +61,7 @@ export default function Nav() {
               className={`${baseLinkClass} ${isVenues ? activeLinkClass : ""}`}
               aria-current={isVenues ? "page" : undefined}
             >
-              Browse Venues
+              Find Courts
             </Link>
             <Link
               href="/games"
@@ -127,7 +127,7 @@ export default function Nav() {
               onClick={() => setMobileMenuOpen(false)}
               aria-current={isVenues ? "page" : undefined}
             >
-              Browse Venues
+              Find Courts
             </Link>
             <Link
               href="/games"

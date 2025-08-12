@@ -3,7 +3,7 @@ export default function CookiePage() {
     <main className="mx-auto max-w-3xl px-6 py-12 space-y-10">
       <header>
         <h1 className="text-3xl font-semibold">Cookie Policy</h1>
-        <p className="mt-2 text-[var(--text-secondary)]"><strong>Effective date:</strong> [Month Day, Year]</p>
+        <p className="mt-2 text-[var(--text-secondary)]"><strong>Effective date:</strong> August 12, 2025</p>
       </header>
 
       <section className="space-y-3">
@@ -43,7 +43,7 @@ export default function CookiePage() {
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Contact</h2>
-        <p className="text-[var(--text-secondary)]">Questions about this policy: [email]</p>
+        <p className="text-[var(--text-secondary)]">Questions about this policy: admin@bitnifty.com.au</p>
       </section>
 
       <section className="space-y-3">

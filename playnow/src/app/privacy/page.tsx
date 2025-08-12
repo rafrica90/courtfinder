@@ -3,13 +3,13 @@ export default function PrivacyPage() {
     <main className="mx-auto max-w-3xl px-6 py-12 space-y-10">
       <header>
         <h1 className="text-3xl font-semibold">Privacy Policy</h1>
-        <p className="mt-2 text-[var(--text-secondary)]"><strong>Effective date:</strong> [Month Day, Year]</p>
-        <p className="mt-4 text-[var(--text-secondary)]">This Privacy Policy explains how [Your Company Name] ("we", "us") collects, uses, and shares personal information when you access or use our website and services at [domain] (the "Service"). If you do not agree with this Policy, please do not use the Service.</p>
+        <p className="mt-2 text-[var(--text-secondary)]"><strong>Effective date:</strong> August 12, 2025</p>
+        <p className="mt-4 text-[var(--text-secondary)]">This Privacy Policy explains how CourtFinder ("we", "us") collects, uses, and shares personal information when you access or use our website and services at courtfinder.app (the "Service"). If you do not agree with this Policy, please do not use the Service.</p>
       </header>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Data Controller and Contact</h2>
-        <p className="text-[var(--text-secondary)]">Controller: [Your Company Name], [Address]. Contact: [email]</p>
+        <p className="text-[var(--text-secondary)]">Controller: CourtFinder. Contact: admin@bitnifty.com.au</p>
       </section>
 
       <section className="space-y-3">
@@ -75,7 +75,7 @@ export default function PrivacyPage() {
           <li><strong>EEA/UK:</strong> access, rectify, erase, restrict, object, and data portability; right to lodge a complaint with a supervisory authority.</li>
           <li><strong>California:</strong> right to know, delete, correct, and to limit use of sensitive personal information (if collected); no discrimination for exercising rights.</li>
         </ul>
-        <p className="text-[var(--text-secondary)]">To exercise rights or submit a request, contact us at [email]. We may verify your identity and respond within the timeframe required by law. Authorized agents may submit requests as permitted.</p>
+        <p className="text-[var(--text-secondary)]">To exercise rights or submit a request, contact us at admin@bitnifty.com.au. We may verify your identity and respond within the timeframe required by law. Authorized agents may submit requests as permitted.</p>
       </section>
 
       <section className="space-y-3">
@@ -105,7 +105,7 @@ export default function PrivacyPage() {
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">How to Contact Us</h2>
-        <p className="text-[var(--text-secondary)]">Questions or requests regarding this Policy may be sent to [email].</p>
+        <p className="text-[var(--text-secondary)]">Questions or requests regarding this Policy may be sent to admin@bitnifty.com.au.</p>
       </section>
     </main>
   );

@@ -50,6 +50,26 @@ const fallbackPostalCodes = [
   { label: 'Perth WA 6000, Australia', city: 'Perth', state: 'WA', countryCode: 'AU', postalCode: '6000' },
 ];
 
+// Minimal fallback mapping of postal code → suburbs (for local dev without HERE API)
+const fallbackPostalToSuburbs: Record<string, { suburb: string; city: string; state: string; countryCode: string; postalCode: string; }[]> = {
+  // Western Sydney examples
+  '2145': [
+    { suburb: 'Greystanes', city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2145' },
+    { suburb: 'Wentworthville', city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2145' },
+    { suburb: 'Westmead', city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2145' },
+  ],
+  '2150': [
+    { suburb: 'Parramatta', city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2150' },
+    { suburb: 'North Parramatta', city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2150' },
+    { suburb: "O'Connell", city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2150' },
+  ],
+  '2160': [
+    { suburb: 'Merrylands', city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2160' },
+    { suburb: 'Guildford', city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2160' },
+    { suburb: 'Merrylands West', city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2160' },
+  ],
+};
+
 export async function GET(req: NextRequest) {
   const rl = await withRateLimit(req, strictRateLimiter);
   if (!rl.success) return rl.response!;
@@ -136,9 +156,23 @@ export async function GET(req: NextRequest) {
   // If no API key, provide fallback suggestions
   if (!apiKey) {
     if (type === 'postalCode') {
+      const digitsOnly = q.replace(/\D/g, '');
+      const pcSuburbs = fallbackPostalToSuburbs[digitsOnly];
+      if (pcSuburbs && pcSuburbs.length > 0) {
+        const suggestions = pcSuburbs.map((s, idx) => ({
+          id: `fallback-pcsub-${digitsOnly}-${idx}`,
+          label: `${s.suburb}, ${s.city}, ${s.state} ${s.postalCode}, Australia`,
+          city: s.city,
+          countryCode: s.countryCode,
+          suburb: s.suburb,
+          state: s.state,
+          postalCode: s.postalCode,
+        }));
+        return NextResponse.json({ suggestions });
+      }
       const qLower = q.toLowerCase();
       const filtered = fallbackPostalCodes
-        .filter(pc => (!filterCountry || pc.countryCode === filterCountry) && (pc.postalCode.includes(qLower) || pc.label.toLowerCase().includes(qLower)))
+        .filter(pc => (!filterCountry || pc.countryCode === filterCountry) && (pc.postalCode.includes(digitsOnly) || pc.label.toLowerCase().includes(qLower)))
         .slice(0, 5)
         .map((pc, idx) => ({ id: `fallback-pc-${idx}`, label: pc.label, city: pc.city, countryCode: pc.countryCode, suburb: '', state: pc.state, postalCode: pc.postalCode }));
       return NextResponse.json({ suggestions: filtered });
@@ -159,15 +193,15 @@ export async function GET(req: NextRequest) {
 
   try {
     const url = new URL('https://autosuggest.search.hereapi.com/v1/autosuggest');
+    // For postal code flow, we do NOT restrict types so we can receive suburb/locality
+    // items that include the postalCode. We'll filter them after.
     url.searchParams.set('q', q);
     url.searchParams.set('apiKey', apiKey);
     url.searchParams.set('limit', '5');
     // Add a broad search area (worldwide) or use user's location if available
     url.searchParams.set('at', '0,0'); // Center point for worldwide search
     url.searchParams.set('lang', 'en');
-    if (type === 'postalCode') {
-      url.searchParams.set('types', 'postalCode');
-    }
+    // no type restriction when type === 'postalCode'
 
     const res = await fetch(url.toString());
     if (!res.ok) {
@@ -245,11 +279,12 @@ export async function GET(req: NextRequest) {
 
     // Apply filtering based on requested type
     if (type === 'postalCode') {
-      suggestions = suggestions.filter((s, idx) => {
-        const item = (data.items || [])[idx];
-        const isPostal = item?.resultType === 'postalCode' || /\b\d{3,}\b/.test(s.label);
+      const digitsOnly = q.replace(/\D/g, '');
+      suggestions = suggestions.filter((s) => {
+        const hasPc = (s as any).postalCode && (s as any).postalCode.toString().includes(digitsOnly);
+        const labelHasPc = s.label && new RegExp(`\\b${digitsOnly}\\b`).test(s.label);
         const okCountry = !filterCountry || s.countryCode === filterCountry;
-        return isPostal && okCountry;
+        return okCountry && (hasPc || labelHasPc);
       });
     } else {
       // Default: keep only suburb-type entries to avoid city-only

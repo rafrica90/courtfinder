@@ -51,7 +51,7 @@ function AccountPageInner() {
       setCity(exact.city);
       setCountryCode(exact.countryCode);
       setState(exact.state);
-      setSuburb('');
+      setSuburb(exact.suburb || '');
     }
   }, [location, suggestions]);
 
@@ -86,12 +86,15 @@ function AccountPageInner() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!user || !supabase) return;
-    // Require suburb for location accuracy
-    // For postcode flow require a selected postcode (location holds the postalCode)
-    if (!location || location.trim().length < 3) {
-      setError("Please enter a valid postcode and pick from suggestions");
-      return;
-    }
+    // Client-side required field checks
+    if (!displayName.trim()) { setError('Name is required'); return; }
+    if (!email.trim()) { setError('Email is required'); return; }
+    if (!phone.trim()) { setError('Mobile is required'); return; }
+    if (!countryCode.trim()) { setError('Country is required'); return; }
+    if (!location || location.trim().length < 3) { setError('Please enter a valid postcode and pick from suggestions'); return; }
+    if (!city.trim()) { setError('City is required (select a postcode suggestion)'); return; }
+    if (!state.trim()) { setError('State is required (select a postcode suggestion)'); return; }
+    if (!suburb.trim()) { setError('Suburb is required (select a postcode suggestion)'); return; }
     setSaving(true);
     setMessage(null);
     setError(null);
@@ -171,16 +174,30 @@ function AccountPageInner() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm text-[#b8c5d6] mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
-              placeholder="you@example.com"
-            />
-            <p className="mt-1 text-xs text-[#6b7b8f]">Changing email may require confirmation via email.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-[#b8c5d6] mb-1">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                placeholder="you@example.com"
+                required
+              />
+              <p className="mt-1 text-xs text-[#6b7b8f]">Changing email may require confirmation via email.</p>
+            </div>
+            <div>
+              <label className="block text-sm text-[#b8c5d6] mb-1">Mobile</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                placeholder="+1 555 555 5555"
+                required
+              />
+            </div>
           </div>
 
           {/* Password first */}
@@ -207,23 +224,15 @@ function AccountPageInner() {
             </div>
           </div>
 
+          {/* Country and Postcode on the same line */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">Mobile</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
-                placeholder="+1 555 555 5555"
-              />
-            </div>
             <div>
               <label className="block text-sm text-[#b8c5d6] mb-1">Country</label>
               <select
                 value={countryCode}
                 onChange={(e) => setCountryCode(e.target.value)}
                 className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                required
               >
                 <option value="AU">Australia</option>
                 <option value="NZ">New Zealand</option>
@@ -232,9 +241,108 @@ function AccountPageInner() {
                 <option value="CA">Canada</option>
               </select>
             </div>
+            <div>
+              <label className="block text-sm text-[#b8c5d6] mb-1">Postcode</label>
+              <input
+                type="text"
+                value={location}
+                onChange={async (e) => {
+                  const v = e.target.value.replace(/[^0-9]/g, '');
+                  setLocation(v);
+                  if (v.trim().length < 3) {
+                    setSuggestions([]);
+                    setShowSuggestions(false);
+                    setSuggestLoading(false);
+                    return;
+                  }
+                  if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+                  debounceTimerRef.current = setTimeout(async () => {
+                    try {
+                      if (suggestAbortRef.current) suggestAbortRef.current.abort();
+                      suggestAbortRef.current = new AbortController();
+                      setSuggestLoading(true);
+                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(v)}`, { signal: suggestAbortRef.current.signal });
+                      const json = await res.json();
+                      if (json?.suggestions && json.suggestions.length > 0) {
+                        setSuggestions(json.suggestions);
+                        setShowSuggestions(true);
+                      } else {
+                        setSuggestions([]);
+                        setShowSuggestions(false);
+                      }
+                    } catch (err) {
+                      setSuggestions([]);
+                      setShowSuggestions(false);
+                    } finally {
+                      setSuggestLoading(false);
+                    }
+                  }, 250);
+                }}
+                onFocus={async () => {
+                  if (location.trim().length >= 3) {
+                    try {
+                      setSuggestLoading(true);
+                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(location)}`);
+                      const json = await res.json();
+                      if (json?.suggestions && json.suggestions.length > 0) {
+                        setSuggestions(json.suggestions);
+                        setShowSuggestions(true);
+                      }
+                    } catch {}
+                    finally { setSuggestLoading(false); }
+                  }
+                }}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                placeholder="e.g., 2150"
+                required
+              />
+              {showSuggestions && (
+                <div className="relative">
+                  <div className="absolute z-10 w-full mt-1 bg-[#0f1f39] border border-white/10 rounded-md shadow-lg max-h-60 overflow-auto">
+                    {suggestLoading && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">Searching…</div>)}
+                    {!suggestLoading && suggestions.length === 0 && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">No results</div>)}
+                    {!suggestLoading && suggestions.map((s, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={async () => {
+                          setShowSuggestions(false);
+                          try {
+                            if (s.id) {
+                              const res = await fetch(`/api/geocode/suggest?id=${encodeURIComponent(s.id)}`);
+                              const json = await res.json();
+                              if (json.location) {
+                                const loc = json.location;
+                                setLocation(loc.postalCode || '');
+                                setCity(loc.city || '');
+                                setCountryCode(loc.countryCode ? loc.countryCode.substring(0,2): countryCode);
+                                setState(loc.state || '');
+                                setSuburb(loc.suburb || '');
+                                return;
+                              }
+                            }
+                          } catch {}
+                          // fallback
+                          setLocation(s.postalCode || '');
+                          setCity(s.city || '');
+                          setCountryCode(s.countryCode || countryCode);
+                          setState(s.state || '');
+                          setSuburb(s.suburb || '');
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"
+                      >
+                        <div className="font-medium">{s.label}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* City and State derived from Postcode */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-[#b8c5d6] mb-1">City</label>
               <input
@@ -243,215 +351,35 @@ function AccountPageInner() {
                 readOnly
                 className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
                 placeholder="e.g., Sydney"
+                required
               />
             </div>
             <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">Postcode</label>
-              <input
-                type="text"
-                value={location}
-                onChange={async (e) => {
-                  const v = e.target.value.replace(/[^0-9]/g, '');
-                  setLocation(v);
-                  if (v.trim().length < 3) {
-                    setSuggestions([]);
-                    setShowSuggestions(false);
-                    setSuggestLoading(false);
-                    return;
-                  }
-                  if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-                  debounceTimerRef.current = setTimeout(async () => {
-                    try {
-                      if (suggestAbortRef.current) suggestAbortRef.current.abort();
-                      suggestAbortRef.current = new AbortController();
-                      setSuggestLoading(true);
-                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(v)}`, { signal: suggestAbortRef.current.signal });
-                      const json = await res.json();
-                      if (json?.suggestions && json.suggestions.length > 0) {
-                        setSuggestions(json.suggestions);
-                        setShowSuggestions(true);
-                      } else {
-                        setSuggestions([]);
-                        setShowSuggestions(false);
-                      }
-                    } catch (err) {
-                      setSuggestions([]);
-                      setShowSuggestions(false);
-                    } finally {
-                      setSuggestLoading(false);
-                    }
-                  }, 250);
-                }}
-                onFocus={async () => {
-                  if (location.trim().length >= 3) {
-                    try {
-                      setSuggestLoading(true);
-                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(location)}`);
-                      const json = await res.json();
-                      if (json?.suggestions && json.suggestions.length > 0) {
-                        setSuggestions(json.suggestions);
-                        setShowSuggestions(true);
-                      }
-                    } catch {}
-                    finally { setSuggestLoading(false); }
-                  }
-                }}
-                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
-                placeholder="e.g., 2150"
-              />
-              {showSuggestions && (
-                <div className="relative">
-                  <div className="absolute z-10 w-full mt-1 bg-[#0f1f39] border border-white/10 rounded-md shadow-lg max-h-60 overflow-auto">
-                    {suggestLoading && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">Searching…</div>)}
-                    {!suggestLoading && suggestions.length === 0 && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">No results</div>)}
-                    {!suggestLoading && suggestions.map((s, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={async () => {
-                          setShowSuggestions(false);
-                          try {
-                            if (s.id) {
-                              const res = await fetch(`/api/geocode/suggest?id=${encodeURIComponent(s.id)}`);
-                              const json = await res.json();
-                              if (json.location) {
-                                const loc = json.location;
-                                setLocation(loc.postalCode || '');
-                                setCity(loc.city || '');
-                                setCountryCode(loc.countryCode ? loc.countryCode.substring(0,2): countryCode);
-                                setState(loc.state || '');
-                                setSuburb('');
-                                return;
-                              }
-                            }
-                          } catch {}
-                          // fallback
-                          setLocation(s.postalCode || '');
-                          setCity(s.city || '');
-                          setCountryCode(s.countryCode || countryCode);
-                          setState(s.state || '');
-                          setSuburb('');
-                        }}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"
-                      >
-                        <div className="font-medium">{s.label}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">Postcode</label>
-              <input
-                type="text"
-                value={location}
-                onChange={async (e) => {
-                  const v = e.target.value.replace(/[^0-9]/g, '');
-                  setLocation(v);
-                  if (v.trim().length < 3) {
-                    setSuggestions([]);
-                    setShowSuggestions(false);
-                    setSuggestLoading(false);
-                    return;
-                  }
-                  if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-                  debounceTimerRef.current = setTimeout(async () => {
-                    try {
-                      if (suggestAbortRef.current) suggestAbortRef.current.abort();
-                      suggestAbortRef.current = new AbortController();
-                      setSuggestLoading(true);
-                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(v)}`, { signal: suggestAbortRef.current.signal });
-                      const json = await res.json();
-                      if (json?.suggestions && json.suggestions.length > 0) {
-                        setSuggestions(json.suggestions);
-                        setShowSuggestions(true);
-                      } else {
-                        setSuggestions([]);
-                        setShowSuggestions(false);
-                      }
-                    } catch (err) {
-                      setSuggestions([]);
-                      setShowSuggestions(false);
-                    } finally {
-                      setSuggestLoading(false);
-                    }
-                  }, 250);
-                }}
-                onFocus={async () => {
-                  if (location.trim().length >= 3) {
-                    try {
-                      setSuggestLoading(true);
-                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(location)}`);
-                      const json = await res.json();
-                      if (json?.suggestions && json.suggestions.length > 0) {
-                        setSuggestions(json.suggestions);
-                        setShowSuggestions(true);
-                      }
-                    } catch {}
-                    finally { setSuggestLoading(false); }
-                  }
-                }}
-                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
-                placeholder="e.g., 2150"
-              />
-              {showSuggestions && (
-                <div className="relative">
-                  <div className="absolute z-10 w-full mt-1 bg-[#0f1f39] border border-white/10 rounded-md shadow-lg max-h-60 overflow-auto">
-                    {suggestLoading && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">Searching…</div>)}
-                    {!suggestLoading && suggestions.length === 0 && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">No results</div>)}
-                    {!suggestLoading && suggestions.map((s, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={async () => {
-                          setShowSuggestions(false);
-                          try {
-                            if (s.id) {
-                              const res = await fetch(`/api/geocode/suggest?id=${encodeURIComponent(s.id)}`);
-                              const json = await res.json();
-                              if (json.location) {
-                                const loc = json.location;
-                                setLocation(loc.postalCode || '');
-                                setCity(loc.city || '');
-                                setCountryCode(loc.countryCode ? loc.countryCode.substring(0,2): countryCode);
-                                setState(loc.state || '');
-                                setSuburb('');
-                                return;
-                              }
-                            }
-                          } catch {}
-                          // fallback
-                          setLocation(s.postalCode || '');
-                          setCity(s.city || '');
-                          setCountryCode(s.countryCode || countryCode);
-                          setState(s.state || '');
-                          setSuburb('');
-                        }}
-                        className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"
-                      >
-                        <div className="font-medium">{s.label}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">State (required)</label>
+              <label className="block text-sm text-[#b8c5d6] mb-1">State</label>
               <input
                 type="text"
                 value={state}
                 readOnly
                 className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
                 placeholder="e.g., NSW"
+                required
               />
             </div>
           </div>
+
+          {/* Suburb - greyed out */}
+          <div>
+            <label className="block text-sm text-[#b8c5d6] mb-1">Suburb</label>
+            <input
+              type="text"
+              value={suburb}
+              readOnly
+              className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
+              placeholder="e.g., Parramatta"
+              required
+            />
+          </div>
+          {/* Duplicate postcode block removed */}
 
           {/* Removed auto-normalize button; autocomplete will be used instead */}
         </section>

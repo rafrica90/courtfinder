@@ -185,11 +185,15 @@ export async function GET(req: NextRequest) {
           countryCode = countryMap[country] || '';
         }
 
-        // If state not provided, try to infer from the third part (e.g., "NSW 2145")
-        if (!state && parts.length >= 3) {
-          const region = parts[2].split(/[\s-]/)[0];
-          if (region && region.length >= 2 && region.length <= 3) {
-            state = region;
+        // If state not provided, try to infer by scanning middle tokens for AU-style codes
+        if (!state && parts.length >= 2) {
+          const lastIndex = parts.length - 1; // country index
+          for (let i = 1; i < lastIndex; i++) {
+            const token = parts[i].split(/[\s-]/)[0];
+            if (token && token.length >= 2 && token.length <= 3 && token.toUpperCase() === token) {
+              state = token; // e.g., NSW, VIC, QLD
+              break;
+            }
           }
         }
 

@@ -278,9 +278,19 @@ function AccountPageInner() {
                               // Normalize AU heuristics: if label looks like
                               // "Suburb, City, STATE, Country" fill accordingly
                               const parts = (loc.label || '').split(',').map((p: string) => p.trim());
-                              const inferredSuburb = parts[0] || loc.suburb || '';
-                              const inferredCity = parts[1] || loc.city || '';
-                              const inferredState = loc.state || (parts[2] ? parts[2].split(/[\s-]/)[0] : '');
+                              const inferredSuburb = parts.length >= 4 ? (parts[0] || loc.suburb || '') : (loc.suburb || '');
+                              const inferredCity = loc.city || (parts[0] || '');
+                              // search through tokens for an uppercase 2-3 letter code (NSW/VIC/QLD)
+                              let inferredState = loc.state || '';
+                              if (!inferredState) {
+                                for (let i = 1; i < parts.length - 1; i++) {
+                                  const token = parts[i].split(/[\s-]/)[0];
+                                  if (token && token.length >= 2 && token.length <= 3 && token.toUpperCase() === token) {
+                                    inferredState = token;
+                                    break;
+                                  }
+                                }
+                              }
 
                               setLocation(loc.label);
                               setCity(inferredCity);

@@ -134,62 +134,60 @@ export async function GET(req: NextRequest) {
 
     const data = (await res.json()) as { items?: HereSuggestItem[] };
     const suggestions = (data.items || [])
-      .filter((it) => {
-        // Include any result with a title or address label
-        return !!(it.title || it.address?.label);
-      })
-      .slice(0, 5) // Limit to 5 suggestions
+      .filter((it) => !!(it.title || it.address?.label))
+      .slice(0, 5)
       .map((it) => {
         const label = it.address?.label || it.title || '';
-        // Parse city and country from label (e.g., "Sydney, NSW 2000, Australia")
-        const parts = label.split(',').map(p => p.trim());
-        let city = '';
-        let countryCode = '';
-        let suburb = '';
-        let state = '';
-        
-        // For localities, the first part is usually the city
-        if (it.resultType === 'locality' && parts.length > 0) {
-          city = parts[0];
+        const parts = label.split(',').map((p) => p.trim());
+
+        // Prefer structured fields when available
+        let suburb = (it as any)?.address?.district || (it as any)?.address?.subdistrict || '';
+        let city = it.address?.city || '';
+        let state = it.address?.stateCode || it.address?.state || '';
+
+        // Heuristic parsing for AU-style labels like
+        // "Greystanes, Sydney, NSW 2145, Australia"
+        if (parts.length >= 2) {
+          if (!suburb) suburb = parts[0];
+          // If city equals suburb (common for localities), take the second part as city
+          if (!city || city.toLowerCase() === suburb.toLowerCase()) {
+            city = parts[1];
+          }
         }
-        
-        // The last part is usually the country
+
+        // Derive country code from the last token
+        let countryCode = '';
         if (parts.length > 0) {
           const country = parts[parts.length - 1];
-          // Map common country names to ISO codes
           const countryMap: Record<string, string> = {
-            'Australia': 'AU',
+            Australia: 'AU',
             'United States': 'US',
             'United Kingdom': 'GB',
-            'Canada': 'CA',
+            Canada: 'CA',
             'New Zealand': 'NZ',
-            'Germany': 'DE',
-            'France': 'FR',
-            'Spain': 'ES',
-            'Italy': 'IT',
-            'Japan': 'JP',
-            'China': 'CN',
-            'India': 'IN',
-            'Brazil': 'BR',
-            'Mexico': 'MX',
-            'England': 'GB',
+            Germany: 'DE',
+            France: 'FR',
+            Spain: 'ES',
+            Italy: 'IT',
+            Japan: 'JP',
+            China: 'CN',
+            India: 'IN',
+            Brazil: 'BR',
+            Mexico: 'MX',
+            England: 'GB',
           };
           countryCode = countryMap[country] || '';
         }
 
-        if (it.address) {
-          suburb = it.address.county || '';
-          state = it.address.state || '';
+        // If state not provided, try to infer from the third part (e.g., "NSW 2145")
+        if (!state && parts.length >= 3) {
+          const region = parts[2].split(/[\s-]/)[0];
+          if (region && region.length >= 2 && region.length <= 3) {
+            state = region;
+          }
         }
 
-        return {
-          id: it.id,
-          label,
-          city,
-          countryCode,
-          suburb,
-          state,
-        };
+        return { id: it.id, label, city, countryCode, suburb, state };
       });
 
     return NextResponse.json({ suggestions });

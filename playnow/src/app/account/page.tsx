@@ -275,11 +275,18 @@ function AccountPageInner() {
                             const json = await res.json();
                             if (json.location) {
                               const loc = json.location;
+                              // Normalize AU heuristics: if label looks like
+                              // "Suburb, City, STATE, Country" fill accordingly
+                              const parts = (loc.label || '').split(',').map((p: string) => p.trim());
+                              const inferredSuburb = parts[0] || loc.suburb || '';
+                              const inferredCity = parts[1] || loc.city || '';
+                              const inferredState = loc.state || (parts[2] ? parts[2].split(/[\s-]/)[0] : '');
+
                               setLocation(loc.label);
-                              setCity(loc.city || '');
+                              setCity(inferredCity);
                               setCountryCode(loc.countryCode ? loc.countryCode.substring(0, 2) : '');
-                              setState(loc.state || '');
-                              setSuburb(loc.suburb || '');
+                              setState(inferredState);
+                              setSuburb(inferredSuburb);
                               return;
                             }
                           }

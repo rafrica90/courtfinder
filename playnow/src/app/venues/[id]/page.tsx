@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 import { MapPin, Clock, Star, Shield, Users, Calendar, ChevronRight, Heart, Share2, Phone, Mail, Globe } from "lucide-react";
+import VenueImage from "@/components/VenueImage";
 
 export default async function VenueDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -30,13 +31,11 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
     <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c]">
       {/* Hero Image Section */}
       <div className="relative h-96 bg-[#0f2847]">
-        <img
+        <VenueImage
           src={mainImage ? `/api/image?url=${encodeURIComponent(mainImage)}` : fallbackImage}
           alt={venue.name}
+          fallbackSrc={fallbackImage}
           className="w-full h-full object-cover opacity-90"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = fallbackImage;
-          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         

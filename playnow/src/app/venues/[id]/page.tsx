@@ -147,6 +147,8 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
               {(venue.bookingUrl || venue.booking_url) ? (
                 <a 
                   href={`/api/clicks?venueId=${venue.id}&redirect=${encodeURIComponent(venue.bookingUrl || venue.booking_url)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full block text-center px-6 py-3 bg-[#00ff88] text-[#0a1628] rounded-lg hover:bg-[#00cc6a] transition-colors font-bold mb-3 shadow-lg hover:shadow-[#00ff88]/30"
                 >
                   Book Now

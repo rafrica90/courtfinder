@@ -151,12 +151,12 @@ export async function GET(req: NextRequest) {
         }
 
         // AU-style with suburb present: "Suburb, City, STATE 2000, Australia"
-        // Only infer suburb from label when there are many parts (>=4), otherwise leave blank
-        if (!suburb && parts.length >= 4) {
+        // Prefer the second token as city in this pattern
+        if (parts.length >= 4) {
           const possibleState = parts[2]?.split(/[\s-]/)[0];
           if (possibleState && possibleState.length >= 2 && possibleState.length <= 3) {
-            suburb = parts[0];
-            if (!city) city = parts[1];
+            if (!suburb) suburb = parts[0];
+            city = parts[1] || city; // override to City token (e.g., Sydney)
             if (!state) state = possibleState;
           }
         }

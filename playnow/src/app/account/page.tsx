@@ -192,7 +192,7 @@ function AccountPageInner() {
               />
             </div>
             <div className="relative">
-              <label className="block text-sm text-[#b8c5d6] mb-1">Search Location (suburb)</label>
+              <label className="block text-sm text-[#b8c5d6] mb-1">Enter your suburb</label>
               <input
                 type="text"
                 value={location}
@@ -256,8 +256,8 @@ function AccountPageInner() {
                   // Delay hiding to allow click on suggestion
                   setTimeout(() => setShowSuggestions(false), 200);
                 }}
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
-                placeholder="City, Country"
+                className="w-full rounded-lg border border-[#00d9ff]/40 bg-[#0b1a31] px-4 py-3 text-white placeholder-[#7aa2b7] focus:outline-none focus:ring-2 focus:ring-[#00d9ff] shadow-sm"
+                placeholder="Start typing your suburb…"
                 autoComplete="off"
               />
               {showSuggestions && (
@@ -284,7 +284,7 @@ function AccountPageInner() {
                               // "Suburb, City, STATE, Country" fill accordingly
                               const parts = (loc.label || '').split(',').map((p: string) => p.trim());
                               const inferredSuburb = parts.length >= 4 ? (parts[0] || loc.suburb || '') : (loc.suburb || '');
-                              const inferredCity = loc.city || (parts[0] || '');
+                              const inferredCity = parts.length >= 2 ? (parts[1] || loc.city || '') : (loc.city || parts[0] || '');
                               // search through tokens for an uppercase 2-3 letter code (NSW/VIC/QLD)
                               let inferredState = loc.state || '';
                               if (!inferredState) {

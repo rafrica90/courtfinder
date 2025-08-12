@@ -180,6 +180,30 @@ function AccountPageInner() {
             <p className="mt-1 text-xs text-[#6b7b8f]">Changing email may require confirmation via email.</p>
           </div>
 
+          {/* Password first */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-[#b8c5d6] mb-1">New password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                placeholder="••••••••"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-[#b8c5d6] mb-1">Confirm password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                placeholder="••••••••"
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-[#b8c5d6] mb-1">Mobile</label>
@@ -332,7 +356,7 @@ function AccountPageInner() {
                 type="text"
                 value={city}
                 readOnly
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
                 placeholder="e.g., Sydney"
               />
             </div>
@@ -342,7 +366,7 @@ function AccountPageInner() {
                 type="text"
                 value={countryCode}
                 readOnly
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
                 placeholder="AU"
                 maxLength={2}
               />
@@ -355,7 +379,7 @@ function AccountPageInner() {
                 type="text"
                 value={suburb}
                 readOnly
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
                 placeholder="e.g., Greystanes"
               />
             </div>
@@ -365,7 +389,7 @@ function AccountPageInner() {
                 type="text"
                 value={state}
                 readOnly
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
                 placeholder="e.g., NSW"
               />
             </div>
@@ -375,28 +399,6 @@ function AccountPageInner() {
         </section>
 
         <section className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">New password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
-                placeholder="••••••••"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">Confirm password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
-                placeholder="••••••••"
-              />
-            </div>
-          </div>
           <div className="flex justify-end">
             <button
               type="submit"

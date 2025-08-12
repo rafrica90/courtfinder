@@ -48,8 +48,8 @@ export default function SignUpPage() {
     }
     // Remove leading zeros
     while (digits.startsWith("0")) digits = digits.substring(1);
-    // Ensure 10 digits as requested
-    if (digits.length > 10) digits = digits.substring(digits.length - 10);
+    // Ensure 9 digits after country code
+    if (digits.length > 9) digits = digits.substring(digits.length - 9);
     return `${dial}${digits}`;
   }
 
@@ -61,7 +61,7 @@ export default function SignUpPage() {
 
   function validPhone(raw: string, cc: string): boolean {
     const dial = COUNTRY_TO_DIAL[cc] || "+";
-    const match = new RegExp(`^\\${dial}\\d{10}$`);
+    const match = new RegExp(`^\\${dial}\\d{9}$`);
     return match.test(raw);
   }
 
@@ -153,15 +153,15 @@ export default function SignUpPage() {
                 pattern="\\d*"
                 value={phoneDigits}
                 onChange={(e) => {
-                  const digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 10);
+                  const digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 9);
                   setPhoneDigits(digits);
                 }}
                 className="w-full px-3 py-2 rounded-r-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
-                placeholder="10 digits"
+                placeholder="9 digits"
               />
             </div>
             {!validPhone(phone, countryCode) && (
-              <p className="mt-1 text-xs text-[#b8c5d6]">Enter exactly 10 digits after the country code</p>
+              <p className="mt-1 text-xs text-[#b8c5d6]">Enter exactly 9 digits after the country code</p>
             )}
           </div>
         );

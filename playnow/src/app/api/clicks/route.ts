@@ -6,30 +6,90 @@ function isValidRedirectUrl(url: string): boolean {
   try {
     const redirectUrl = new URL(url);
     
-    // Get allowed domains from environment variable
-    const allowedDomains = process.env.ALLOWED_REDIRECT_DOMAINS?.split(',') || [
+    // For venue booking URLs, we allow any HTTPS URL from trusted venue booking sites
+    // These are external booking platforms that venues use
+    const trustedBookingDomains = [
+      'cityofsydney.nsw.gov.au',
+      'tennis.com.au',
+      'picklepoint.com.au',
+      'playpickle.com.au',
+      'northsydneytennis.com.au',
+      'whitecitytennis.com.au',
+      'parklandssports.com.au',
+      'lyneparktennis.com.au',
+      'bookable.net.au',
+      'tennisvenues.com.au',
+      'tennisworld.net.au',
+      'kikoff.com.au',
+      'ultimatesoccer.com.au',
+      'sydneyolympicpark.com.au',
+      'footballnsw.com.au',
+      'clubmarconi.com.au',
+      'intrinsicsports.com.au',
+      'fdlc.com.au',
+      'mosmanlawntennis.com.au',
+      'burwood.nsw.gov.au',
+      'cpsports.com.au',
+      'birchgrovetennis.com.au',
+      'haberfieldtennis.com.au',
+      'strathfieldsportsclub.com.au',
+      'southendtenniscentre.com.au',
+      'swtctennis.com.au',
+      'croydontenniscentre.com.au',
+      'wakehursttennis.com.au',
+      'ryde.nsw.gov.au',
+      'blacktown.nsw.gov.au',
+      'liverpool.nsw.gov.au',
+      'camden.nsw.gov.au',
+      'bayside.nsw.gov.au',
+      'canterbury-bankstown.nsw.gov.au',
+      'innerwest.nsw.gov.au',
+      'northernbeaches.nsw.gov.au',
+      'waverley.nsw.gov.au',
+      'pcycnsw.org.au',
+      'canadabay.nsw.gov.au',
+      'thejar.com.au',
+      'cityofparramatta.nsw.gov.au',
+      'thehills.nsw.gov.au',
+      'georgesriver.nsw.gov.au',
+      'bankstown.nsw.gov.au',
+      'uts.edu.au',
+      'citycommunitytennis.com.au'
+    ];
+    
+    // Get allowed internal domains from environment variable  
+    const allowedInternalDomains = process.env.ALLOWED_REDIRECT_DOMAINS?.split(',') || [
       'localhost:3000',
+      'localhost:3001',
       'courtfinder.app',
       'playnow.app'
     ];
     
-    // Check if the redirect domain is in the allowed list
     const hostname = redirectUrl.hostname;
-    const isAllowed = allowedDomains.some(domain => {
+    
+    // Check if it's an internal domain
+    const isInternalDomain = allowedInternalDomains.some(domain => {
       // Support wildcard subdomains
       if (domain.startsWith('*.')) {
         const baseDomain = domain.slice(2);
         return hostname === baseDomain || hostname.endsWith(`.${baseDomain}`);
       }
-      return hostname === domain;
+      return hostname === domain || hostname.includes(domain);
     });
+    
+    // Check if it's a trusted booking domain
+    const isTrustedBookingDomain = trustedBookingDomains.some(domain => 
+      hostname === domain || 
+      hostname.endsWith(`.${domain}`) || 
+      hostname === `www.${domain}`
+    );
     
     // Only allow HTTPS in production (allow HTTP for localhost in dev)
     const isSecureProtocol = 
       redirectUrl.protocol === 'https:' || 
-      (process.env.NODE_ENV !== 'production' && redirectUrl.hostname === 'localhost');
+      (process.env.NODE_ENV !== 'production' && hostname.includes('localhost'));
     
-    return isAllowed && isSecureProtocol;
+    return (isInternalDomain || isTrustedBookingDomain) && isSecureProtocol;
   } catch {
     return false;
   }

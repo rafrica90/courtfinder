@@ -204,12 +204,22 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
                 </div>
               </div>
 
-              <a 
-                href={`/api/clicks?venueId=${venue.id}&redirect=${encodeURIComponent(venue.bookingUrl)}`}
-                className="w-full block text-center px-6 py-3 bg-[#00ff88] text-[#0a1628] rounded-lg hover:bg-[#00cc6a] transition-colors font-bold mb-3 shadow-lg hover:shadow-[#00ff88]/30"
-              >
-                Book Now
-              </a>
+              {/* Book Now button - handle both bookingUrl (camelCase) and booking_url (snake_case) */}
+              {(venue.bookingUrl || venue.booking_url) ? (
+                <a 
+                  href={`/api/clicks?venueId=${venue.id}&redirect=${encodeURIComponent(venue.bookingUrl || venue.booking_url)}`}
+                  className="w-full block text-center px-6 py-3 bg-[#00ff88] text-[#0a1628] rounded-lg hover:bg-[#00cc6a] transition-colors font-bold mb-3 shadow-lg hover:shadow-[#00ff88]/30"
+                >
+                  Book Now
+                </a>
+              ) : (
+                <button 
+                  disabled
+                  className="w-full block text-center px-6 py-3 bg-gray-500 text-gray-300 rounded-lg cursor-not-allowed font-bold mb-3"
+                >
+                  Booking Not Available
+                </button>
+              )}
 
               <Link
                 href={`/games/new?venueId=${venue.id}`}

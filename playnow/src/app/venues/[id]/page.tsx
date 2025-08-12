@@ -28,13 +28,15 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
   // Always show a stock image matched to sport
   const mainImage: string | undefined = getStockImageForVenue(venue);
   const fallbackImage = GENERIC_PLACEHOLDER;
+  const isTrustedCdn = typeof mainImage === 'string' && /(images\.unsplash\.com|cdn\.pixabay\.com|images\.pexels\.com)/i.test(mainImage);
+  const heroSrc = mainImage && !isTrustedCdn ? `/api/image?url=${encodeURIComponent(mainImage)}` : mainImage;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c]">
       {/* Hero Image Section */}
       <div className="relative h-96 bg-[#0f2847]">
           <VenueImage
-            src={mainImage ? `/api/image?url=${encodeURIComponent(mainImage)}` : fallbackImage}
+            src={heroSrc || fallbackImage}
             alt={venue.name}
             fallbackSrc={fallbackImage}
             className="w-full h-full object-cover opacity-90"

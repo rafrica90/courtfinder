@@ -17,8 +17,10 @@ export default function VenueCard({ venue }: VenueCardProps) {
   const stockImage = getStockImageForVenue(venue);
   const initialRaw = stockImage;
   const isHttp = typeof initialRaw === "string" && /^(https?:)\/\//i.test(initialRaw);
+  // For well-known image CDNs (Unsplash, Pixabay, Pexels) use direct URL to avoid proxy failures.
+  const isTrustedCdn = typeof initialRaw === "string" && /(images\.unsplash\.com|cdn\.pixabay\.com|images\.pexels\.com)/i.test(initialRaw);
   // Route unknown remote images via our proxy to avoid CORS and noisy network errors
-  const initialSrc = isHttp ? `/api/image?url=${encodeURIComponent(initialRaw)}` : initialRaw;
+  const initialSrc = isHttp && !isTrustedCdn ? `/api/image?url=${encodeURIComponent(initialRaw)}` : initialRaw;
   const [imgSrc, setImgSrc] = useState<string | undefined>(initialSrc);
   
   return (

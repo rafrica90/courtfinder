@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, User, Calendar, MapPin, LogOut } from "lucide-react";
+import Image from "next/image";
+import { Menu, User, Calendar, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -20,8 +21,22 @@ export default function Nav() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-[#00d9ff] rounded-lg flex items-center justify-center group-hover:bg-[#00ff88] transition-colors">
-              <MapPin className="h-5 w-5 text-[#0a1628]" />
+            <div className="relative w-8 h-8 rounded-lg overflow-hidden">
+              <Image
+                src="/blue icon.png"
+                alt="CourtFinder icon"
+                fill
+                sizes="32px"
+                priority
+                className="object-cover transition-opacity duration-200 group-hover:opacity-0"
+              />
+              <Image
+                src="/green icon.png"
+                alt="CourtFinder icon hover"
+                fill
+                sizes="32px"
+                className="object-cover opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+              />
             </div>
             <span className="font-bold text-xl text-white">CourtFinder</span>
           </Link>

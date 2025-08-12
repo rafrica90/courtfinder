@@ -49,17 +49,10 @@ function getVenueImages(venue, index) {
 
   const availableImages = sportImageMap[sportType] || sportImageMap.default;
 
-  // Build 1-3 images, cycling deterministically from the index to vary by venue
-  const numImages = Math.min(3, availableImages.length);
-  const images = [];
-  for (let i = 0; i < numImages; i++) {
-    const imageIndex = (index + i) % availableImages.length;
-    images.push(availableImages[imageIndex]);
-  }
+  // Use a single image per venue (even if list has more).
+  const images = [availableImages[(index) % availableImages.length]];
 
-  if (firstSpecific) {
-    images[0] = firstSpecific;
-  }
+  if (firstSpecific) images[0] = firstSpecific;
 
   return images;
 }

@@ -18,6 +18,7 @@ export default function SignUpPage() {
   const [displayName, setDisplayName] = useState("");
   const [countryCode, setCountryCode] = useState("AU");
   const [phone, setPhone] = useState("");
+  const [phoneDigits, setPhoneDigits] = useState("");
   const [location, setLocation] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -52,6 +53,12 @@ export default function SignUpPage() {
     return `${dial}${digits}`;
   }
 
+  // Keep phone composed of non-editable country dial code + 10 digits
+  useEffect(() => {
+    const dial = COUNTRY_TO_DIAL[countryCode] || "+";
+    setPhone(`${dial}${phoneDigits}`);
+  }, [countryCode, phoneDigits]);
+
   function validPhone(raw: string, cc: string): boolean {
     const dial = COUNTRY_TO_DIAL[cc] || "+";
     const match = new RegExp(`^\\${dial}\\d{10}$`);
@@ -84,6 +91,18 @@ export default function SignUpPage() {
     else {
       setSuccessMsg("Account created! Check your email to confirm.");
       setTimeout(() => router.push("/"), 1500);
+    }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    if (loading) return;
+    if (!canNext) return;
+    if (step < 5) {
+      setStep((s) => Math.min(5, s + 1));
+    } else {
+      void handleCreate();
     }
   }
 
@@ -124,16 +143,25 @@ export default function SignUpPage() {
         return (
           <div>
             <label className="block text-sm text-[#b8c5d6] mb-1">Mobile</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              onBlur={() => setPhone((p) => normalizePhone(p, countryCode))}
-              className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
-              placeholder={`${COUNTRY_TO_DIAL[countryCode] || "+"} and 10 digits`}
-            />
+            <div className="flex">
+              <span className="inline-flex items-center px-3 rounded-l-md border border-white/10 bg-[#0a1628] text-white select-none">
+                {COUNTRY_TO_DIAL[countryCode] || "+"}
+              </span>
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="\\d*"
+                value={phoneDigits}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 10);
+                  setPhoneDigits(digits);
+                }}
+                className="w-full px-3 py-2 rounded-r-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
+                placeholder="10 digits"
+              />
+            </div>
             {!validPhone(phone, countryCode) && (
-              <p className="mt-1 text-xs text-[#b8c5d6]">Format: {COUNTRY_TO_DIAL[countryCode]} followed by 10 digits</p>
+              <p className="mt-1 text-xs text-[#b8c5d6]">Enter exactly 10 digits after the country code</p>
             )}
           </div>
         );
@@ -253,7 +281,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a1628] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#0a1628] px-4" onKeyDown={handleKeyDown}>
       <div className="fixed inset-0 bg-black/60" />
       <div className="relative w-full max-w-md bg-[#0d1b31] p-6 sm:p-8 rounded-lg shadow-xl border border-white/10">
         <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">Create Account</h1>

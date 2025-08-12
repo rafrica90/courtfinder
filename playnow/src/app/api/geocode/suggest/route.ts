@@ -12,6 +12,7 @@ type HereSuggestItem = {
     state?: string;
     county?: string;
     stateCode?: string;
+    postalCode?: string;
   };
 };
 
@@ -40,6 +41,15 @@ const fallbackCities = [
   { label: 'Manly, Sydney, NSW, Australia', city: 'Sydney', countryCode: 'AU', state: 'NSW', suburb: 'Manly' },
 ];
 
+// Fallback postal codes (limited AU sample)
+const fallbackPostalCodes = [
+  { label: 'Sydney NSW 2000, Australia', city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2000' },
+  { label: 'Parramatta NSW 2150, Australia', city: 'Sydney', state: 'NSW', countryCode: 'AU', postalCode: '2150' },
+  { label: 'Melbourne VIC 3000, Australia', city: 'Melbourne', state: 'VIC', countryCode: 'AU', postalCode: '3000' },
+  { label: 'Brisbane QLD 4000, Australia', city: 'Brisbane', state: 'QLD', countryCode: 'AU', postalCode: '4000' },
+  { label: 'Perth WA 6000, Australia', city: 'Perth', state: 'WA', countryCode: 'AU', postalCode: '6000' },
+];
+
 export async function GET(req: NextRequest) {
   const rl = await withRateLimit(req, strictRateLimiter);
   if (!rl.success) return rl.response!;
@@ -52,6 +62,8 @@ export async function GET(req: NextRequest) {
                  : null;
 
   const id = searchParams.get('id');
+  const type = searchParams.get('type') || '';
+  const filterCountry = (searchParams.get('country') || '').toUpperCase();
   if (id) {
     // If an ID is provided and it's a fallback ID, return the data directly
     if (id.startsWith('fallback-')) {
@@ -66,6 +78,23 @@ export async function GET(req: NextRequest) {
             suburb: city.suburb,
             state: city.state,
             countryCode: city.countryCode,
+          },
+        });
+      }
+    }
+    if (id.startsWith('fallback-pc-')) {
+      const idx = parseInt(id.replace('fallback-pc-', ''));
+      if (idx >= 0 && idx < fallbackPostalCodes.length) {
+        const pc = fallbackPostalCodes[idx];
+        return NextResponse.json({
+          location: {
+            id: id,
+            label: pc.label,
+            city: pc.city,
+            suburb: '',
+            state: pc.state,
+            countryCode: pc.countryCode,
+            postalCode: pc.postalCode,
           },
         });
       }
@@ -91,6 +120,7 @@ export async function GET(req: NextRequest) {
               suburb: address.district || address.subdistrict, // district is often the suburb
               state: address.stateCode || address.state,
               countryCode: address.countryCode,
+              postalCode: address.postalCode,
             },
           });
         }
@@ -105,17 +135,26 @@ export async function GET(req: NextRequest) {
 
   // If no API key, provide fallback suggestions
   if (!apiKey) {
-    const qLower = q.toLowerCase();
-    const filtered = fallbackCities
-      .filter(city => 
-        city.label.toLowerCase().includes(qLower) || 
-        city.city.toLowerCase().includes(qLower) ||
-        city.suburb.toLowerCase().includes(qLower)
-      )
-      .slice(0, 5)
-      .map((city, idx) => ({ ...city, id: `fallback-${idx}` }));
-    
-    return NextResponse.json({ suggestions: filtered });
+    if (type === 'postalCode') {
+      const qLower = q.toLowerCase();
+      const filtered = fallbackPostalCodes
+        .filter(pc => (!filterCountry || pc.countryCode === filterCountry) && (pc.postalCode.includes(qLower) || pc.label.toLowerCase().includes(qLower)))
+        .slice(0, 5)
+        .map((pc, idx) => ({ id: `fallback-pc-${idx}`, label: pc.label, city: pc.city, countryCode: pc.countryCode, suburb: '', state: pc.state, postalCode: pc.postalCode }));
+      return NextResponse.json({ suggestions: filtered });
+    } else {
+      const qLower = q.toLowerCase();
+      const filtered = fallbackCities
+        .filter(city => 
+          city.label.toLowerCase().includes(qLower) || 
+          city.city.toLowerCase().includes(qLower) ||
+          city.suburb.toLowerCase().includes(qLower)
+        )
+        .slice(0, 5)
+        .map((city, idx) => ({ ...city, id: `fallback-${idx}` }));
+      
+      return NextResponse.json({ suggestions: filtered });
+    }
   }
 
   try {
@@ -126,6 +165,9 @@ export async function GET(req: NextRequest) {
     // Add a broad search area (worldwide) or use user's location if available
     url.searchParams.set('at', '0,0'); // Center point for worldwide search
     url.searchParams.set('lang', 'en');
+    if (type === 'postalCode') {
+      url.searchParams.set('types', 'postalCode');
+    }
 
     const res = await fetch(url.toString());
     if (!res.ok) {
@@ -197,11 +239,22 @@ export async function GET(req: NextRequest) {
           }
         }
 
-        return { id: it.id, label, city, countryCode, suburb, state };
+        const postalCode = it.address?.postalCode || '';
+        return { id: it.id, label, city, countryCode, suburb, state, postalCode };
       });
 
-    // Enforce suburb-only: keep only entries that have a suburb value
-    suggestions = suggestions.filter((s) => typeof s.suburb === 'string' && s.suburb.trim().length > 0);
+    // Apply filtering based on requested type
+    if (type === 'postalCode') {
+      suggestions = suggestions.filter((s, idx) => {
+        const item = (data.items || [])[idx];
+        const isPostal = item?.resultType === 'postalCode' || /\b\d{3,}\b/.test(s.label);
+        const okCountry = !filterCountry || s.countryCode === filterCountry;
+        return isPostal && okCountry;
+      });
+    } else {
+      // Default: keep only suburb-type entries to avoid city-only
+      suggestions = suggestions.filter((s) => typeof s.suburb === 'string' && s.suburb.trim().length > 0);
+    }
 
     return NextResponse.json({ suggestions });
   } catch (err) {

@@ -32,7 +32,7 @@ function AccountPageInner() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [city, setCity] = useState("");
   const [countryCode, setCountryCode] = useState("");
-  const [suggestions, setSuggestions] = useState<{ id?: string; label: string; city: string; countryCode: string; suburb: string; state: string; }[]>([]);
+  const [suggestions, setSuggestions] = useState<{ id?: string; label: string; city: string; countryCode: string; suburb: string; state: string; postalCode?: string; }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suburb, setSuburb] = useState("");
   const [state, setState] = useState("");
@@ -85,8 +85,9 @@ function AccountPageInner() {
     e.preventDefault();
     if (!user || !supabase) return;
     // Require suburb for location accuracy
-    if (!suburb || suburb.trim().length === 0) {
-      setError("Please choose a suburb from suggestions");
+    // For postcode flow require a selected postcode (location holds the postalCode)
+    if (!location || location.trim().length < 3) {
+      setError("Please enter a valid postcode and pick from suggestions");
       return;
     }
     setSaving(true);
@@ -361,27 +362,117 @@ function AccountPageInner() {
               />
             </div>
             <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">Country (ISO code)</label>
-              <input
-                type="text"
+              <label className="block text-sm text-[#b8c5d6] mb-1">Country</label>
+              <select
                 value={countryCode}
-                readOnly
-                className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
-                placeholder="AU"
-                maxLength={2}
-              />
+                onChange={(e) => setCountryCode(e.target.value)}
+                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+              >
+                <option value="AU">Australia</option>
+                <option value="NZ">New Zealand</option>
+                <option value="US">United States</option>
+                <option value="GB">United Kingdom</option>
+                <option value="CA">Canada</option>
+              </select>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">Suburb</label>
+              <label className="block text-sm text-[#b8c5d6] mb-1">Postcode</label>
               <input
                 type="text"
-                value={suburb}
-                readOnly
-                className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
-                placeholder="e.g., Greystanes"
+                value={location}
+                onChange={async (e) => {
+                  const v = e.target.value.replace(/[^0-9]/g, '');
+                  setLocation(v);
+                  if (v.trim().length < 3) {
+                    setSuggestions([]);
+                    setShowSuggestions(false);
+                    setSuggestLoading(false);
+                    return;
+                  }
+                  if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+                  debounceTimerRef.current = setTimeout(async () => {
+                    try {
+                      if (suggestAbortRef.current) suggestAbortRef.current.abort();
+                      suggestAbortRef.current = new AbortController();
+                      setSuggestLoading(true);
+                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(v)}`, { signal: suggestAbortRef.current.signal });
+                      const json = await res.json();
+                      if (json?.suggestions && json.suggestions.length > 0) {
+                        setSuggestions(json.suggestions);
+                        setShowSuggestions(true);
+                      } else {
+                        setSuggestions([]);
+                        setShowSuggestions(false);
+                      }
+                    } catch (err) {
+                      setSuggestions([]);
+                      setShowSuggestions(false);
+                    } finally {
+                      setSuggestLoading(false);
+                    }
+                  }, 250);
+                }}
+                onFocus={async () => {
+                  if (location.trim().length >= 3) {
+                    try {
+                      setSuggestLoading(true);
+                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(location)}`);
+                      const json = await res.json();
+                      if (json?.suggestions && json.suggestions.length > 0) {
+                        setSuggestions(json.suggestions);
+                        setShowSuggestions(true);
+                      }
+                    } catch {}
+                    finally { setSuggestLoading(false); }
+                  }
+                }}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                placeholder="e.g., 2150"
               />
+              {showSuggestions && (
+                <div className="relative">
+                  <div className="absolute z-10 w-full mt-1 bg-[#0f1f39] border border-white/10 rounded-md shadow-lg max-h-60 overflow-auto">
+                    {suggestLoading && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">Searching…</div>)}
+                    {!suggestLoading && suggestions.length === 0 && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">No results</div>)}
+                    {!suggestLoading && suggestions.map((s, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={async () => {
+                          setShowSuggestions(false);
+                          try {
+                            if (s.id) {
+                              const res = await fetch(`/api/geocode/suggest?id=${encodeURIComponent(s.id)}`);
+                              const json = await res.json();
+                              if (json.location) {
+                                const loc = json.location;
+                                setLocation(loc.postalCode || '');
+                                setCity(loc.city || '');
+                                setCountryCode(loc.countryCode ? loc.countryCode.substring(0,2): countryCode);
+                                setState(loc.state || '');
+                                setSuburb('');
+                                return;
+                              }
+                            }
+                          } catch {}
+                          // fallback
+                          setLocation(s.postalCode || '');
+                          setCity(s.city || '');
+                          setCountryCode(s.countryCode || countryCode);
+                          setState(s.state || '');
+                          setSuburb('');
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"
+                      >
+                        <div className="font-medium">{s.label}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm text-[#b8c5d6] mb-1">State (required)</label>

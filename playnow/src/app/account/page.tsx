@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { withAuth } from "@/contexts/AuthContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -32,10 +32,14 @@ function AccountPageInner() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [city, setCity] = useState("");
   const [countryCode, setCountryCode] = useState("");
-  const [suggestions, setSuggestions] = useState<{ label: string; city: string; countryCode: string; suburb: string; state: string; }[]>([]);
+  const [suggestions, setSuggestions] = useState<{ id?: string; label: string; city: string; countryCode: string; suburb: string; state: string; }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suburb, setSuburb] = useState("");
   const [state, setState] = useState("");
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [suggestLoading, setSuggestLoading] = useState(false);
+  const suggestAbortRef = useRef<AbortController | null>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const userEmail = useMemo(() => user?.email ?? "", [user]);
 
@@ -55,20 +59,24 @@ function AccountPageInner() {
     if (!user || !supabase) return;
     setEmail(userEmail);
     (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("user_id, display_name, phone, location, city, country_code, suburb, state")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (data) {
-        const row = data as ProfileRow;
-        setDisplayName(row.display_name ?? "");
-        setPhone(row.phone ?? "");
-        setLocation(row.location ?? "");
-        setCity(row.city ?? "");
-        setCountryCode((row.country_code ?? "").toUpperCase());
-        setSuburb(row.suburb ?? "");
-        setState(row.state ?? "");
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("user_id, display_name, phone, location, city, country_code, suburb, state")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (data) {
+          const row = data as ProfileRow;
+          setDisplayName(row.display_name ?? "");
+          setPhone(row.phone ?? "");
+          setLocation(row.location ?? "");
+          setCity(row.city ?? "");
+          setCountryCode((row.country_code ?? "").toUpperCase());
+          setSuburb(row.suburb ?? "");
+          setState(row.state ?? "");
+        }
+      } finally {
+        setInitialLoading(false);
       }
     })();
   }, [user, supabase, userEmail]);
@@ -189,35 +197,53 @@ function AccountPageInner() {
                   if (v.trim().length < 2) {
                     setSuggestions([]);
                     setShowSuggestions(false);
+                    setSuggestLoading(false);
                     return;
                   }
-                  try {
-                    const res = await fetch(`/api/geocode/suggest?q=${encodeURIComponent(v)}`);
-                    const json = await res.json();
-                    if (json?.suggestions && json.suggestions.length > 0) {
-                      setSuggestions(json.suggestions);
-                      setShowSuggestions(true);
-                    } else {
+                  // Debounce and cancel previous request
+                  if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+                  debounceTimerRef.current = setTimeout(async () => {
+                    try {
+                      if (suggestAbortRef.current) suggestAbortRef.current.abort();
+                      suggestAbortRef.current = new AbortController();
+                      setSuggestLoading(true);
+                      const res = await fetch(`/api/geocode/suggest?q=${encodeURIComponent(v)}`,
+                        { signal: suggestAbortRef.current.signal }
+                      );
+                      const json = await res.json();
+                      if (json?.suggestions && json.suggestions.length > 0) {
+                        setSuggestions(json.suggestions);
+                        setShowSuggestions(true);
+                      } else {
+                        setSuggestions([]);
+                        setShowSuggestions(false);
+                      }
+                    } catch (err) {
                       setSuggestions([]);
                       setShowSuggestions(false);
+                    } finally {
+                      setSuggestLoading(false);
                     }
-                  } catch (err) {
-                    setSuggestions([]);
-                    setShowSuggestions(false);
-                  }
+                  }, 250);
                 }}
                 onFocus={async () => {
                   // Re-fetch suggestions when focusing if there's text
                   if (location.trim().length >= 2) {
                     try {
+                      setSuggestLoading(true);
                       const res = await fetch(`/api/geocode/suggest?q=${encodeURIComponent(location)}`);
                       const json = await res.json();
                       if (json?.suggestions && json.suggestions.length > 0) {
                         setSuggestions(json.suggestions);
                         setShowSuggestions(true);
+                      } else {
+                        setSuggestions([]);
+                        setShowSuggestions(false);
                       }
                     } catch {
                       // Silent fail
+                    } finally {
+                      setSuggestLoading(false);
                     }
                   }
                 }}
@@ -229,24 +255,33 @@ function AccountPageInner() {
                 placeholder="City, Country"
                 autoComplete="off"
               />
-              {showSuggestions && suggestions.length > 0 && (
+              {showSuggestions && (
                 <div className="absolute z-10 w-full mt-1 bg-[#0f1f39] border border-white/10 rounded-md shadow-lg max-h-60 overflow-auto">
-                  {suggestions.map((s, idx) => (
+                  {suggestLoading && (
+                    <div className="px-3 py-2 text-sm text-[#b8c5d6]">Searching…</div>
+                  )}
+                  {!suggestLoading && suggestions.length === 0 && (
+                    <div className="px-3 py-2 text-sm text-[#b8c5d6]">No results</div>
+                  )}
+                  {!suggestLoading && suggestions.map((s, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={async () => {
                         setShowSuggestions(false);
                         try {
-                          const res = await fetch(`/api/geocode/suggest?id=${encodeURIComponent(s.id)}`);
-                          const json = await res.json();
-                          if (json.location) {
-                            const loc = json.location;
-                            setLocation(loc.label);
-                            setCity(loc.city || '');
-                            setCountryCode(loc.countryCode ? loc.countryCode.substring(0, 2) : '');
-                            setState(loc.state || '');
-                            setSuburb(loc.suburb || '');
+                          if (s.id) {
+                            const res = await fetch(`/api/geocode/suggest?id=${encodeURIComponent(s.id)}`);
+                            const json = await res.json();
+                            if (json.location) {
+                              const loc = json.location;
+                              setLocation(loc.label);
+                              setCity(loc.city || '');
+                              setCountryCode(loc.countryCode ? loc.countryCode.substring(0, 2) : '');
+                              setState(loc.state || '');
+                              setSuburb(loc.suburb || '');
+                              return;
+                            }
                           }
                         } catch (err) {
                           // Fallback to basic info if lookup fails
@@ -351,6 +386,18 @@ function AccountPageInner() {
           </div>
         </section>
       </form>
+      {/* Initial loading overlay */}
+      {initialLoading && (
+        <div className="fixed inset-0 bg-[#0a1628]/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="flex items-center gap-3 text-white">
+            <svg className="animate-spin h-6 w-6 text-[#00d9ff]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+            <span className="text-sm">Loading your profile…</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

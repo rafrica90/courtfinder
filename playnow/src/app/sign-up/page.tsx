@@ -19,6 +19,24 @@ const COUNTRY_TO_DIAL: Record<string, string> = {
   ZA: "+27"
 };
 
+function normalizeCountryIso(code: string | undefined | null): string {
+  if (!code) return '';
+  const c = code.toUpperCase();
+  if (c.length === 2) return c;
+  const alpha3To2: Record<string, string> = {
+    AUS: 'AU', NZL: 'NZ', USA: 'US', GBR: 'GB', CAN: 'CA',
+    IRL: 'IE', DEU: 'DE', FRA: 'FR', ESP: 'ES', ITA: 'IT',
+    NLD: 'NL', SWE: 'SE', NOR: 'NO', DNK: 'DK', FIN: 'FI',
+    CHE: 'CH', AUT: 'AT', BEL: 'BE', PRT: 'PT', SGP: 'SG',
+    MYS: 'MY', IDN: 'ID', PHL: 'PH', THA: 'TH', VNM: 'VN',
+    JPN: 'JP', KOR: 'KR', CHN: 'CN', HKG: 'HK', IND: 'IN',
+    ARE: 'AE', SAU: 'SA', ISR: 'IL', TUR: 'TR', BRA: 'BR',
+    MEX: 'MX', ARG: 'AR', CHL: 'CL', COL: 'CO', PER: 'PE',
+    ZAF: 'ZA'
+  };
+  return alpha3To2[c] || c.slice(0, 2);
+}
+
 export default function SignUpPage() {
   const router = useRouter();
   const { signUp, user } = useAuth();
@@ -193,7 +211,7 @@ export default function SignUpPage() {
                               setCity(loc.city || "");
                               setStateValue(loc.state || "");
                               setSuburb(loc.suburb || "");
-                              setCountryCode(((loc.countryCode || countryCode) as string).toUpperCase());
+                              setCountryCode(normalizeCountryIso((loc.countryCode || countryCode) as string));
                               return;
                             }
                           }
@@ -202,7 +220,7 @@ export default function SignUpPage() {
                         setCity(s.city || "");
                         setStateValue(s.state || "");
                         setSuburb(s.suburb || "");
-                        setCountryCode(((s.countryCode || countryCode) as string).toUpperCase());
+                        setCountryCode(normalizeCountryIso((s.countryCode || countryCode) as string));
                       }}
                       className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"
                     >

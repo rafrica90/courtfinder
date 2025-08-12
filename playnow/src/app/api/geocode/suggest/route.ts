@@ -311,7 +311,7 @@ export async function GET(req: NextRequest) {
           const item = (data.items || [])[idx] as any;
           const label = s.label;
           const countryCode = item?.address?.countryCode || s.countryCode || '';
-          return { id: item?.id || s.id, label, city: '', countryCode, suburb: '', state: '', postalCode: '' };
+          return { id: item?.id || s.id, label, city: '', countryCode: (countryCode || '').toUpperCase(), suburb: '', state: '', postalCode: '' };
         })
         .filter((s) => s.countryCode && s.label && (!filterCountry || s.countryCode === filterCountry));
     } else {

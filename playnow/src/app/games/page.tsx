@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Calendar, MapPin, Users, Clock, DollarSign, Star, Filter } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
+import { getSupabaseServiceClient } from "@/lib/supabase/server";
 
 // Mock data for games
 const mockGames = [
@@ -73,6 +74,63 @@ const mockGames = [
 export default async function GamesPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[]>> }) {
   const sp = searchParams ? await searchParams : undefined;
   const created = sp?.created === '1';
+  
+  // Try to fetch games from Supabase
+  const supabase = getSupabaseServiceClient();
+  let games = mockGames; // Default to mock data
+  
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select(`
+          *,
+          venues (
+            id,
+            name,
+            address,
+            city
+          ),
+          participants (
+            id,
+            user_id,
+            status
+          )
+        `)
+        .gte('date', new Date().toISOString().split('T')[0]) // Only future games
+        .order('date', { ascending: true })
+        .order('time', { ascending: true });
+      
+      if (data && !error && data.length > 0) {
+        // Transform Supabase data to match our UI format
+        games = data.map((game: any) => ({
+          id: game.id,
+          sport: game.sport || 'Tennis',
+          venue: game.venues?.name || 'Unknown Venue',
+          address: game.venues ? `${game.venues.address}, ${game.venues.city}` : 'Unknown Location',
+          date: new Date(game.date).toLocaleDateString('en-US', { 
+            weekday: 'long',
+            month: 'short',
+            day: 'numeric'
+          }),
+          time: game.time,
+          duration: `${game.duration || 2} hours`,
+          playersJoined: game.participants?.filter((p: any) => p.status === 'joined').length || 0,
+          maxPlayers: game.max_players,
+          costPerPlayer: game.cost_per_player,
+          hostName: game.host_name || 'Anonymous',
+          hostRating: 4.5, // Would need to fetch from profiles
+          level: game.skill_level || 'All Levels',
+          visibility: game.visibility || 'public',
+        }));
+      }
+    } catch (error) {
+      // If there's an error, just use mock data
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching games:', error);
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a1628] via-[#0f2847] to-[#1a3a5c]">
@@ -177,7 +235,7 @@ export default async function GamesPage({ searchParams }: { searchParams?: Promi
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h1 className="text-2xl font-bold text-white">Available Games</h1>
-                <p className="text-[#b8c5d6] mt-1">{mockGames.length} games found near you</p>
+                <p className="text-[#b8c5d6] mt-1">{games.length} games found near you</p>
               </div>
               <Link
                 href="/games/new"
@@ -188,7 +246,7 @@ export default async function GamesPage({ searchParams }: { searchParams?: Promi
             </div>
 
             <div className="space-y-4">
-              {mockGames.map((game) => (
+              {games.map((game) => (
                 <div
                   key={game.id}
                   className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 hover:border-[#00d9ff]/50 hover:shadow-xl hover:shadow-[#00d9ff]/10 transition-all duration-300 p-6"
@@ -275,7 +333,7 @@ export default async function GamesPage({ searchParams }: { searchParams?: Promi
               ))}
             </div>
 
-            {mockGames.length === 0 && (
+            {games.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-[#b8c5d6] text-lg mb-4">No games found matching your criteria.</p>
                 <Link

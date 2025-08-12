@@ -10,17 +10,34 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
   const supabase = getSupabaseServiceClient();
   let filtered: any[] = [];
   if (supabase) {
-    // Prefer DB data via RPC, with fallback to direct table read
-    const { data, error } = await supabase
-      .rpc("search_venues", {
-        search_query: location ?? null,
-        sport_filter: sport ? [sport] : null,
-        indoor_outdoor_filter: null,
-        // Pass location directly to the city filter as well for precise matching
-        city_filter: location ?? null,
-      });
-    if (error || !data || data.length === 0) {
-      const { data: allVenues } = await supabase.from("venues").select("*");
+    // Try RPC first, but fallback to direct query if it doesn't exist
+    let data = null;
+    let error = null;
+    
+    try {
+      const rpcResult = await supabase
+        .rpc("search_venues", {
+          search_query: location ?? null,
+          sport_filter: sport ? [sport] : null,
+          indoor_outdoor_filter: null,
+          city_filter: location ?? null,
+        });
+      data = rpcResult.data;
+      error = rpcResult.error;
+    } catch (e) {
+      // RPC function might not exist, fallback to direct query
+      error = e;
+    }
+    
+    // If RPC failed or returned no data, use direct table query
+    if (error || !data) {
+      const { data: allVenues, error: venuesError } = await supabase.from("venues").select("*");
+      
+      // Log for debugging in production
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Direct venues query:', { count: allVenues?.length, error: venuesError });
+      }
+      
       const normalize = (val: unknown): string => {
         if (typeof val === "string") return val.toLowerCase();
         if (val === null || val === undefined) return "";

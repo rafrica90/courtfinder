@@ -293,10 +293,11 @@ function AccountPageInner() {
                         } catch (err) {
                           // Fallback to basic info if lookup fails
                           setLocation(s.label);
-                          setCity(s.city);
-                          setCountryCode(s.countryCode);
-                          setState(s.state);
-                          setSuburb(s.suburb);
+                          setCity(s.city || '');
+                          setCountryCode(s.countryCode || '');
+                          setState(s.state || '');
+                          // If only a city was typed/selected, leave suburb blank
+                          setSuburb(s.suburb || '');
                         }
                       }}
                       className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"

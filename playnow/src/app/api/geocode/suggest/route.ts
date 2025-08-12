@@ -145,13 +145,19 @@ export async function GET(req: NextRequest) {
         let city = it.address?.city || '';
         let state = it.address?.stateCode || it.address?.state || '';
 
-        // Heuristic parsing for AU-style labels like
-        // "Greystanes, Sydney, NSW 2145, Australia"
-        if (parts.length >= 2) {
-          if (!suburb) suburb = parts[0];
-          // If city equals suburb (common for localities), take the second part as city
-          if (!city || city.toLowerCase() === suburb.toLowerCase()) {
-            city = parts[1];
+        // If result is a locality (city/town) and city is missing, use first token as city
+        if (!city && it.resultType === 'locality' && parts.length > 0) {
+          city = parts[0];
+        }
+
+        // AU-style with suburb present: "Suburb, City, STATE 2000, Australia"
+        // Only infer suburb from label when there are many parts (>=4), otherwise leave blank
+        if (!suburb && parts.length >= 4) {
+          const possibleState = parts[2]?.split(/[\s-]/)[0];
+          if (possibleState && possibleState.length >= 2 && possibleState.length <= 3) {
+            suburb = parts[0];
+            if (!city) city = parts[1];
+            if (!state) state = possibleState;
           }
         }
 

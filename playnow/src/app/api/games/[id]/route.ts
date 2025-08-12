@@ -25,6 +25,7 @@ export async function GET(
           city,
           sports,
           amenities,
+          notes,
           booking_url
         ),
         participants (
@@ -70,6 +71,7 @@ export async function PUT(
     
     const body = await req.json();
     const {
+      venueId,
       startTime,
       minPlayers,
       maxPlayers,
@@ -99,16 +101,22 @@ export async function PUT(
     }
 
     // Update the game
+    const updatePayload: any = {
+      start_time: startTime,
+      min_players: minPlayers,
+      max_players: maxPlayers,
+      visibility,
+      notes,
+      cost_instructions: costInstructions
+    };
+
+    if (venueId) {
+      updatePayload.venue_id = venueId;
+    }
+
     const { data: game, error } = await supabase
       .from('games')
-      .update({
-        start_time: startTime,
-        min_players: minPlayers,
-        max_players: maxPlayers,
-        visibility,
-        notes,
-        cost_instructions: costInstructions
-      })
+      .update(updatePayload)
       .eq('id', id)
       .select()
       .single();

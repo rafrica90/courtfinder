@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api-client";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Users, MapPin, DollarSign, FileText, Eye } from "lucide-react";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function EditGamePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -14,6 +15,9 @@ export default function EditGamePage({ params }: { params: Promise<{ id: string 
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [gameData, setGameData] = useState<any>(null);
+  const [venueId, setVenueId] = useState<string>("");
+  const [allVenues, setAllVenues] = useState<any[]>([]);
+  const [isLoadingVenues, setIsLoadingVenues] = useState<boolean>(false);
   
   // Form state
   const [startTime, setStartTime] = useState("");
@@ -55,6 +59,7 @@ export default function EditGamePage({ params }: { params: Promise<{ id: string 
           }
           
           setGameData(game);
+          setVenueId(game.venue_id || game.venues?.id || "");
           
           // Populate form with existing data
           if (game.start_time) {
@@ -84,6 +89,49 @@ export default function EditGamePage({ params }: { params: Promise<{ id: string 
     fetchGameData();
   }, [params, user, router]);
 
+  // Load venues list for selection
+  useEffect(() => {
+    let isMounted = true;
+    const loadVenues = async () => {
+      setIsLoadingVenues(true);
+      try {
+        const supabase = getSupabaseBrowserClient();
+        if (supabase) {
+          try {
+            const { data, error } = await supabase
+              .from('venues')
+              .select('*')
+              .limit(1000);
+            if (!error && data && isMounted) {
+              setAllVenues(data);
+              return;
+            }
+          } catch (supabaseError) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('Supabase venues fetch failed:', supabaseError);
+            }
+          }
+        }
+        if (isMounted) {
+          const { venues } = await import('@/lib/mockData');
+          setAllVenues(venues as any[]);
+        }
+      } catch (loadError) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error loading venues:', loadError);
+        }
+        try {
+          const { venues } = await import('@/lib/mockData');
+          if (isMounted) setAllVenues(venues as any[]);
+        } catch {}
+      } finally {
+        if (isMounted) setIsLoadingVenues(false);
+      }
+    };
+    loadVenues();
+    return () => { isMounted = false; };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -101,6 +149,7 @@ export default function EditGamePage({ params }: { params: Promise<{ id: string 
       const gameId = (await params).id;
       
       const { data, error } = await api.games.update(gameId, {
+        venueId: venueId || gameData?.venue_id,
         startTime: combinedDateTime.toISOString(),
         minPlayers,
         maxPlayers,
@@ -185,17 +234,37 @@ export default function EditGamePage({ params }: { params: Promise<{ id: string 
             </div>
           )}
 
-          {/* Venue Info (read-only) */}
+          {/* Venue Selection */}
           <div className="mb-6 p-4 bg-white/5 rounded-lg">
-            <div className="flex items-center gap-2 text-[#b8c5d6]">
-              <MapPin className="h-5 w-5" />
-              <div>
-                <p className="font-medium">{gameData.venues?.name || 'Unknown Venue'}</p>
-                <p className="text-sm text-[#7a8b9a]">
-                  {gameData.venues?.address}, {gameData.venues?.city}
-                </p>
+            <label className="flex items-center gap-2 text-sm font-medium text-[#b8c5d6] mb-2">
+              <MapPin className="h-4 w-4" />
+              Venue
+            </label>
+            <select
+              value={venueId}
+              onChange={(e) => setVenueId(e.target.value)}
+              className="w-full px-4 py-2 bg-[#0f1f39] border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+            >
+              <option value="">Select a venue</option>
+              {allVenues.map((v: any) => (
+                <option key={v.id} value={v.id}>{v.name} - {v.city}</option>
+              ))}
+            </select>
+            <p className="text-xs text-[#7a8b9a] mt-2">{isLoadingVenues ? 'Loading venues…' : `${allVenues.length} venue${allVenues.length===1?'':'s'} available`}</p>
+
+            {venueId && (
+              <div className="mt-4 p-3 bg-white/5 rounded border border-white/10">
+                {(() => {
+                  const selected = allVenues.find((v: any) => v.id === venueId) || gameData.venues;
+                  return (
+                    <div>
+                      <p className="font-medium text-white">{selected?.name || 'Selected Venue'}</p>
+                      <p className="text-sm text-[#7a8b9a]">{selected?.address}{selected?.city ? `, ${selected.city}` : ''}</p>
+                    </div>
+                  );
+                })()}
               </div>
-            </div>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

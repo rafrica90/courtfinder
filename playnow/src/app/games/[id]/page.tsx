@@ -170,7 +170,8 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
               id: game.venue_id || game.venues?.id || '',
               name: game.venues?.name || 'Unknown Venue',
               address: game.venues ? `${game.venues.address || ''}, ${game.venues.city || ''}` : 'Unknown Location',
-              amenities: game.venues?.amenities || [],
+               amenities: game.venues?.amenities || [],
+               notes: game.venues?.notes || '',
               bookingUrl: game.venues?.booking_url || ''
             },
             hostUserId: game.host_user_id,
@@ -552,30 +553,23 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
               </div>
             )}
 
-            {/* Venue Info */}
+            {/* Venue Info (inline details) */}
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
               <h2 className="text-xl font-bold text-white mb-4">Venue Information</h2>
               <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium text-white mb-2">Amenities</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {gameData.venue.amenities.map((amenity, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-[#00d9ff]/10 text-[#00d9ff] rounded-full text-sm"
-                      >
-                        {amenity}
-                      </span>
-                    ))}
+                <div className="flex items-start gap-2 text-[#b8c5d6]">
+                  <MapPin className="h-5 w-5 text-[#00d9ff] mt-0.5" />
+                  <div>
+                    <p className="text-white font-medium">{gameData.venue.name}</p>
+                    <p className="text-sm text-[#7a8b9a]">{gameData.venue.address}</p>
                   </div>
                 </div>
-                <Link
-                  href={`/venues/${gameData.venue.id}`}
-                  className="inline-flex items-center gap-2 text-[#00d9ff] hover:text-white transition-colors"
-                >
-                  View Venue Details
-                  <ArrowLeft className="h-4 w-4 rotate-180" />
-                </Link>
+                {gameData.venue.notes && (
+                  <div>
+                    <h3 className="font-medium text-white mb-2">About this venue</h3>
+                    <p className="text-[#b8c5d6] leading-relaxed">{gameData.venue.notes}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -648,3 +642,4 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
     </div>
   );
 }
+

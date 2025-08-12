@@ -46,12 +46,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
       
       // Handle auth events
-      if (_event === 'SIGNED_IN') {
+      if (_event === 'SIGNED_IN' || _event === 'TOKEN_REFRESHED') {
+        // Refresh data on the current page without changing route
         router.refresh();
-      } else if (_event === 'SIGNED_OUT') {
-        router.push('/');
-      } else if (_event === 'TOKEN_REFRESHED') {
-        // Token was refreshed successfully
       }
     });
 

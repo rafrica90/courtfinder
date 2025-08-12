@@ -50,6 +50,15 @@ const fallbackPostalCodes = [
   { label: 'Perth WA 6000, Australia', city: 'Perth', state: 'WA', countryCode: 'AU', postalCode: '6000' },
 ];
 
+// Fallback countries for country autocomplete
+const fallbackCountries = [
+  { label: 'Australia', countryCode: 'AU' },
+  { label: 'New Zealand', countryCode: 'NZ' },
+  { label: 'United States', countryCode: 'US' },
+  { label: 'United Kingdom', countryCode: 'GB' },
+  { label: 'Canada', countryCode: 'CA' },
+];
+
 // Minimal fallback mapping of postal code → suburbs (for local dev without HERE API)
 const fallbackPostalToSuburbs: Record<string, { suburb: string; city: string; state: string; countryCode: string; postalCode: string; }[]> = {
   // Western Sydney examples
@@ -176,6 +185,13 @@ export async function GET(req: NextRequest) {
         .slice(0, 5)
         .map((pc, idx) => ({ id: `fallback-pc-${idx}`, label: pc.label, city: pc.city, countryCode: pc.countryCode, suburb: '', state: pc.state, postalCode: pc.postalCode }));
       return NextResponse.json({ suggestions: filtered });
+    } else if (type === 'country') {
+      const qLower = q.toLowerCase();
+      const suggestions = fallbackCountries
+        .filter(c => c.label.toLowerCase().includes(qLower) || c.countryCode.toLowerCase().includes(qLower))
+        .slice(0, 8)
+        .map((c, idx) => ({ id: `fallback-ctry-${idx}`, label: c.label, city: '', countryCode: c.countryCode, suburb: '', state: '', postalCode: '' }));
+      return NextResponse.json({ suggestions });
     } else {
       const qLower = q.toLowerCase();
       const filtered = fallbackCities
@@ -201,6 +217,9 @@ export async function GET(req: NextRequest) {
     // Add a broad search area (worldwide) or use user's location if available
     url.searchParams.set('at', '0,0'); // Center point for worldwide search
     url.searchParams.set('lang', 'en');
+    if (type === 'country') {
+      url.searchParams.set('types', 'country');
+    }
     // no type restriction when type === 'postalCode'
 
     const res = await fetch(url.toString());
@@ -286,6 +305,15 @@ export async function GET(req: NextRequest) {
         const okCountry = !filterCountry || s.countryCode === filterCountry;
         return okCountry && (hasPc || labelHasPc);
       });
+    } else if (type === 'country') {
+      suggestions = suggestions
+        .map((s, idx) => {
+          const item = (data.items || [])[idx] as any;
+          const label = s.label;
+          const countryCode = item?.address?.countryCode || s.countryCode || '';
+          return { id: item?.id || s.id, label, city: '', countryCode, suburb: '', state: '', postalCode: '' };
+        })
+        .filter((s) => s.countryCode && s.label && (!filterCountry || s.countryCode === filterCountry));
     } else {
       // For general search, allow any locality/address types and just enforce country filter
       suggestions = suggestions.filter((s) => !filterCountry || s.countryCode === filterCountry);

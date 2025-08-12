@@ -14,6 +14,7 @@ export default function SignUpPage() {
   const { signUp, user } = useAuth();
 
   const [step, setStep] = useState(0);
+  const totalSteps = 5; // 0: Name, 1: Location, 2: Mobile, 3: Email, 4: Password
 
   const [displayName, setDisplayName] = useState("");
   const [countryCode, setCountryCode] = useState("AU");
@@ -67,11 +68,10 @@ export default function SignUpPage() {
 
   const canNext = useMemo(() => {
     if (step === 0) return displayName.trim().length >= 2;
-    if (step === 1) return !!countryCode;
+    if (step === 1) return location.trim().length >= 3 && !!countryCode; // require country from selection
     if (step === 2) return validPhone(phone, countryCode);
-    if (step === 3) return location.trim().length >= 3; // selection recommended but not forced
-    if (step === 4) return /@/.test(email);
-    if (step === 5) return password.length >= 8 && !/(password|123456|qwerty)/i.test(password) && !email || password.toLowerCase().indexOf(email.split("@")[0]?.toLowerCase()) === -1;
+    if (step === 3) return /@/.test(email);
+    if (step === 4) return password.length >= 8 && !/(password|123456|qwerty)/i.test(password) && (!email || password.toLowerCase().indexOf(email.split("@")[0]?.toLowerCase()) === -1);
     return false;
   }, [step, displayName, countryCode, phone, location, email, password]);
 
@@ -99,8 +99,8 @@ export default function SignUpPage() {
     e.preventDefault();
     if (loading) return;
     if (!canNext) return;
-    if (step < 5) {
-      setStep((s) => Math.min(5, s + 1));
+    if (step < totalSteps - 1) {
+      setStep((s) => Math.min(totalSteps - 1, s + 1));
     } else {
       void handleCreate();
     }
@@ -125,18 +125,86 @@ export default function SignUpPage() {
       case 1:
         return (
           <div>
-            <label className="block text-sm text-[#b8c5d6] mb-1">Country</label>
-            <select
-              value={countryCode}
-              onChange={(e) => setCountryCode(e.target.value)}
+            <label className="block text-sm text-[#b8c5d6] mb-1">Location</label>
+            <input
+              type="text"
+              value={location}
+              onChange={async (e) => {
+                const v = e.target.value;
+                setLocation(v);
+                if (v.trim().length < 3) { setSuggestions([]); setShowSuggestions(false); return; }
+                if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+                debounceTimerRef.current = setTimeout(async () => {
+                  try {
+                    if (suggestAbortRef.current) suggestAbortRef.current.abort();
+                    suggestAbortRef.current = new AbortController();
+                    setSuggestLoading(true);
+                    const res = await fetch(`/api/geocode/suggest?q=${encodeURIComponent(v)}`, { signal: suggestAbortRef.current.signal });
+                    const json = await res.json();
+                    if (json?.suggestions && json.suggestions.length > 0) { setSuggestions(json.suggestions); setShowSuggestions(true); }
+                    else { setSuggestions([]); setShowSuggestions(false); }
+                  } catch { setSuggestions([]); setShowSuggestions(false); }
+                  finally { setSuggestLoading(false); }
+                }, 250);
+              }}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+              onFocus={async () => {
+                if (location.trim().length >= 3) {
+                  try {
+                    setSuggestLoading(true);
+                    const res = await fetch(`/api/geocode/suggest?q=${encodeURIComponent(location)}`);
+                    const json = await res.json();
+                    if (json?.suggestions && json.suggestions.length > 0) { setSuggestions(json.suggestions); setShowSuggestions(true); }
+                  } catch {}
+                  finally { setSuggestLoading(false); }
+                }
+              }}
               className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
-            >
-              <option value="AU">Australia</option>
-              <option value="NZ">New Zealand</option>
-              <option value="US">United States</option>
-              <option value="GB">United Kingdom</option>
-              <option value="CA">Canada</option>
-            </select>
+              placeholder="Suburb, city or postcode"
+            />
+            {showSuggestions && (
+              <div className="relative">
+                <div className="absolute z-10 w-full mt-1 bg-[#0a1628] border border-white/10 rounded-md shadow-lg max-h-60 overflow-auto">
+                  {suggestLoading && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">Searching…</div>)}
+                  {!suggestLoading && suggestions.length === 0 && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">No results</div>)}
+                  {!suggestLoading && suggestions.map((s, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={async () => {
+                        setShowSuggestions(false);
+                        try {
+                          if (s.id) {
+                            const res = await fetch(`/api/geocode/suggest?id=${encodeURIComponent(s.id)}`);
+                            const json = await res.json();
+                            if (json.location) {
+                              const loc = json.location;
+                              setLocation(loc.postalCode || s.label || "");
+                              setCity(loc.city || "");
+                              setStateValue(loc.state || "");
+                              setSuburb(loc.suburb || "");
+                              setCountryCode((loc.countryCode || '').toUpperCase());
+                              return;
+                            }
+                          }
+                        } catch {}
+                        setLocation(s.postalCode || s.label || "");
+                        setCity(s.city || "");
+                        setStateValue(s.state || "");
+                        setSuburb(s.suburb || "");
+                        setCountryCode((s.countryCode || '').toUpperCase());
+                      }}
+                      className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"
+                    >
+                      <div className="font-medium">{s.label}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {(city || stateValue || suburb || countryCode) && (
+              <p className="mt-2 text-xs text-[#9bb0c2]">Detected: {suburb ? `${suburb}, `: ""}{city} {stateValue && `(${stateValue})`} — Country: {countryCode}</p>
+            )}
           </div>
         );
       case 2:
@@ -168,89 +236,6 @@ export default function SignUpPage() {
       case 3:
         return (
           <div>
-            <label className="block text-sm text-[#b8c5d6] mb-1">Location</label>
-            <input
-              type="text"
-              value={location}
-              onChange={async (e) => {
-                const v = e.target.value;
-                setLocation(v);
-                if (v.trim().length < 3) { setSuggestions([]); setShowSuggestions(false); return; }
-                if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-                debounceTimerRef.current = setTimeout(async () => {
-                  try {
-                    if (suggestAbortRef.current) suggestAbortRef.current.abort();
-                    suggestAbortRef.current = new AbortController();
-                    setSuggestLoading(true);
-                    const res = await fetch(`/api/geocode/suggest?country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(v)}`, { signal: suggestAbortRef.current.signal });
-                    const json = await res.json();
-                    if (json?.suggestions && json.suggestions.length > 0) { setSuggestions(json.suggestions); setShowSuggestions(true); }
-                    else { setSuggestions([]); setShowSuggestions(false); }
-                  } catch { setSuggestions([]); setShowSuggestions(false); }
-                  finally { setSuggestLoading(false); }
-                }, 250);
-              }}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-              onFocus={async () => {
-                if (location.trim().length >= 3) {
-                  try {
-                    setSuggestLoading(true);
-                    const res = await fetch(`/api/geocode/suggest?country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(location)}`);
-                    const json = await res.json();
-                    if (json?.suggestions && json.suggestions.length > 0) { setSuggestions(json.suggestions); setShowSuggestions(true); }
-                  } catch {}
-                  finally { setSuggestLoading(false); }
-                }
-              }}
-              className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
-              placeholder="Suburb, postcode or city"
-            />
-            {showSuggestions && (
-              <div className="relative">
-                <div className="absolute z-10 w-full mt-1 bg-[#0a1628] border border-white/10 rounded-md shadow-lg max-h-60 overflow-auto">
-                  {suggestLoading && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">Searching…</div>)}
-                  {!suggestLoading && suggestions.length === 0 && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">No results</div>)}
-                  {!suggestLoading && suggestions.map((s, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={async () => {
-                        setShowSuggestions(false);
-                        try {
-                          if (s.id) {
-                            const res = await fetch(`/api/geocode/suggest?id=${encodeURIComponent(s.id)}`);
-                            const json = await res.json();
-                            if (json.location) {
-                              const loc = json.location;
-                              setLocation(loc.postalCode || s.label || "");
-                              setCity(loc.city || "");
-                              setStateValue(loc.state || "");
-                              setSuburb(loc.suburb || "");
-                              return;
-                            }
-                          }
-                        } catch {}
-                        setLocation(s.postalCode || s.label || "");
-                        setCity(s.city || "");
-                        setStateValue(s.state || "");
-                        setSuburb(s.suburb || "");
-                      }}
-                      className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"
-                    >
-                      <div className="font-medium">{s.label}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            {(city || stateValue || suburb) && (
-              <p className="mt-2 text-xs text-[#9bb0c2]">Detected: {suburb ? `${suburb}, `: ""}{city} {stateValue && `(${stateValue})`}</p>
-            )}
-          </div>
-        );
-      case 4:
-        return (
-          <div>
             <label className="block text-sm text-[#b8c5d6] mb-1">Email</label>
             <input
               type="email"
@@ -259,6 +244,20 @@ export default function SignUpPage() {
               className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
               placeholder="you@example.com"
             />
+          </div>
+        );
+      case 4:
+        return (
+          <div>
+            <label className="block text-sm text-[#b8c5d6] mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
+              placeholder="Minimum 8 characters"
+            />
+            <p className="mt-1 text-xs text-[#b8c5d6]">Use a long unique passphrase (NIST). No arbitrary character rules; minimum 8 characters.</p>
           </div>
         );
       case 5:
@@ -281,7 +280,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a1628] px-4" onKeyDown={handleKeyDown}>
+    <div className="min-h-screen flex justify-center items-start bg-[#0a1628] px-4 pt-24 sm:pt-32" onKeyDown={handleKeyDown}>
       <div className="fixed inset-0 bg-black/60" />
       <div className="relative w-full max-w-md bg-[#0d1b31] p-6 sm:p-8 rounded-lg shadow-xl border border-white/10">
         <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">Create Account</h1>

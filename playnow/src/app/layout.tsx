@@ -8,14 +8,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AuthProvider>
           {children}
+          <footer aria-label="Footer" className="mt-16 border-t border-[var(--border)]">
+            <nav aria-label="Footer navigation" className="mx-auto max-w-5xl px-6 py-6 text-center">
+              <a className="mx-3 underline text-[var(--primary)] hover:text-[var(--primary-hover)]" href="/privacy">Privacy Policy</a>
+              <a className="mx-3 underline text-[var(--primary)] hover:text-[var(--primary-hover)]" href="/terms">Terms</a>
+              <a className="mx-3 underline text-[var(--primary)] hover:text-[var(--primary-hover)]" href="/cookie">Cookie Policy</a>
+            </nav>
+          </footer>
         </AuthProvider>
-        <footer aria-label="Footer" style={{ padding: '1rem', borderTop: '1px solid #e5e7eb', marginTop: '2rem', textAlign: 'center' }}>
-          <nav aria-label="Footer navigation">
-            <a href="/privacy" style={{ margin: '0 1rem' }}>Privacy Policy</a>
-            <a href="/terms" style={{ margin: '0 1rem' }}>Terms</a>
-            <a href="/cookie" style={{ margin: '0 1rem' }}>Cookie Policy</a>
-          </nav>
-        </footer>
       </body>
     </html>
   );

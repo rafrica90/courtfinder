@@ -43,15 +43,15 @@ function AccountPageInner() {
 
   const userEmail = useMemo(() => user?.email ?? "", [user]);
 
-  // When the typed location exactly matches a suggestion, auto-fill city/country
+  // When the typed postcode matches a suggestion, auto-fill derived fields
   useEffect(() => {
     if (!location || suggestions.length === 0) return;
-    const exact = suggestions.find(s => s.label.toLowerCase() === location.toLowerCase());
+    const exact = suggestions.find(s => (s.postalCode || '').toLowerCase() === location.toLowerCase());
     if (exact) {
       setCity(exact.city);
       setCountryCode(exact.countryCode);
       setState(exact.state);
-      setSuburb(exact.suburb);
+      setSuburb('');
     }
   }, [location, suggestions]);
 
@@ -69,7 +69,9 @@ function AccountPageInner() {
           const row = data as ProfileRow;
           setDisplayName(row.display_name ?? "");
           setPhone(row.phone ?? "");
-          setLocation(row.location ?? "");
+          const locRaw = row.location ?? "";
+          const digits = locRaw.replace(/\D/g, "");
+          setLocation(digits.length >= 3 ? digits : "");
           setCity(row.city ?? "");
           setCountryCode((row.country_code ?? "").toUpperCase());
           setSuburb(row.suburb ?? "");
@@ -216,30 +218,54 @@ function AccountPageInner() {
                 placeholder="+1 555 555 5555"
               />
             </div>
-            <div className="relative">
-              <label className="block text-sm text-[#b8c5d6] mb-1">Enter your suburb</label>
+            <div>
+              <label className="block text-sm text-[#b8c5d6] mb-1">Country</label>
+              <select
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
+                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+              >
+                <option value="AU">Australia</option>
+                <option value="NZ">New Zealand</option>
+                <option value="US">United States</option>
+                <option value="GB">United Kingdom</option>
+                <option value="CA">Canada</option>
+              </select>
+            </div>
+          </div>
+
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-[#b8c5d6] mb-1">City</label>
+              <input
+                type="text"
+                value={city}
+                readOnly
+                className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
+                placeholder="e.g., Sydney"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-[#b8c5d6] mb-1">Postcode</label>
               <input
                 type="text"
                 value={location}
                 onChange={async (e) => {
-                  const v = e.target.value;
+                  const v = e.target.value.replace(/[^0-9]/g, '');
                   setLocation(v);
-                  if (v.trim().length < 2) {
+                  if (v.trim().length < 3) {
                     setSuggestions([]);
                     setShowSuggestions(false);
                     setSuggestLoading(false);
                     return;
                   }
-                  // Debounce and cancel previous request
                   if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
                   debounceTimerRef.current = setTimeout(async () => {
                     try {
                       if (suggestAbortRef.current) suggestAbortRef.current.abort();
                       suggestAbortRef.current = new AbortController();
                       setSuggestLoading(true);
-                      const res = await fetch(`/api/geocode/suggest?q=${encodeURIComponent(v)}`,
-                        { signal: suggestAbortRef.current.signal }
-                      );
+                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(v)}`, { signal: suggestAbortRef.current.signal });
                       const json = await res.json();
                       if (json?.suggestions && json.suggestions.length > 0) {
                         setSuggestions(json.suggestions);
@@ -257,123 +283,64 @@ function AccountPageInner() {
                   }, 250);
                 }}
                 onFocus={async () => {
-                  // Re-fetch suggestions when focusing if there's text
-                  if (location.trim().length >= 2) {
+                  if (location.trim().length >= 3) {
                     try {
                       setSuggestLoading(true);
-                      const res = await fetch(`/api/geocode/suggest?q=${encodeURIComponent(location)}`);
+                      const res = await fetch(`/api/geocode/suggest?type=postalCode&country=${encodeURIComponent(countryCode)}&q=${encodeURIComponent(location)}`);
                       const json = await res.json();
                       if (json?.suggestions && json.suggestions.length > 0) {
                         setSuggestions(json.suggestions);
                         setShowSuggestions(true);
-                      } else {
-                        setSuggestions([]);
-                        setShowSuggestions(false);
                       }
-                    } catch {
-                      // Silent fail
-                    } finally {
-                      setSuggestLoading(false);
-                    }
+                    } catch {}
+                    finally { setSuggestLoading(false); }
                   }
                 }}
-                onBlur={() => {
-                  // Delay hiding to allow click on suggestion
-                  setTimeout(() => setShowSuggestions(false), 200);
-                }}
-                className="w-full rounded-lg border border-[#00d9ff]/40 bg-[#0b1a31] px-4 py-3 text-white placeholder-[#7aa2b7] focus:outline-none focus:ring-2 focus:ring-[#00d9ff] shadow-sm"
-                placeholder="Start typing your suburb…"
-                autoComplete="off"
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white placeholder-[#6b7b8f] focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                placeholder="e.g., 2150"
               />
               {showSuggestions && (
-                <div className="absolute z-10 w-full mt-1 bg-[#0f1f39] border border-white/10 rounded-md shadow-lg max-h-60 overflow-auto">
-                  {suggestLoading && (
-                    <div className="px-3 py-2 text-sm text-[#b8c5d6]">Searching…</div>
-                  )}
-                  {!suggestLoading && suggestions.length === 0 && (
-                    <div className="px-3 py-2 text-sm text-[#b8c5d6]">No results</div>
-                  )}
-                  {!suggestLoading && suggestions.map((s, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={async () => {
-                        setShowSuggestions(false);
-                        try {
-                          if (s.id) {
-                            const res = await fetch(`/api/geocode/suggest?id=${encodeURIComponent(s.id)}`);
-                            const json = await res.json();
-                            if (json.location) {
-                              const loc = json.location;
-                              // Normalize AU heuristics: if label looks like
-                              // "Suburb, City, STATE, Country" fill accordingly
-                              const parts = (loc.label || '').split(',').map((p: string) => p.trim());
-                              const inferredSuburb = parts.length >= 4 ? (parts[0] || loc.suburb || '') : (loc.suburb || '');
-                              const inferredCity = parts.length >= 2 ? (parts[1] || loc.city || '') : (loc.city || parts[0] || '');
-                              // search through tokens for an uppercase 2-3 letter code (NSW/VIC/QLD)
-                              let inferredState = loc.state || '';
-                              if (!inferredState) {
-                                for (let i = 1; i < parts.length - 1; i++) {
-                                  const token = parts[i].split(/[\s-]/)[0];
-                                  if (token && token.length >= 2 && token.length <= 3 && token.toUpperCase() === token) {
-                                    inferredState = token;
-                                    break;
-                                  }
-                                }
+                <div className="relative">
+                  <div className="absolute z-10 w-full mt-1 bg-[#0f1f39] border border-white/10 rounded-md shadow-lg max-h-60 overflow-auto">
+                    {suggestLoading && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">Searching…</div>)}
+                    {!suggestLoading && suggestions.length === 0 && (<div className="px-3 py-2 text-sm text-[#b8c5d6]">No results</div>)}
+                    {!suggestLoading && suggestions.map((s, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={async () => {
+                          setShowSuggestions(false);
+                          try {
+                            if (s.id) {
+                              const res = await fetch(`/api/geocode/suggest?id=${encodeURIComponent(s.id)}`);
+                              const json = await res.json();
+                              if (json.location) {
+                                const loc = json.location;
+                                setLocation(loc.postalCode || '');
+                                setCity(loc.city || '');
+                                setCountryCode(loc.countryCode ? loc.countryCode.substring(0,2): countryCode);
+                                setState(loc.state || '');
+                                setSuburb('');
+                                return;
                               }
-
-                              setLocation(loc.label);
-                              setCity(inferredCity);
-                              setCountryCode(loc.countryCode ? loc.countryCode.substring(0, 2) : '');
-                              setState(inferredState);
-                              setSuburb(inferredSuburb);
-                              return;
                             }
-                          }
-                        } catch (err) {
-                          // Fallback to basic info if lookup fails
-                          setLocation(s.label);
+                          } catch {}
+                          // fallback
+                          setLocation(s.postalCode || '');
                           setCity(s.city || '');
-                          setCountryCode(s.countryCode || '');
+                          setCountryCode(s.countryCode || countryCode);
                           setState(s.state || '');
-                          setSuburb(s.suburb || '');
-                        }
-                      }}
-                      className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"
-                    >
-                      <div className="font-medium">{s.label}</div>
-                      {s.city && <div className="text-xs text-[#6b7b8f]">{s.city}{s.countryCode ? `, ${s.countryCode}` : ''}</div>}
-                    </button>
-                  ))}
+                          setSuburb('');
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-white/10 text-white border-b border-white/5 last:border-b-0"
+                      >
+                        <div className="font-medium">{s.label}</div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
-            </div>
-          </div>
-
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">City</label>
-              <input
-                type="text"
-                value={city}
-                readOnly
-                className="w-full rounded-md border border-white/10 bg-[#0b1426] px-3 py-2 text-[#9bb0c2] placeholder-[#6b7b8f] opacity-70 cursor-not-allowed"
-                placeholder="e.g., Sydney"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-[#b8c5d6] mb-1">Country</label>
-              <select
-                value={countryCode}
-                onChange={(e) => setCountryCode(e.target.value)}
-                className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
-              >
-                <option value="AU">Australia</option>
-                <option value="NZ">New Zealand</option>
-                <option value="US">United States</option>
-                <option value="GB">United Kingdom</option>
-                <option value="CA">Canada</option>
-              </select>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

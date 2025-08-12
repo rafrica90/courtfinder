@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { sports, venues } from "@/lib/mockData";
-import SearchBar from "@/components/SearchBar";
 import VenueCard from "@/components/VenueCard";
+import SportsCarousel from "@/components/SportsCarousel";
 import { MapPin, Calendar, Users, ArrowRight } from "lucide-react";
 
 export default function Home() {
@@ -59,28 +59,9 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Search Section */}
+            {/* Sports Carousel Section */}
             <div className="lg:pl-12">
-              <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10">
-                <h3 className="text-xl font-semibold text-white mb-4">Quick Search</h3>
-                <SearchBar variant="hero" />
-                
-                {/* Quick sport filters */}
-                <div className="mt-6">
-                  <p className="text-sm text-[#b8c5d6] mb-3">Popular Sports:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {sports.map((sport) => (
-                      <Link
-                        key={sport.id}
-                        href={`/venues?sport=${sport.slug}`}
-                        className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg text-sm font-medium text-white hover:bg-[#00d9ff]/20 hover:text-[#00d9ff] transition-all border border-white/10 hover:border-[#00d9ff]/50"
-                      >
-                        {sport.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <SportsCarousel />
             </div>
           </div>
         </div>

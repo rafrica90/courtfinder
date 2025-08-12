@@ -29,9 +29,10 @@ interface Venue {
 interface VenuesClientProps {
   initialVenues: Venue[];
   sport?: string;
+  searchedVenueName?: string;
 }
 
-export default function VenuesClient({ initialVenues, sport }: VenuesClientProps) {
+export default function VenuesClient({ initialVenues, sport, searchedVenueName }: VenuesClientProps) {
   const [allVenues] = useState<Venue[]>(initialVenues);
   const [filteredVenues, setFilteredVenues] = useState<Venue[]>(initialVenues);
   const [venues, setVenues] = useState<Venue[]>(initialVenues);
@@ -118,10 +119,16 @@ export default function VenuesClient({ initialVenues, sport }: VenuesClientProps
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">
-              {sport ? `${sport.charAt(0).toUpperCase() + sport.slice(1)} Venues` : "All Venues"}
+              {searchedVenueName 
+                ? `Search results for "${searchedVenueName}"`
+                : sport 
+                  ? `${sport.charAt(0).toUpperCase() + sport.slice(1)} Venues` 
+                  : "All Venues"}
             </h1>
             <p className="text-[#b8c5d6] mt-1">
               {venues.length} venues found
+              {searchedVenueName && ` matching "${searchedVenueName}"`}
+              {sport && ` for ${sport}`}
             </p>
           </div>
 

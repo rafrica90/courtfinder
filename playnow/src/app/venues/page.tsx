@@ -6,6 +6,7 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
   const sp = searchParams ? await searchParams : undefined;
   const sport = typeof sp?.sport === "string" ? sp?.sport : undefined;
   const location = typeof sp?.location === "string" ? sp?.location : undefined;
+  const venueName = typeof sp?.venueName === "string" ? sp?.venueName : undefined;
 
   const supabase = getSupabaseServiceClient();
   let filtered: any[] = [];
@@ -43,20 +44,33 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
         if (val === null || val === undefined) return "";
         try { return String(val).toLowerCase(); } catch { return ""; }
       };
-      // First try exact city match (case-insensitive); if none match, fall back to broad text match
-      const bySearch = typeof location === "string" && location.length > 0
-        ? (allVenues ?? []).filter((v: any) => {
-            const q = location.toLowerCase();
-            // Prefer city equality / inclusion first
-            if (normalize(v.city) === q) return true;
-            return (
-              normalize(v.name).includes(q) ||
-              normalize(v.address).includes(q) ||
-              normalize(v.city).includes(q) ||
-              normalize(v.notes).includes(q)
-            );
-          })
-        : (allVenues ?? []);
+      
+      // Start with all venues
+      let bySearch = allVenues ?? [];
+      
+      // Filter by venue name if provided (partial match, case-insensitive)
+      if (typeof venueName === "string" && venueName.length > 0) {
+        const nameQuery = venueName.toLowerCase();
+        bySearch = bySearch.filter((v: any) => 
+          normalize(v.name).includes(nameQuery)
+        );
+      }
+      
+      // Further filter by location if provided
+      if (typeof location === "string" && location.length > 0) {
+        const q = location.toLowerCase();
+        bySearch = bySearch.filter((v: any) => {
+          // Prefer city equality / inclusion first
+          if (normalize(v.city) === q) return true;
+          return (
+            normalize(v.address).includes(q) ||
+            normalize(v.city).includes(q) ||
+            normalize(v.notes).includes(q)
+          );
+        });
+      }
+      
+      // Finally filter by sport if provided
       filtered = typeof sport === "string" && sport.length > 0
         ? bySearch.filter((v: any) => Array.isArray(v.sports) && v.sports.includes(sport))
         : bySearch;
@@ -66,7 +80,22 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
   } else {
     // Fallback to mock data in dev without env
     const { venues } = await import("@/lib/mockData");
-    filtered = sport ? venues.filter((v: any) => v.sportId === sport) : venues;
+    let mockFiltered = venues;
+    
+    // Filter by venue name if provided
+    if (venueName) {
+      const nameQuery = venueName.toLowerCase();
+      mockFiltered = mockFiltered.filter((v: any) => 
+        v.name?.toLowerCase().includes(nameQuery)
+      );
+    }
+    
+    // Filter by sport if provided
+    if (sport) {
+      mockFiltered = mockFiltered.filter((v: any) => v.sportId === sport);
+    }
+    
+    filtered = mockFiltered;
   }
 
   return (
@@ -101,6 +130,7 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
             notes: venue.notes ?? undefined,
           }))}
           sport={sport}
+          searchedVenueName={venueName}
         />
       </div>
     </div>

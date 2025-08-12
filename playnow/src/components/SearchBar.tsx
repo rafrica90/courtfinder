@@ -17,6 +17,8 @@ export default function SearchBar({ variant = "hero" }: SearchBarProps) {
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
   const [players, setPlayers] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   // Load venues and derive available cities just like the Host Game page
   const [allVenues, setAllVenues] = useState<any[]>([]);
@@ -67,6 +69,22 @@ export default function SearchBar({ variant = "hero" }: SearchBarProps) {
     return Array.from(cities).sort();
   }, [allVenues]);
 
+  // Generate venue name suggestions based on input
+  useEffect(() => {
+    if (venueName.length > 0) {
+      const query = venueName.toLowerCase();
+      const matches = allVenues
+        .filter((v: any) => v.name?.toLowerCase().includes(query))
+        .map((v: any) => v.name)
+        .slice(0, 5); // Show top 5 suggestions
+      setSuggestions(matches);
+      setShowSuggestions(matches.length > 0);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [venueName, allVenues]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
@@ -90,8 +108,27 @@ export default function SearchBar({ variant = "hero" }: SearchBarProps) {
             placeholder="Search venue name..."
             value={venueName}
             onChange={(e) => setVenueName(e.target.value)}
+            onFocus={() => venueName && setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             className="w-full pl-10 pr-3 py-2 bg-white/10 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00d9ff] focus:border-transparent text-white placeholder-gray-400"
           />
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute z-50 top-full mt-1 w-full bg-[#1a2c4a] border border-white/20 rounded-md shadow-lg max-h-60 overflow-auto">
+              {suggestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => {
+                    setVenueName(suggestion);
+                    setShowSuggestions(false);
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-white/10 text-white transition-colors"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <select
           value={sport}

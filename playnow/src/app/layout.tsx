@@ -1,12 +1,14 @@
 import React from 'react';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
+import Nav from '@/components/Nav';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
         <AuthProvider>
+          <Nav />
           {children}
           <footer aria-label="Footer" className="mt-16 border-t border-[var(--border)]">
             <nav aria-label="Footer navigation" className="mx-auto max-w-5xl px-6 py-6 text-center">

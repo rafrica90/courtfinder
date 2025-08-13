@@ -19,8 +19,8 @@ export default function Nav() {
   const activeLinkClass = "text-[#00d9ff]";
 
   const isVenues = pathname.startsWith("/venues");
-  const isFindGames = pathname === "/games";
-  const isHostGame = pathname === "/games/new";
+  const isHostGame = pathname.startsWith("/games/new");
+  const isFindGames = pathname.startsWith("/games") && !isHostGame;
   const isBookings = pathname === "/bookings";
 
   const handleSignOut = async () => {

@@ -44,10 +44,39 @@ export default function VenueCard({ venue }: VenueCardProps) {
     router.push(url);
   };
   
+  const formatHours = (raw: unknown): string | null => {
+    if (!raw) return null;
+    // Accept a plain string directly
+    if (typeof raw === "string") return raw;
+    // Accept an object keyed by day names with open/close strings
+    try {
+      const now = new Date();
+      const dayIndex = now.getDay(); // 0-6 Sun-Sat
+      const weekdays = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+      const key = weekdays[dayIndex];
+      if (typeof raw === "object" && raw !== null) {
+        const obj: any = raw as any;
+        const today = obj[key] ?? obj[key.charAt(0).toUpperCase()+key.slice(1)];
+        if (today) {
+          // common shapes: { open: "08:00", close: "22:00" } or "8am - 10pm"
+          if (typeof today === "string") return today;
+          if (typeof today === "object" && (today.open || today.close)) {
+            const o = today.open ?? "";
+            const c = today.close ?? "";
+            if (o || c) return `${o} - ${c}`.trim();
+          }
+        }
+      }
+    } catch {}
+    return null;
+  };
+
+  const operatingHours = formatHours((venue as any).hours);
+
   return (
-    <Link href={`/venues/${venue.id}`} className="group block">
-      <article className="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-[#00d9ff]/50 hover:shadow-xl hover:shadow-[#00d9ff]/10 transition-all duration-300 hover:-translate-y-1">
-        <div className="relative h-48 bg-[#0f2847]">
+    <Link href={`/venues/${venue.id}`} className="group block h-full">
+      <article className="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-[#00d9ff]/50 hover:shadow-xl hover:shadow-[#00d9ff]/10 transition-all duration-300 hover:-translate-y-1 h-full min-h-[420px] flex flex-col">
+        <div className="relative aspect-[16/9] bg-[#0f2847]">
           {imgSrc ? (
             <img
               src={imgSrc}
@@ -59,20 +88,23 @@ export default function VenueCard({ venue }: VenueCardProps) {
               }}
             />
           ) : null}
-          {/* Hourly rate badge removed */}
-          <div className="absolute bottom-3 left-3 bg-[#00d9ff]/90 text-[#0a1628] px-2 py-1 rounded text-xs font-bold">
-            {venue.indoorOutdoor === "indoor" ? "Indoor" : venue.indoorOutdoor === "outdoor" ? "Outdoor" : "Indoor & Outdoor"}
+          {/* Location overlay inside image to free space */}
+          <div className="absolute bottom-3 left-3 right-3 flex items-center gap-1 text-xs font-semibold bg-black/50 text-white px-2 py-1 rounded">
+            <MapPin className="h-3 w-3 text-[#00d9ff]" />
+            <span className="truncate">{venue.address || venue.city}</span>
           </div>
         </div>
         
-        <div className="p-4">
+        <div className="p-4 flex-1 flex flex-col">
           <h3 className="font-semibold text-lg mb-1 text-white group-hover:text-[#00d9ff] transition-colors">
             {venue.name}
           </h3>
           
-          <div className="flex items-center gap-1 text-sm text-[#b8c5d6] mb-2">
-            <MapPin className="h-4 w-4 text-[#00d9ff]" />
-            <span>{venue.city}</span>
+          {/* Indoor/Outdoor moved below image */}
+          <div className="mb-2">
+            <span className="inline-block bg-white/10 text-[#b8c5d6] border border-white/10 px-2 py-0.5 rounded text-xs font-medium">
+              {venue.indoorOutdoor === "indoor" ? "Indoor" : venue.indoorOutdoor === "outdoor" ? "Outdoor" : "Indoor & Outdoor"}
+            </span>
           </div>
 
           {/* Sports badges (multi-sport support) */}
@@ -109,12 +141,12 @@ export default function VenueCard({ venue }: VenueCardProps) {
           <div className="flex items-center gap-3 text-sm mb-3">
             <div className="flex items-center gap-1 text-[#7a8b9a]">
               <Clock className="h-4 w-4" />
-              <span>Open now</span>
+              <span>{operatingHours ?? "Hours not available"}</span>
             </div>
           </div>
           
           {/* Amenities badges intentionally removed from cards */}
-          <div className="mt-4 flex gap-2">
+          <div className="mt-auto pt-2 flex gap-2">
             <button
               onClick={handleBookNow}
               disabled={!venue.bookingUrl}

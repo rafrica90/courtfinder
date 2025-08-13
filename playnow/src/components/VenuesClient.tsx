@@ -14,6 +14,7 @@ interface Venue {
   city?: string;
   latitude?: number;
   longitude?: number;
+  hours?: unknown;
   amenities: string[];
   photos: string[];
   imageUrls: string[];

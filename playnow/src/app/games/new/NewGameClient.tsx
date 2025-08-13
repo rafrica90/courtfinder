@@ -257,7 +257,7 @@ export default function NewGameClient() {
                   </div>
                   {venueSports.length > 0 && (
                     <div className="mt-3">
-                      <label className="block text-xs font-medium mb-1 text-[#00d9ff]">Sport for this game *</nlabel>
+                      <label className="block text-xs font-medium mb-1 text-[#00d9ff]">Sport for this game *</label>
                       <select
                         value={selectedSport}
                         onChange={(e)=>setSelectedSport(e.target.value)}

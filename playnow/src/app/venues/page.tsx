@@ -105,6 +105,7 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
             city: venue.city,
             latitude: venue.latitude,
             longitude: venue.longitude,
+            hours: venue.hours ?? undefined,
             amenities: venue.amenities || [],
             photos: venue.photos || [],
             imageUrls: venue.image_urls || venue.imageUrls || [],

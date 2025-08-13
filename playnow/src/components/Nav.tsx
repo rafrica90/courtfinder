@@ -20,7 +20,11 @@ export default function Nav() {
 
   const isVenues = pathname.startsWith("/venues");
   const isHostGame = pathname.startsWith("/games/new");
-  const isFindGames = pathname.startsWith("/games") && !isHostGame;
+  const isFindGames = (
+    pathname === "/games" ||
+    pathname.startsWith("/games?") ||
+    (pathname.startsWith("/games/") && !pathname.startsWith("/games/new"))
+  );
   const isBookings = pathname === "/bookings";
 
   const handleSignOut = async () => {

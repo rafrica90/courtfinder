@@ -108,14 +108,16 @@ export default function SignUpPage() {
     if (step === 4) {
       const local = (email.split("@")[0] || "").toLowerCase();
       const pwd = password.toLowerCase();
+      const sportsValid = selectedSports.length > 0 && selectedSports.every((slug) => Boolean(sportSkills[slug]));
       return (
         password.length >= 8 &&
         !/(password|123456|qwerty)/i.test(password) &&
-        (!email || !pwd.includes(local))
+        (!email || !pwd.includes(local)) &&
+        sportsValid
       );
     }
     return false;
-  }, [step, displayName, countryCode, phone, location, email, password]);
+  }, [step, displayName, countryCode, phone, location, email, password, selectedSports, sportSkills]);
 
   async function handleCreate() {
     setLoading(true);
@@ -302,7 +304,7 @@ export default function SignUpPage() {
             <p className="mt-1 text-xs text-[#b8c5d6]">Use a long unique passphrase (NIST). No arbitrary character rules; minimum 8 characters.</p>
 
             <div className="mt-6 bg-white/5 border border-white/10 rounded-lg p-4">
-              <h2 className="text-white font-semibold mb-3">Sports & Skill (optional)</h2>
+              <h2 className="text-white font-semibold mb-3">Sports & Skill <span className="text-[#00ff88]">(required)</span></h2>
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {availableSports.map((s) => {
@@ -345,6 +347,7 @@ export default function SignUpPage() {
                             setSportSkills((prev) => ({ ...prev, [slug]: val }));
                           }}
                           className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
+                          required
                         >
                           <option value="">Select skill level</option>
                           <option value="beginner">Beginner</option>
@@ -355,6 +358,9 @@ export default function SignUpPage() {
                       </div>
                     ))}
                   </div>
+                )}
+                {selectedSports.length === 0 && (
+                  <p className="text-xs text-[#b8c5d6]">Please select at least one sport and a skill level.</p>
                 )}
               </div>
             </div>

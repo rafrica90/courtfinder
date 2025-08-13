@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Clock } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Venue } from "@/lib/types";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -44,39 +44,12 @@ export default function VenueCard({ venue }: VenueCardProps) {
     router.push(url);
   };
   
-  const formatHours = (raw: unknown): string | null => {
-    if (!raw) return null;
-    // Accept a plain string directly
-    if (typeof raw === "string") return raw;
-    // Accept an object keyed by day names with open/close strings
-    try {
-      const now = new Date();
-      const dayIndex = now.getDay(); // 0-6 Sun-Sat
-      const weekdays = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-      const key = weekdays[dayIndex];
-      if (typeof raw === "object" && raw !== null) {
-        const obj: any = raw as any;
-        const today = obj[key] ?? obj[key.charAt(0).toUpperCase()+key.slice(1)];
-        if (today) {
-          // common shapes: { open: "08:00", close: "22:00" } or "8am - 10pm"
-          if (typeof today === "string") return today;
-          if (typeof today === "object" && (today.open || today.close)) {
-            const o = today.open ?? "";
-            const c = today.close ?? "";
-            if (o || c) return `${o} - ${c}`.trim();
-          }
-        }
-      }
-    } catch {}
-    return null;
-  };
-
-  const operatingHours = formatHours((venue as any).hours);
+  
 
   return (
     <Link href={`/venues/${venue.id}`} className="group block h-full">
       <article className="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-[#00d9ff]/50 hover:shadow-xl hover:shadow-[#00d9ff]/10 transition-all duration-300 hover:-translate-y-1 h-full min-h-[420px] flex flex-col">
-        <div className="relative aspect-[16/9] bg-[#0f2847]">
+        <div className="relative w-full h-40 md:h-44 lg:h-48 bg-[#0f2847]">
           {imgSrc ? (
             <img
               src={imgSrc}
@@ -91,7 +64,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
           {/* Location overlay inside image to free space */}
           <div className="absolute bottom-3 left-3 right-3 flex items-center gap-1 text-xs font-semibold bg-black/50 text-white px-2 py-1 rounded">
             <MapPin className="h-3 w-3 text-[#00d9ff]" />
-            <span className="truncate">{venue.address || venue.city}</span>
+            <span className="truncate">{venue.city}</span>
           </div>
         </div>
         
@@ -138,12 +111,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
             ) : null;
           })()}
           
-          <div className="flex items-center gap-3 text-sm mb-3">
-            <div className="flex items-center gap-1 text-[#7a8b9a]">
-              <Clock className="h-4 w-4" />
-              <span>{operatingHours ?? "Hours not available"}</span>
-            </div>
-          </div>
+          {/* Operating hours removed as requested */}
           
           {/* Amenities badges intentionally removed from cards */}
           <div className="mt-auto pt-2 flex gap-2">

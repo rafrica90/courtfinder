@@ -107,6 +107,7 @@ export async function POST(req: NextRequest) {
       minPlayers,
       maxPlayers,
       visibility,
+      skillLevel,
       notes,
       costInstructions
     } = body;
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest) {
     const hostUserId = authenticatedUserId;
 
     // Basic validation
-    if (!venueId || !startTime || !minPlayers || !maxPlayers || !visibility) {
+    if (!venueId || !startTime || !minPlayers || !maxPlayers || !visibility || !skillLevel) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
     
@@ -186,6 +187,10 @@ export async function POST(req: NextRequest) {
     const userEmail = req.headers.get('x-user-email');
     const hostName = userEmail ? userEmail.split('@')[0] : 'Anonymous Host';
 
+    // Normalize and validate skill level
+    const allowedLevels = ['Beginner','Intermediate','Advanced','All Levels'];
+    const normalizedSkill = allowedLevels.includes(String(skillLevel)) ? String(skillLevel) : 'All Levels';
+
     const { data: game, error } = await supabase
       .from('games')
       .insert({
@@ -201,7 +206,7 @@ export async function POST(req: NextRequest) {
         cost_instructions: costInstructions,
         cost_per_player: costPerPlayer,
         duration: 2, // Default 2 hours
-        skill_level: 'All Levels', // Default skill level
+        skill_level: normalizedSkill,
         status: 'active',
         sport: sport,
         host_name: hostName

@@ -150,6 +150,7 @@ export const api = {
       minPlayers: number;
       maxPlayers: number;
       visibility: string;
+      skillLevel: string;
       notes?: string;
       costInstructions?: string;
     }) => apiClient.post('/api/games', data),
@@ -177,5 +178,12 @@ export const api = {
       apiClient.get(`/api/clicks?venueId=${venueId}&redirect=${encodeURIComponent(redirect)}`, {
         requireAuth: false
       }),
+  },
+  profiles: {
+    // Public view: only sports and skill level
+    getPublic: (userIds: string[]) => {
+      const param = encodeURIComponent(userIds.join(","));
+      return apiClient.get(`/api/profiles/public?ids=${param}`, { requireAuth: false });
+    }
   },
 };

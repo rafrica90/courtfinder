@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
+import { sports as availableSports } from "@/lib/mockData";
+import type { SkillLevel } from "@/lib/types";
 
 type Suggestion = { id?: string; label: string; city: string; countryCode: string; suburb: string; state: string; postalCode?: string };
 
@@ -64,6 +66,10 @@ export default function SignUpPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
+  // Sports selection
+  const [selectedSports, setSelectedSports] = useState<string[]>([]);
+  const [sportSkills, setSportSkills] = useState<Record<string, SkillLevel>>({});
+
   useEffect(() => {
     if (user) router.push("/");
   }, [user, router]);
@@ -118,7 +124,7 @@ export default function SignUpPage() {
     try {
       localStorage.setItem(
         "pendingProfile",
-        JSON.stringify({ displayName, phone, countryCode, location, city, state: stateValue, suburb })
+        JSON.stringify({ displayName, phone, countryCode, location, city, state: stateValue, suburb, selectedSports, sportSkills })
       );
     } catch {}
     const { error } = await signUp(email, password);
@@ -270,7 +276,7 @@ export default function SignUpPage() {
           </div>
         );
       case 3:
-  return (
+        return (
           <div>
             <label className="block text-sm text-[#b8c5d6] mb-1">Email</label>
             <input
@@ -294,20 +300,64 @@ export default function SignUpPage() {
               placeholder="Minimum 8 characters"
             />
             <p className="mt-1 text-xs text-[#b8c5d6]">Use a long unique passphrase (NIST). No arbitrary character rules; minimum 8 characters.</p>
-          </div>
-        );
-      case 5:
-        return (
-          <div>
-            <label className="block text-sm text-[#b8c5d6] mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
-              placeholder="Minimum 8 characters"
-            />
-            <p className="mt-1 text-xs text-[#b8c5d6]">Use a long unique passphrase (NIST). No arbitrary character rules; minimum 8 characters.</p>
+
+            <div className="mt-6 bg-white/5 border border-white/10 rounded-lg p-4">
+              <h2 className="text-white font-semibold mb-3">Sports & Skill (optional)</h2>
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {availableSports.map((s) => {
+                    const checked = selectedSports.includes(s.slug);
+                    return (
+                      <label key={s.slug} className={`flex items-center gap-2 px-3 py-2 rounded-md border cursor-pointer ${checked ? 'border-[#00ff88] bg-[#00ff88]/10 text-white' : 'border-white/10 text-[#b8c5d6] hover:bg-white/5'}`}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            const isOn = e.target.checked;
+                            setSelectedSports((prev) => {
+                              if (isOn) return Array.from(new Set([...prev, s.slug]));
+                              const next = prev.filter((x) => x !== s.slug);
+                              const copy = { ...sportSkills };
+                              delete copy[s.slug];
+                              setSportSkills(copy);
+                              return next;
+                            });
+                          }}
+                          className="sr-only"
+                        />
+                        <span className="select-none">{s.name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                {selectedSports.length > 0 && (
+                  <div className="space-y-2">
+                    {selectedSports.map((slug) => (
+                      <div key={slug} className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                        <div className="text-sm text-white/90">
+                          {availableSports.find(x => x.slug === slug)?.name || slug}
+                        </div>
+                        <select
+                          value={sportSkills[slug] || ''}
+                          onChange={(e) => {
+                            const val = e.target.value as SkillLevel;
+                            setSportSkills((prev) => ({ ...prev, [slug]: val }));
+                          }}
+                          className="w-full px-3 py-2 rounded-md bg-[#0a1628] text-white border border-white/10 focus:outline-none focus:border-[#00d9ff]"
+                        >
+                          <option value="">Select skill level</option>
+                          <option value="beginner">Beginner</option>
+                          <option value="intermediate">Intermediate</option>
+                          <option value="advanced">Advanced</option>
+                          <option value="pro">Pro</option>
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         );
       default:

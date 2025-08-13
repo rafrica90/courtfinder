@@ -74,6 +74,7 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
   const [isJoined, setIsJoined] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [publicProfiles, setPublicProfiles] = useState<Record<string, { sports: string[]; skillLevel: string }>>({});
   
   const isHost = gameData?.hostUserId === currentUserId;
   const currentParticipant = gameData ? [...gameData.participants, ...gameData.waitlist]
@@ -99,9 +100,10 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
           const game = data.game;
           
           // Parse participants into joined and waitlist
+          type RawParticipant = { id: string; user_id: string; status: string | null; created_at?: string | null };
           const joinedParticipants = (game.participants || [])
-            .filter((p: any) => p.status === 'joined')
-            .map((p: any) => ({
+            .filter((p: RawParticipant) => p.status === 'joined')
+            .map((p: RawParticipant) => ({
               id: p.id,
               userId: p.user_id,
               name: p.user_id === game.host_user_id ? (game.host_name || 'Host') : `Player ${p.id.slice(0, 4)}`,
@@ -110,8 +112,8 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
             }));
           
           const waitlistParticipants = (game.participants || [])
-            .filter((p: any) => p.status === 'waitlist')
-            .map((p: any) => ({
+            .filter((p: RawParticipant) => p.status === 'waitlist')
+            .map((p: RawParticipant) => ({
               id: p.id,
               userId: p.user_id,
               name: `Player ${p.id.slice(0, 4)}`,
@@ -213,6 +215,31 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
 
     fetchGameData();
   }, [params, currentUserId]);
+
+  // Fetch public profile info (sports + skill level) for all participants
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      if (!gameData) return;
+      const userIds = Array.from(new Set([
+        ...gameData.participants.map(p => p.userId),
+        ...gameData.waitlist.map(p => p.userId)
+      ]));
+      if (userIds.length === 0) return;
+      const { data, error } = await api.profiles.getPublic(userIds);
+      if (!error && data?.profiles) {
+        type PublicProfile = { userId: string; sports: string[]; skillLevel: string };
+        const map: Record<string, { sports: string[]; skillLevel: string }> = {};
+        for (const p of (data.profiles as PublicProfile[])) {
+          map[p.userId] = {
+            sports: Array.isArray(p.sports) ? p.sports : [],
+            skillLevel: typeof p.skillLevel === 'string' ? p.skillLevel : 'All Levels'
+          };
+        }
+        setPublicProfiles(map);
+      }
+    };
+    fetchProfiles();
+  }, [gameData]);
 
   const handleJoinGame = async () => {
     if (!user) {
@@ -582,28 +609,33 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                 Participants ({gameData.participants.length})
               </h2>
               <div className="space-y-3">
-                {gameData.participants.map((participant, index) => (
-                  <div key={participant.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-[#00d9ff]/20 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium text-[#00d9ff]">
-                          {participant.name.charAt(0)}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-white font-medium">
-                          {participant.name}
-                          {participant.userId === gameData.hostUserId && (
-                            <span className="text-xs text-[#00ff88] ml-1">(Host)</span>
-                          )}
-                          {participant.userId === currentUserId && (
-                            <span className="text-xs text-[#00d9ff] ml-1">(You)</span>
-                          )}
-                        </p>
+                {gameData.participants.map((participant) => {
+                  const pub = publicProfiles[participant.userId];
+                  const sportsText = pub && pub.sports.length > 0 ? pub.sports.join(', ') : 'Sports not set';
+                  const levelText = pub ? pub.skillLevel : 'All Levels';
+                  return (
+                    <div key={participant.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-[#00d9ff]/20 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-medium text-[#00d9ff]">
+                            {(pub && pub.sports[0] ? pub.sports[0] : 'P').charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-white font-medium">{sportsText}</p>
+                          <p className="text-xs text-[#7a8b9a]">{levelText}
+                            {participant.userId === gameData.hostUserId && (
+                              <span className="text-xs text-[#00ff88] ml-1">(Host)</span>
+                            )}
+                            {participant.userId === currentUserId && (
+                              <span className="text-xs text-[#00d9ff] ml-1">(You)</span>
+                            )}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -614,25 +646,30 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                   Waitlist ({gameData.waitlist.length})
                 </h2>
                 <div className="space-y-3">
-                  {gameData.waitlist.map((participant, index) => (
-                    <div key={participant.id} className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-medium text-orange-400">
-                            {participant.name.charAt(0)}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="text-white font-medium">
-                            {participant.name}
-                            {participant.userId === currentUserId && (
-                              <span className="text-xs text-[#00d9ff] ml-1">(You)</span>
-                            )}
-                          </p>
+                  {gameData.waitlist.map((participant) => {
+                    const pub = publicProfiles[participant.userId];
+                    const sportsText = pub && pub.sports.length > 0 ? pub.sports.join(', ') : 'Sports not set';
+                    const levelText = pub ? pub.skillLevel : 'All Levels';
+                    return (
+                      <div key={participant.id} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-orange-400">
+                              {(pub && pub.sports[0] ? pub.sports[0] : 'W').charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-white font-medium">{sportsText}</p>
+                            <p className="text-xs text-[#7a8b9a]">{levelText}
+                              {participant.userId === currentUserId && (
+                                <span className="text-xs text-[#00d9ff] ml-1">(You)</span>
+                              )}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}

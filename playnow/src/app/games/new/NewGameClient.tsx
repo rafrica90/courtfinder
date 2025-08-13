@@ -24,6 +24,7 @@ export default function NewGameClient() {
   const [visibility, setVisibility] = useState<'public'|'private'>('public');
   const [notes, setNotes] = useState('');
   const [costPerPlayer, setCostPerPlayer] = useState('');
+  const [skillLevel, setSkillLevel] = useState('');
   const [sportFilter, setSportFilter] = useState(preselectedSport);
   const [locationFilter, setLocationFilter] = useState(preselectedLocation);
   const [allVenues, setAllVenues] = useState<any[]>([]);
@@ -103,6 +104,7 @@ export default function NewGameClient() {
         minPlayers,
         maxPlayers,
         visibility,
+        skillLevel,
         notes,
         costInstructions: costPerPlayer ? `$${costPerPlayer} per player` : undefined
       });
@@ -326,6 +328,33 @@ export default function NewGameClient() {
                     ? 'Anyone can find and join this game' 
                     : 'Only people with the invite link can join'}
                 </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2 text-[#00d9ff]">Skill Level *</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {['Beginner','Intermediate','Advanced','All Levels'].map((level) => (
+                    <label
+                      key={level}
+                      className={`flex items-center gap-3 px-4 py-3 border rounded-lg cursor-pointer transition-all ${
+                        skillLevel === level
+                          ? 'border-[#00ff88] bg-[#00ff88]/20 text-[#00ff88]'
+                          : 'border-white/20 hover:bg-white/10 text-[#b8c5d6]'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="skillLevel"
+                        value={level}
+                        checked={skillLevel === level}
+                        onChange={() => setSkillLevel(level)}
+                        required
+                        className="sr-only"
+                      />
+                      <span className="font-medium">{level}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div>

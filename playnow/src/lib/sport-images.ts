@@ -4,6 +4,7 @@
 export type SportKey =
   | "tennis"
   | "soccer"
+  | "futsal"
   | "basketball"
   | "pickleball"
   | "swimming"
@@ -22,6 +23,10 @@ const stockImagesBySport: Record<SportKey, string[]> = {
     "https://images.unsplash.com/photo-1595435742656-5272d0b3fa82?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHRlbm5pc3xlbnwwfHwwfHx8Mg%3D%3D",
   ],
   soccer: [
+    "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&q=80",
+  ],
+  futsal: [
+    // Reuse soccer imagery for futsal by default
     "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&q=80",
   ],
   // Restrict all non-target sports to reuse the allowed image set (tennis/pickleball/soccer)

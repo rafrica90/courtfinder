@@ -4,6 +4,7 @@ export const sports: Sport[] = [
   { id: "tennis", name: "Tennis", slug: "tennis" },
   { id: "pickleball", name: "Pickleball", slug: "pickleball" },
   { id: "soccer", name: "Soccer", slug: "soccer" },
+  { id: "futsal", name: "Futsal", slug: "futsal" },
 ];
 
 export const venues: Venue[] = [

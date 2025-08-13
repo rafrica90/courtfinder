@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { withAuth } from "@/contexts/AuthContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { sports as availableSports } from "@/lib/mockData";
+import type { SkillLevel } from "@/lib/types";
 
 type ProfileRow = {
   user_id: string;
@@ -14,6 +16,9 @@ type ProfileRow = {
   country_code?: string | null;
   suburb?: string | null;
   state?: string | null;
+  sports_preferences?: string[] | null;
+  skill_level?: string | null;
+  sport_skill_levels?: Record<string, SkillLevel> | null;
 };
 
 function AccountPageInner() {
@@ -41,6 +46,9 @@ function AccountPageInner() {
   const suggestAbortRef = useRef<AbortController | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [selectedSports, setSelectedSports] = useState<string[]>([]);
+  const [sportSkills, setSportSkills] = useState<Record<string, SkillLevel>>({});
+
   const userEmail = useMemo(() => user?.email ?? "", [user]);
 
   // When the typed postcode matches a suggestion, auto-fill derived fields
@@ -62,7 +70,7 @@ function AccountPageInner() {
       try {
         const { data } = await supabase
           .from("profiles")
-          .select("user_id, display_name, phone, location, city, country_code, suburb, state")
+          .select("user_id, display_name, phone, location, city, country_code, suburb, state, sports_preferences, sport_skill_levels")
           .eq("user_id", user.id)
           .maybeSingle();
         if (data) {
@@ -76,6 +84,9 @@ function AccountPageInner() {
           setCountryCode((row.country_code ?? "").toUpperCase());
           setSuburb(row.suburb ?? "");
           setState(row.state ?? "");
+          setSelectedSports(Array.isArray(row.sports_preferences) ? row.sports_preferences : []);
+          const lvl = row.sport_skill_levels && typeof row.sport_skill_levels === 'object' ? row.sport_skill_levels : {};
+          setSportSkills(lvl as Record<string, SkillLevel>);
         }
       } finally {
         setInitialLoading(false);
@@ -98,6 +109,12 @@ function AccountPageInner() {
             setCity((v) => v || p.city || '');
             setState((v) => v || p.state || '');
             setSuburb((v) => v || p.suburb || '');
+            if (Array.isArray(p.selectedSports)) {
+              setSelectedSports((cur) => cur.length ? cur : p.selectedSports);
+            }
+            if (p.sportSkills && typeof p.sportSkills === 'object') {
+              setSportSkills((cur) => Object.keys(cur).length ? cur : p.sportSkills);
+            }
           }
           localStorage.removeItem('pendingProfile');
         }
@@ -149,6 +166,8 @@ function AccountPageInner() {
         country_code: countryCode || null,
         suburb: suburb || null,
         state: state || null,
+        sports_preferences: selectedSports,
+        sport_skill_levels: sportSkills,
       };
       const { error: profileError } = await supabase
         .from("profiles")
@@ -410,6 +429,68 @@ function AccountPageInner() {
         </section>
 
         <section className="space-y-4">
+          {/* Sports & Skill */}
+          <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+            <h2 className="text-white font-semibold mb-3">Sports & Skill</h2>
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {availableSports.map((s) => {
+                  const checked = selectedSports.includes(s.slug);
+                  return (
+                    <label key={s.slug} className={`flex items-center gap-2 px-3 py-2 rounded-md border cursor-pointer ${checked ? 'border-[#00ff88] bg-[#00ff88]/10 text-white' : 'border-white/10 text-[#b8c5d6] hover:bg-white/5'}`}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          const isOn = e.target.checked;
+                          setSelectedSports((prev) => {
+                            if (isOn) return Array.from(new Set([...prev, s.slug]));
+                            const next = prev.filter((x) => x !== s.slug);
+                            const copy = { ...sportSkills };
+                            delete copy[s.slug];
+                            setSportSkills(copy);
+                            return next;
+                          });
+                        }}
+                        className="sr-only"
+                      />
+                      <span className="select-none">{s.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+
+              {selectedSports.length > 0 && (
+                <div className="space-y-2">
+                  {selectedSports.map((slug) => (
+                    <div key={slug} className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                      <div className="text-sm text-white/90">
+                        {availableSports.find(x => x.slug === slug)?.name || slug}
+                      </div>
+                      <select
+                        value={sportSkills[slug] || ''}
+                        onChange={(e) => {
+                          const val = e.target.value as SkillLevel;
+                          setSportSkills((prev) => ({ ...prev, [slug]: val }));
+                        }}
+                        className="w-full rounded-md border border-white/10 bg-[#0f1f39] px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                      >
+                        <option value="">Select skill level</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                        <option value="pro">Pro</option>
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {selectedSports.length > 0 && (
+                <p className="text-xs text-[#6b7b8f]">Tip: Choose a level for each selected sport to improve match recommendations.</p>
+              )}
+            </div>
+          </div>
+
           <div className="flex justify-end gap-3">
             <button
               type="button"

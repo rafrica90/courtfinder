@@ -4,6 +4,8 @@ export type Sport = {
   slug: string;
 };
 
+export type SkillLevel = "beginner" | "intermediate" | "advanced" | "pro";
+
 export type Venue = {
   id: string;
   name: string;
@@ -46,8 +48,12 @@ export type Participant = {
 export type Profile = {
   userId: string;
   displayName: string;
-  sportsPreferences: string[]; // sport slugs
-  skillLevel?: "beginner" | "intermediate" | "advanced" | "pro";
+  // Preferred sports by slug. Kept for backwards compatibility.
+  sportsPreferences?: string[];
+  // Per-sport skill levels, keyed by sport slug
+  sportSkillLevels?: Record<string, SkillLevel>;
+  // Deprecated: global skill level (prefer sportSkillLevels)
+  skillLevel?: SkillLevel;
   phone?: string;
   location?: string;
   city?: string;

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api-client";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 // Mock data for a specific game (this would come from API in production)
 const mockGameData = {
@@ -75,6 +76,9 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [publicProfiles, setPublicProfiles] = useState<Record<string, { sports: string[]; skillLevel: string }>>({});
+  const [showSkillPrompt, setShowSkillPrompt] = useState(false);
+  const [pendingSkill, setPendingSkill] = useState('');
+  const [existingLevels, setExistingLevels] = useState<Record<string, string>>({});
   
   const isHost = gameData?.hostUserId === currentUserId;
   const currentParticipant = gameData ? [...gameData.participants, ...gameData.waitlist]
@@ -241,15 +245,14 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
     fetchProfiles();
   }, [gameData]);
 
-  const handleJoinGame = async () => {
-    if (!user) {
-      router.push('/sign-in');
-      return;
-    }
-    
+  const normalizedSportSlug = () => {
+    const raw = String(gameData?.sport || '').toLowerCase();
+    return raw.replace(/\s+/g, '_');
+  };
+
+  const performJoin = async () => {
     setIsLoading(true);
     setError(null);
-    
     try {
       const gameId = (await params).id;
       const { data, error } = await api.games.join(gameId);
@@ -259,29 +262,26 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
         setIsLoading(false);
         return;
       }
-      
       if (data) {
         setIsJoined(true);
-        
-        // Update local game data to reflect the join
         if (data.participant?.status === 'joined') {
           setGameData(prev => ({
-            ...prev,
-            participants: [...prev.participants, {
+            ...prev!,
+            participants: [...(prev?.participants || []), {
               id: data.participant.id,
               userId: currentUserId || '',
-              name: "You", // In production, would fetch user name
+              name: "You",
               status: 'joined' as const,
               joinedAt: new Date().toISOString()
             }]
           }));
         } else {
           setGameData(prev => ({
-            ...prev,
-            waitlist: [...prev.waitlist, {
+            ...prev!,
+            waitlist: [...(prev?.waitlist || []), {
               id: data.participant.id,
               userId: currentUserId || '',
-              name: "You", // In production, would fetch user name
+              name: "You",
               status: 'waitlist' as const,
               joinedAt: new Date().toISOString()
             }]
@@ -293,6 +293,50 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleJoinGame = async () => {
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+    // Check if user has skill level for this sport
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const sportSlug = normalizedSportSlug();
+      if (supabase && sportSlug) {
+        const { data: row } = await supabase
+          .from('profiles')
+          .select('sport_skill_levels')
+          .eq('user_id', user.id)
+          .single();
+        const levels = (row?.sport_skill_levels as Record<string, string>) || {};
+        if (!levels[sportSlug]) {
+          setExistingLevels(levels);
+          setShowSkillPrompt(true);
+          return; // wait for user to set level, then join
+        }
+      }
+    } catch {}
+
+    await performJoin();
+  };
+
+  const handleSaveSkillAndJoin = async () => {
+    if (!user) return;
+    const sportSlug = normalizedSportSlug();
+    if (!sportSlug || !pendingSkill) return;
+    try {
+      const supabase = getSupabaseBrowserClient();
+      if (!supabase) return;
+      const updated = { ...existingLevels, [sportSlug]: pendingSkill };
+      await supabase
+        .from('profiles')
+        .upsert({ user_id: user.id, sport_skill_levels: updated }, { onConflict: 'user_id' });
+    } catch {}
+    setShowSkillPrompt(false);
+    setPendingSkill('');
+    await performJoin();
   };
 
   const handleLeaveGame = async () => {

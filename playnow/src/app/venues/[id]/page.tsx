@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
-import { MapPin, Clock, Shield, Users, Heart, Share2 } from "lucide-react";
+import { MapPin, Clock, Users, Heart, Share2 } from "lucide-react";
 import VenueImage from "@/components/VenueImage";
 import { getStockImageForVenue, GENERIC_PLACEHOLDER, getPrimarySport } from "@/lib/sport-images";
 
@@ -105,11 +105,6 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Shield className="h-5 w-5 text-[#00d9ff]" />
-                  <div>
-                    <div className="text-sm text-[#7a8b9a]">Verified</div>
-                    <div className="font-medium text-white">Yes</div>
-                  </div>
                 </div>
               </div>
             </div>

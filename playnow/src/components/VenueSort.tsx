@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Venue {
   id: string;
@@ -18,7 +19,12 @@ interface VenueSortProps {
 }
 
 export default function VenueSort({ venues, onSortedVenues, userLocation }: VenueSortProps) {
-  const [sortBy, setSortBy] = useState<string>("recommended");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  const initialSort = searchParams.get("sort") ?? "recommended";
+  const [sortBy, setSortBy] = useState<string>(initialSort);
 
   // Removed price-based sorting utilities
 
@@ -71,7 +77,32 @@ export default function VenueSort({ venues, onSortedVenues, userLocation }: Venu
     setSortBy(newSortBy);
     const sortedVenues = sortVenues(venues, newSortBy);
     onSortedVenues(sortedVenues);
+
+    // Persist selection in URL so it survives sport/filter navigation
+    const params = new URLSearchParams(searchParams);
+    if (newSortBy && newSortBy !== "recommended") {
+      params.set("sort", newSortBy);
+    } else {
+      params.delete("sort");
+    }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
+
+  // Keep component state in sync with URL changes (e.g., back/forward nav)
+  useEffect(() => {
+    const urlSort = searchParams.get("sort") ?? "recommended";
+    if (urlSort !== sortBy) {
+      setSortBy(urlSort);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // Re-apply current sort whenever input list or location changes
+  useEffect(() => {
+    const sortedVenues = sortVenues(venues, sortBy);
+    onSortedVenues(sortedVenues);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [venues, sortBy, userLocation]);
 
   return (
     <select 

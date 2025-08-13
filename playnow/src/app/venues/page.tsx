@@ -8,104 +8,81 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
   const location = typeof sp?.location === "string" ? sp?.location : undefined;
   const venueName = typeof sp?.venueName === "string" ? sp?.venueName : undefined;
 
-  const supabase = getSupabaseServiceClient();
   let filtered: any[] = [];
-  if (supabase) {
-    // Try RPC first, but fallback to direct query if it doesn't exist
-    let data = null;
-    let error = null;
-    
-    try {
-      const rpcResult = await supabase
-        .rpc("search_venues", {
-          search_query: location ?? null,
-          sport_filter: sport ? [sport] : null,
-          indoor_outdoor_filter: null,
-          city_filter: location ?? null,
-        });
-      data = rpcResult.data;
-      error = rpcResult.error;
-    } catch (e) {
-      // RPC function might not exist, fallback to direct query
-      error = e;
-    }
-    
-    // If RPC failed or returned no data, use direct table query
-    if (error || !data) {
-      const { data: allVenues, error: venuesError } = await supabase.from("venues").select("*");
-      
-      // Log for debugging in production
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Direct venues query:', { count: allVenues?.length, error: venuesError });
+  try {
+    const supabase = getSupabaseServiceClient();
+    if (supabase) {
+      // Try RPC first, but fallback to direct query if it doesn't exist
+      let data = null as any[] | null;
+      let error: any = null;
+      try {
+        const rpcResult = await supabase
+          .rpc("search_venues", {
+            search_query: location ?? null,
+            sport_filter: sport ? [sport] : null,
+            indoor_outdoor_filter: null,
+            city_filter: location ?? null,
+          });
+        data = rpcResult.data as any[] | null;
+        error = rpcResult.error;
+      } catch (e) {
+        error = e;
       }
       
-      const normalize = (val: unknown): string => {
-        if (typeof val === "string") return val.toLowerCase();
-        if (val === null || val === undefined) return "";
-        try { return String(val).toLowerCase(); } catch { return ""; }
-      };
-      
-      // Start with all venues
-      let bySearch = allVenues ?? [];
-      
-      // Filter by venue name if provided (partial match, case-insensitive)
-      if (typeof venueName === "string" && venueName.length > 0) {
-        const nameQuery = venueName.toLowerCase();
-        bySearch = bySearch.filter((v: any) => 
-          normalize(v.name).includes(nameQuery)
-        );
+      if (error || !Array.isArray(data)) {
+        const { data: allVenues } = await supabase.from("venues").select("*");
+        const normalize = (val: unknown): string => {
+          if (typeof val === "string") return val.toLowerCase();
+          if (val === null || val === undefined) return "";
+          try { return String(val).toLowerCase(); } catch { return ""; }
+        };
+        let bySearch = allVenues ?? [];
+        if (typeof venueName === "string" && venueName.length > 0) {
+          const nameQuery = venueName.toLowerCase();
+          bySearch = bySearch.filter((v: any) => normalize(v.name).includes(nameQuery));
+        }
+        if (typeof location === "string" && location.length > 0) {
+          const q = location.toLowerCase();
+          bySearch = bySearch.filter((v: any) => {
+            if (normalize(v.city) === q) return true;
+            return (
+              normalize(v.address).includes(q) ||
+              normalize(v.city).includes(q) ||
+              normalize(v.notes).includes(q)
+            );
+          });
+        }
+        filtered = typeof sport === "string" && sport.length > 0
+          ? bySearch.filter((v: any) => Array.isArray(v.sports) && v.sports.includes(sport))
+          : bySearch;
+      } else {
+        let rpcFiltered = data;
+        if (venueName) {
+          const nameQuery = venueName.toLowerCase();
+          rpcFiltered = rpcFiltered.filter((v: any) => (typeof v?.name === "string" ? v.name.toLowerCase() : "").includes(nameQuery));
+        }
+        filtered = rpcFiltered;
       }
-      
-      // Further filter by location if provided
-      if (typeof location === "string" && location.length > 0) {
-        const q = location.toLowerCase();
-        bySearch = bySearch.filter((v: any) => {
-          // Prefer city equality / inclusion first
-          if (normalize(v.city) === q) return true;
-          return (
-            normalize(v.address).includes(q) ||
-            normalize(v.city).includes(q) ||
-            normalize(v.notes).includes(q)
-          );
-        });
-      }
-      
-      // Finally filter by sport if provided
-      filtered = typeof sport === "string" && sport.length > 0
-        ? bySearch.filter((v: any) => Array.isArray(v.sports) && v.sports.includes(sport))
-        : bySearch;
     } else {
-      // RPC succeeded, but we still need to filter by venue name if provided
-      let rpcFiltered = data;
-      
+      const { venues } = await import("@/lib/mockData");
+      let mockFiltered = venues ?? [];
       if (venueName) {
         const nameQuery = venueName.toLowerCase();
-        rpcFiltered = rpcFiltered.filter((v: any) => 
-          v.name?.toLowerCase().includes(nameQuery)
-        );
+        mockFiltered = mockFiltered.filter((v: any) => (typeof v?.name === "string" ? v.name.toLowerCase() : "").includes(nameQuery));
       }
-      
-      filtered = rpcFiltered;
+      if (sport) {
+        mockFiltered = mockFiltered.filter((v: any) => v.sportId === sport);
+      }
+      filtered = mockFiltered;
     }
-  } else {
-    // Fallback to mock data in dev without env
-    const { venues } = await import("@/lib/mockData");
-    let mockFiltered = venues;
-    
-    // Filter by venue name if provided
-    if (venueName) {
-      const nameQuery = venueName.toLowerCase();
-      mockFiltered = mockFiltered.filter((v: any) => 
-        v.name?.toLowerCase().includes(nameQuery)
-      );
+  } catch {
+    // Absolute fallback to prevent 500s
+    try {
+      const { venues } = await import("@/lib/mockData");
+      filtered = venues ?? [];
+    } catch {
+      filtered = [];
     }
-    
-    // Filter by sport if provided
-    if (sport) {
-      mockFiltered = mockFiltered.filter((v: any) => v.sportId === sport);
-    }
-    
-    filtered = mockFiltered;
   }
 
   return (

@@ -1,0 +1,53 @@
+City: Auckland → fetching bounds
+Querying Overpass for Auckland...
+Found 3647 elements in Auckland
+City: Wellington → fetching bounds
+Querying Overpass for Wellington...
+Found 333 elements in Wellington
+City: Christchurch → fetching bounds
+Querying Overpass for Christchurch...
+Found 1149 elements in Christchurch
+City: Hamilton → fetching bounds
+Querying Overpass for Hamilton...
+Found 435 elements in Hamilton
+City: Tauranga → fetching bounds
+Querying Overpass for Tauranga...
+Found 196 elements in Tauranga
+City: Dunedin → fetching bounds
+Querying Overpass for Dunedin...
+Found 202 elements in Dunedin
+City: Palmerston North → fetching bounds
+Querying Overpass for Palmerston North...
+Found 235 elements in Palmerston North
+City: Napier → fetching bounds
+Querying Overpass for Napier...
+Overpass failed for Napier: Overpass error: 504 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:
+City: Hastings → fetching bounds
+Querying Overpass for Hastings...
+Found 370 elements in Hastings
+City: Rotorua → fetching bounds
+Querying Overpass for Rotorua...
+Found 149 elements in Rotorua
+City: New Plymouth → fetching bounds
+Querying Overpass for New Plymouth...
+Found 179 elements in New Plymouth
+City: Nelson → fetching bounds
+Querying Overpass for Nelson...
+Found 138 elements in Nelson
+City: Queenstown → fetching bounds
+Querying Overpass for Queenstown...
+Overpass failed for Queenstown: Overpass error: 504 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:
+City: Invercargill → fetching bounds
+Querying Overpass for Invercargill...
+Found 104 elements in Invercargill
+Prepared 93 new NZ venues with verified booking links.
+Deduplicated 9 rows within batch; proceeding with 84.
+Inserted 75/84
+Inserted 84/84
+NZ discovery complete.

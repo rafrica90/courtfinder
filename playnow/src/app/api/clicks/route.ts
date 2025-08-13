@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 
 // Validate and sanitize redirect URLs to prevent open redirect attacks
-function isValidRedirectUrl(url: string): boolean {
+function normalizeHost(hostname: string): string {
+  return hostname.startsWith('www.') ? hostname.slice(4) : hostname;
+}
+
+// Validate and sanitize redirect URLs to prevent open redirect attacks
+function isValidRedirectUrl(url: string, extraAllowedHosts: string[] = []): boolean {
   try {
     const redirectUrl = new URL(url);
     
@@ -57,6 +62,11 @@ function isValidRedirectUrl(url: string): boolean {
       'citycommunitytennis.com.au'
     ];
     
+    // Add missing trusted domain(s)
+    trustedBookingDomains.push(
+      '5sports.com.au'
+    );
+    
     // Get allowed internal domains from environment variable  
     const allowedInternalDomains = process.env.ALLOWED_REDIRECT_DOMAINS?.split(',') || [
       'localhost:3000',
@@ -78,18 +88,28 @@ function isValidRedirectUrl(url: string): boolean {
     });
     
     // Check if it's a trusted booking domain
-    const isTrustedBookingDomain = trustedBookingDomains.some(domain => 
-      hostname === domain || 
-      hostname.endsWith(`.${domain}`) || 
-      hostname === `www.${domain}`
-    );
+    const isTrustedBookingDomain = trustedBookingDomains.some(domain => {
+      const normDomain = normalizeHost(domain);
+      const normHost = normalizeHost(hostname);
+      return (
+        normHost === normDomain ||
+        normHost.endsWith(`.${normDomain}`)
+      );
+    });
+
+    // Dynamically allow hosts derived from the venue's own booking_url
+    const isExtraAllowed = extraAllowedHosts.some(allowed => {
+      const normAllowed = normalizeHost(allowed);
+      const normHost = normalizeHost(hostname);
+      return normHost === normAllowed || normHost.endsWith(`.${normAllowed}`);
+    });
     
     // Only allow HTTPS in production (allow HTTP for localhost in dev)
     const isSecureProtocol = 
       redirectUrl.protocol === 'https:' || 
       (process.env.NODE_ENV !== 'production' && hostname.includes('localhost'));
     
-    return (isInternalDomain || isTrustedBookingDomain) && isSecureProtocol;
+    return (isInternalDomain || isTrustedBookingDomain || isExtraAllowed) && isSecureProtocol;
   } catch {
     return false;
   }
@@ -104,8 +124,31 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing venueId or redirect' }, { status: 400 });
   }
 
+  // Try to fetch venue's booking_url to dynamically allow its host
+  let extraAllowedHosts: string[] = [];
+  try {
+    const supabase = getSupabaseServiceClient();
+    if (supabase && venueId) {
+      const { data } = await supabase
+        .from('venues')
+        .select('booking_url')
+        .eq('id', venueId)
+        .maybeSingle();
+      if (data?.booking_url) {
+        try {
+          const bookingHost = new URL(data.booking_url).hostname;
+          extraAllowedHosts.push(bookingHost);
+          // Also allow without/with www variants
+          const normalized = normalizeHost(bookingHost);
+          extraAllowedHosts.push(normalized);
+          extraAllowedHosts.push(`www.${normalized}`);
+        } catch {}
+      }
+    }
+  } catch {}
+
   // Validate redirect URL to prevent open redirect attacks
-  if (!isValidRedirectUrl(redirect)) {
+  if (!isValidRedirectUrl(redirect, extraAllowedHosts)) {
     return NextResponse.json({ error: 'Invalid redirect URL' }, { status: 400 });
   }
 

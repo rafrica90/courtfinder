@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SlidersHorizontal } from "lucide-react";
 import { sports } from "@/lib/mockData";
 
@@ -18,6 +18,7 @@ export interface FilterState {
 export default function VenueFilters({ currentSport, onFiltersChange }: VenueFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   
   const [filters, setFilters] = useState<FilterState>({
     venueTypes: []
@@ -48,7 +49,13 @@ export default function VenueFilters({ currentSport, onFiltersChange }: VenueFil
       params.delete('venueTypes');
     }
     
-    router.push(`/venues?${params.toString()}`, { scroll: false });
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const buildQueryObject = (modify: (p: URLSearchParams) => void) => {
+    const p = new URLSearchParams(searchParams);
+    modify(p);
+    return Object.fromEntries(p.entries());
   };
 
   const handleVenueTypeChange = (venueType: string, checked: boolean) => {
@@ -77,7 +84,9 @@ export default function VenueFilters({ currentSport, onFiltersChange }: VenueFil
           <h4 className="font-medium mb-3 text-[#00d9ff]">Sport</h4>
           <div className="space-y-2">
             <Link
-              href="/venues"
+              href={{ pathname: "/venues", query: buildQueryObject((p) => {
+                p.delete("sport");
+              }) }}
               className={`block px-3 py-2 rounded-lg transition-colors ${
                 !currentSport ? "bg-[#00ff88] text-[#0a1628] font-semibold" : "text-[#b8c5d6] hover:bg-white/10"
               }`}
@@ -87,7 +96,9 @@ export default function VenueFilters({ currentSport, onFiltersChange }: VenueFil
             {sports.map((s) => (
               <Link
                 key={s.id}
-                href={`/venues?sport=${s.slug}`}
+                href={{ pathname: "/venues", query: buildQueryObject((p) => {
+                  p.set("sport", s.slug);
+                }) }}
                 className={`block px-3 py-2 rounded-lg transition-colors ${
                   currentSport === s.slug ? "bg-[#00ff88] text-[#0a1628] font-semibold" : "text-[#b8c5d6] hover:bg-white/10"
                 }`}

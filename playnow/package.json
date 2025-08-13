@@ -8,6 +8,13 @@
     "start": "next start",
     "lint": "next lint",
     "import:venues": "node -r dotenv/config scripts/import-venues.mjs",
+    "geocode:venues": "node -r dotenv/config scripts/geocode-venues.mjs",
+    "import:csv": "node -r dotenv/config scripts/import-csv-venues.mjs",
+    "report:coords": "node -r dotenv/config scripts/report-venue-coords.mjs",
+    "report:dupes": "node -r dotenv/config scripts/report-venue-dupes.mjs",
+    "export:venues": "node -r dotenv/config scripts/export-venues.mjs",
+    "discover:nz": "node -r dotenv/config scripts/discover-nz-venues.mjs",
+    "combine:csvs": "node scripts/combine-csvs.mjs",
     "security:check": "npm audit && npm run lint && npm run build",
     "deploy:prepare": "chmod +x railway-deploy.sh && ./railway-deploy.sh"
   },
@@ -15,6 +22,7 @@
     "@supabase/supabase-js": "^2.54.0",
     "lucide-react": "^0.539.0",
     "next": "15.4.6",
+    "node-fetch": "^3.3.2",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
@@ -24,9 +32,9 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^16.4.5",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
-    "dotenv": "^16.4.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

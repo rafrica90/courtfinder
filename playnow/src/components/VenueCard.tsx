@@ -25,6 +25,37 @@ export default function VenueCard({ venue }: VenueCardProps) {
   const [imgSrc, setImgSrc] = useState<string | undefined>(initialSrc);
   const router = useRouter();
 
+  // Compute display name without trailing bracketed suburb, e.g. "Ultimate Soccer (Fairfield)" → "Ultimate Soccer"
+  const displayName = useMemo(() => {
+    const raw = String(venue.name || "");
+    return raw.replace(/\s*\([^)]*\)\s*$/g, "").trim();
+  }, [venue.name]);
+
+  // Derive a compact location string: "suburb, STATE, Country"
+  const locationText = useMemo(() => {
+    const rawCity = String(venue.city || "").trim();
+    const rawState = String(venue.state || "").trim();
+    const rawAddress = String(venue.address || "");
+
+    const looksLikeStreet = /\d|\b(road|rd|street|st|ave|avenue|hwy|highway|drive|dr|lane|ln|boulevard|blvd|ct|court|pl|place|way|rd\.|st\.|dr\.)\b/i.test(rawCity);
+    let suburb = !looksLikeStreet && rawCity ? rawCity : "";
+    if (!suburb) {
+      const parts = rawAddress.split(",").map((s) => s.trim()).filter(Boolean);
+      if (parts.length >= 2) suburb = parts[parts.length - 2];
+      else suburb = parts[0] || "";
+    }
+
+    let state = rawState;
+    if (!state) {
+      const stateMatch = (rawAddress.match(/\b(NSW|VIC|QLD|WA|SA|TAS|ACT|NT)\b/i) || [""])[0];
+      state = stateMatch ? stateMatch.toUpperCase() : "";
+    }
+
+    const country = String(venue.country || "").trim();
+    const parts = [suburb, state, country].filter(Boolean);
+    return parts.join(", ");
+  }, [venue.city, venue.state, venue.address, venue.country]);
+
   const handleBookNow = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -64,13 +95,13 @@ export default function VenueCard({ venue }: VenueCardProps) {
           {/* Location overlay inside image to free space */}
           <div className="absolute bottom-3 left-3 right-3 flex items-center gap-1 text-xs font-semibold bg-black/50 text-white px-2 py-1 rounded">
             <MapPin className="h-3 w-3 text-[#00d9ff]" />
-            <span className="truncate">{venue.city}</span>
+            <span className="truncate">{locationText}</span>
           </div>
         </div>
         
         <div className="p-4 flex-1 flex flex-col">
           <h3 className="font-semibold text-lg mb-1 text-white group-hover:text-[#00d9ff] transition-colors">
-            {venue.name}
+            {displayName}
           </h3>
           
           {/* Indoor/Outdoor moved below image */}

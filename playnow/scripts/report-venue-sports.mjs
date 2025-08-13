@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import fs from 'fs/promises';
+import path from 'path';
 
 function getEnv(name, required = true) {
   const val = process.env[name];
@@ -54,6 +56,27 @@ async function main() {
     for (const v of missingSportsArray.slice(0, 50)) {
       console.log(`- ${v.name} | ${v.city || ''} | ${normalizeUrl(v.booking_url)}`);
     }
+    // Write full lists to CSV and JSON for downstream processing
+    const outDir = path.resolve(process.cwd(), 'playnow', 'CSVs');
+    try { await fs.mkdir(outDir, { recursive: true }); } catch {}
+    const csvPath = path.join(outDir, 'missing-sports-venues.csv');
+    const jsonPath = path.join(outDir, 'missing-sports-venues.json');
+    const header = ['id','name','city','address','booking_url','sport_id','sports'].join(',');
+    const csv = [header]
+      .concat(missingSportsArray.map(v => [
+        v.id,
+        JSON.stringify(v.name ?? ''),
+        JSON.stringify(v.city ?? ''),
+        JSON.stringify(v.address ?? ''),
+        JSON.stringify(normalizeUrl(v.booking_url) ?? ''),
+        JSON.stringify(v.sport_id ?? ''),
+        JSON.stringify(Array.isArray(v.sports) ? v.sports : [])
+      ].join(',')))
+      .join('\n');
+    await fs.writeFile(csvPath, csv, 'utf8');
+    await fs.writeFile(jsonPath, JSON.stringify(missingSportsArray, null, 2), 'utf8');
+    console.log(`\nSaved full list to: ${csvPath}`);
+    console.log(`Saved JSON to: ${jsonPath}`);
   }
 }
 

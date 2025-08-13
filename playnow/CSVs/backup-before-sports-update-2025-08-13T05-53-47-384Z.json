@@ -1,0 +1,206 @@
+[
+  {
+    "id": "a1c220fa-aaa7-4312-8daa-26283a2179cf",
+    "name": "Kingston Beach Oval",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "c48b0c8b-5071-46da-84fc-2e1405c10999",
+    "name": "Sherburd Oval",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "5a51975c-8972-4607-a521-af01bf0ee7c0",
+    "name": "Edgeworth Street Soccer Grounds",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "2229967a-3bba-4ff6-9788-a5dcd09a5428",
+    "name": "Darebin State Football Centre (DISC)",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "46dfd6ce-878f-4727-9663-519b5ca1d475",
+    "name": "Knox Regional Football Centre",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "881f8641-bf4b-4750-9d93-876f78acc09d",
+    "name": "Home of the Matildas – State Football Centre",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "9188f4b2-ae22-4049-b160-d447e687f31a",
+    "name": "Kingston Pickleball Centre",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "f51c8913-34cf-4f08-ae81-9f08e8e9427f",
+    "name": "The Jar – South Melbourne",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "29a360d4-7d8d-4e18-afd0-3673ab9e6f74",
+    "name": "PicklePlay (Bentleigh East)",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "a08ea2d7-f0f0-44a9-92a4-a5c24437fbe0",
+    "name": "Pickleball Palace",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "dd6afb7e-b816-4eb0-b602-d9a27b539ce0",
+    "name": "Cornelian Bay Oval",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "8d4b6b98-ec29-4e19-a704-9954e2a1b31d",
+    "name": "Lightwood Park Complex (Grounds 1",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "f0881716-1337-4ef4-9bc1-fa525a37fb6e",
+    "name": "KIKOFF Lakemba",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "8e432b37-8e01-4a98-bc66-f7f7f055cdbe",
+    "name": "5Sports Caringbah",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "ca449a41-6afc-4fea-bb81-87a31efdb46c",
+    "name": "KIKOFF Harbord (Brookvale)",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "eca7f47e-c626-4277-9871-95575cc23d08",
+    "name": "Ultimate Soccer (Fairfield)",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "41e20646-003e-430b-91e0-32c81f30416e",
+    "name": "Wanderers Fives (Rooty Hill)",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "44f180b9-7ae3-4088-a02a-885fbad10df5",
+    "name": "Fraser Fives – Sydney Portugal Community Club",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "9206156a-2ae1-4c70-8408-2a8df4508e33",
+    "name": "Five Dock & Concord Oval Recreation Centres – Futsal",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "afbba9d5-0587-4b44-a3f5-979963e212cd",
+    "name": "The Football Centre",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "81a009b7-2071-4aac-8630-d3e062036984",
+    "name": "Tauranga Bridge Club",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "a8bbf7ae-fa19-4cfd-9b69-b8e60cdef0d2",
+    "name": "Padel Brisbane",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "d95a2691-bd43-4564-95fe-be1d8f995b26",
+    "name": "Howick Squash",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "4e801f6c-c72b-48c5-8901-118c3a3a1bdc",
+    "name": "Island Bay Tennis & Squash Club",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "defbb381-3272-404b-a425-cf1cff609553",
+    "name": "Huon Valley PCYC",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "0d664e24-99a4-488d-b42d-175d9c8f13d7",
+    "name": "Clare Street Oval (New Town)",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "366f290d-0e04-40ba-8c23-0bd67d6a74e0",
+    "name": "South Hobart Oval",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "cc01ef65-851d-45a2-834b-165aaaf3d163",
+    "name": "Wentworth Park Sportsgrounds",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "15526c25-b63f-403c-ae82-085b411162a4",
+    "name": "Cambridge New Soccer Ground",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "30702eae-f40b-48bd-a56f-5842a024fe9f",
+    "name": "Royal Pickle (Carrum Downs)",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "ac5ca73a-28d7-4caf-b8a4-ae7a0d246091",
+    "name": "Clifton Hill Tennis Club – Pickleball Sessions",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "cdf07ecd-9d75-467f-8b0e-0748ec4bdc60",
+    "name": "Level Up Pickleball",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "4b064b45-3e40-442b-b085-990a946ebdb9",
+    "name": "Swing & Serve",
+    "sport_id": null,
+    "sports": []
+  },
+  {
+    "id": "999ed2bc-3c80-45b7-aa0b-abd3e7700245",
+    "name": "Banksia Centre (Camp Banksia)",
+    "sport_id": null,
+    "sports": []
+  }
+]

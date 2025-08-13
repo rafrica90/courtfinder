@@ -13,6 +13,8 @@ export type Venue = {
   sports?: string[]; // multi-sport support
   address: string;
   city: string;
+  state?: string;
+  country?: string;
   latitude: number;
   longitude: number;
   // Optional structured operating hours coming from the database (JSONB)

@@ -1,0 +1,632 @@
+[
+  {
+    "id": "53e9c6fd-8aa8-4c08-9679-f818ba84044d",
+    "name": "Netball North Harbour",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://prodcdn.sporty.co.nz/cms/16565/favicon.png"
+  },
+  {
+    "id": "39392f88-af77-4d1a-af5b-bd1747987e79",
+    "name": "Game Over",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://book.gameoverchristchurch.co.nz/"
+  },
+  {
+    "id": "18c0e28b-16e6-4d51-865a-48393767376f",
+    "name": "Olympia Gymnastic Sports",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://gnz.friendlymanager.com/login?forgot=1&club=olympiagymnastics"
+  },
+  {
+    "id": "7e462846-408d-446e-a2d1-7fce69e1cf31",
+    "name": "Laser Strike",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://laserstrikenz.co.nz/order.php"
+  },
+  {
+    "id": "6724e58e-ca49-40a1-abf2-490142d87790",
+    "name": "West Harbour Tennis & Pickleball Club",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://clubspark.kiwi/Library/WestHarbourTennisandPickleballClub?command=Proxy&amp;type=Favicons&amp;currentFolder=%2f&amp;fileName=whtcpbfavicom.png&amp;thumbnail=whtcpbfavicom__32x32.png&amp;cache=31536000"
+  },
+  {
+    "id": "9d7a5afe-5dfc-4bbf-9497-6da5a55e4307",
+    "name": "AceSports Pro Shop",
+    "city": "Auckland",
+    "address": "41R Meadowland Drive, Somerville, Auckland, 2014",
+    "booking_url": "https://acesports.net.nz/pages/our-coaching-venues"
+  },
+  {
+    "id": "6cfd9211-581d-4221-9819-3503ce96525c",
+    "name": "Action Central",
+    "city": "Auckland",
+    "address": "911 Dominion Road, Mount Roskill, Auckland, 1041",
+    "booking_url": "https://actionindoorsports.com/central/court-hire/"
+  },
+  {
+    "id": "a9290ab3-80c7-4778-ad35-16167d96848c",
+    "name": "Mission Bay Tennis Club",
+    "city": "Auckland",
+    "address": "11a Marau Crescent, Auckland, 1071",
+    "booking_url": "https://clubspark.kiwi/MissionBayTC/Membership/Join"
+  },
+  {
+    "id": "15e53ff2-a9fb-4571-8934-c11ced24b23a",
+    "name": "Maraetai Tennis Club",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.sporty.co.nz/"
+  },
+  {
+    "id": "97687041-993b-48c7-b2ae-a71be2af1a1f",
+    "name": "Three Kings Tennis Pavilion",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "mailto:venuehire@aucklandcouncil.govt.nz?Subject=Enquiry%20on%20Three%20Kings%20Tennis%20Pavilion"
+  },
+  {
+    "id": "cbbad3e6-6985-4c9e-a84e-2288d7757550",
+    "name": "Gladstone Tennis Club",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.gladstonetennis.co.nz/book-online"
+  },
+  {
+    "id": "643295e6-1521-4410-b9c0-9a50d31bcf78",
+    "name": "Parnell Lawn Tennis Club",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://prodcdn.sporty.co.nz/cms/16033/favicon.png"
+  },
+  {
+    "id": "0f169dfb-143c-4198-9e13-67d8538813b0",
+    "name": "Miramar Tennis Club",
+    "city": "Wellington",
+    "address": "Wellington, New Zealand",
+    "booking_url": "https://www.sportsground.co.nz/Content/google-fonts.css"
+  },
+  {
+    "id": "9c377113-851e-4558-82ca-e9bba9e0e0a1",
+    "name": "Avonhead Park Tennis Court",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://clubspark.kiwi/TKHPtennis"
+  },
+  {
+    "id": "af787044-0b03-44b4-94f3-d2283620b76c",
+    "name": "Redwood Tennis Club",
+    "city": "Christchurch",
+    "address": "345 Main North Road, Redwood, Christchurch, 8051",
+    "booking_url": "https://www.redwoodtennis.co.nz/register-online"
+  },
+  {
+    "id": "9211b016-b936-4a02-985b-c42beb657a4a",
+    "name": "Wilding Park Tennis Centre",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://www.pay2play.co.nz/bookings/session_select/82"
+  },
+  {
+    "id": "446d2672-b3de-490f-b62e-d214a55eb22f",
+    "name": "St Peters Tennis Club",
+    "city": "Hamilton",
+    "address": "Palmerston Street",
+    "booking_url": "https://www.facebook.com/stpeterstennisclub"
+  },
+  {
+    "id": "5f810ecc-35a4-4941-9465-5cfdc1e456d0",
+    "name": "Muay Thai Institute",
+    "city": "Wellington",
+    "address": "6 College Street, Wellington, 6011",
+    "booking_url": "https://maps.app.goo.gl/v7v6gognCti779Eo9"
+  },
+  {
+    "id": "95a3c9c0-35d8-4637-bd5b-c6f5af49bbb6",
+    "name": "Waitemata Rugby Football Club",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://prodcdn.sporty.co.nz/cms/14713/favicon.png"
+  },
+  {
+    "id": "7014bc8d-345e-4e98-b3d3-6080e46a8145",
+    "name": "Herne Bay Ponsonby Rackets Club",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://hernebayrackets.helloclub.com/public/calendar/month/all/2024-08-28"
+  },
+  {
+    "id": "8bab6aad-3e6a-4f89-99f9-b325449ac245",
+    "name": "The Thorndon Club",
+    "city": "Wellington",
+    "address": "4 Katherine Avenue, Thorndon, Wellington, 6011",
+    "booking_url": "https://thorndon.helloclub.com/?_gl=1*1kwnnf3*_gcl_au*NzgzNzA0NDY4LjE3MjExMjI2NjA"
+  },
+  {
+    "id": "bdb1268f-3035-4205-82b7-461ae0ccd53d",
+    "name": "Skate Nelson",
+    "city": "Nelson",
+    "address": "Nelson, New Zealand",
+    "booking_url": "http://www.skatenelson.nz/parties-private-hires-nelson.html"
+  },
+  {
+    "id": "aa805bb0-7736-4310-8724-bfb2ef9bdd12",
+    "name": "Cameron Pools",
+    "city": "Auckland",
+    "address": "53 Arundel Street, Mount Roskill, Auckland, 1041",
+    "booking_url": "https://www.clmnz.co.nz/cameron-pool-and-leisure-centre/facility-rules/"
+  },
+  {
+    "id": "3a13bb3d-d2be-44b5-955a-6ac325b89fd8",
+    "name": "Game Over Auckland",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://book.gameoverauckland.co.nz/"
+  },
+  {
+    "id": "9639b14c-06b2-4518-9039-4b640b214c62",
+    "name": "Mount Pleasant Squash Club",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://www.mtpleasantsquash.co.nz/casual/"
+  },
+  {
+    "id": "5eed540f-e262-4e7a-80c8-17a8d36b1ac9",
+    "name": "Millennium Institute of Sport",
+    "city": "Auckland",
+    "address": "17 Antares Place, Auckland",
+    "booking_url": "https://facebook.com/autmillennium"
+  },
+  {
+    "id": "f2970ed6-e1c0-4e2f-bbcb-9bb01ae878b8",
+    "name": "Ace Learn to Swim",
+    "city": "Hamilton",
+    "address": "Hamilton, New Zealand",
+    "booking_url": "https://form.jotform.com/Ace_Learn/ace-enrolment-form"
+  },
+  {
+    "id": "c5cb6264-1ad0-472c-b868-262e1d2ebf82",
+    "name": "Clip 'N Climb North Shore",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://clipnclimbnorthshore.co.nz/group-bookings"
+  },
+  {
+    "id": "9f269ffe-53f1-4829-aa84-782f06a1c9e4",
+    "name": "Vertical Adventures",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://verticaladventures.co.nz/booking/"
+  },
+  {
+    "id": "32c2442a-3f3a-40b2-8c24-c79fe1cecd3c",
+    "name": "SonSk8",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.sonsk8.co.nz/private-hire"
+  },
+  {
+    "id": "5a9b63c4-9c0e-4863-b25e-ac2a7e46be7c",
+    "name": "Ritual",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.facebook.com/ritualnz"
+  },
+  {
+    "id": "3c2ecafa-b911-4d40-8955-14ad4b7d76df",
+    "name": "Swimgym Howick",
+    "city": "Auckland",
+    "address": "2/1 Fencible Drive, Auckland, 2014",
+    "booking_url": "https://www.swimgym.org.nz/form"
+  },
+  {
+    "id": "7cb93a62-992d-479e-a0ec-a0a05b28bbb1",
+    "name": "Northern Rocks",
+    "city": "Auckland",
+    "address": "111 Diana Drive",
+    "booking_url": "https://scontent-syd2-1.cdninstagram.com/v/t51.82787-15/516336631_18330584836207429_7431559459870355080_n.jpg?stp=dst-jpg_e35_tt6&#038;_nc_cat=100&#038;ccb=1-7&#038;_nc_sid=18de74&#038;_nc_ohc=VH3SZhKA9SAQ7kNvwHedvAU&#038;_nc_oc=Adk6orez0lVCfl_4gAYACXOIlSkmfGWUVbOu9dur6m283d0gKBBsYLfzShXEVMqGvGA&#038;_nc_zt=23&#038;_nc_ht=scontent-syd2-1.cdninstagram.com&#038;edm=ANo9K5cEAAAA&#038;_nc_gid=eIGjcoG7yEwEB8zJ83zlWQ&#038;oh=00_AfSsVpVwsl8JpGfI0Otv6C1XT0LnqJ4c1pbRq2wV2twFcA&#038;oe=68820409"
+  },
+  {
+    "id": "9f543f87-8217-4348-8582-b6da03af6600",
+    "name": "Synergy Sports",
+    "city": "Auckland",
+    "address": "44 Portage Road",
+    "booking_url": "https://synergysports.co.nz/booking/"
+  },
+  {
+    "id": "01585553-f494-466d-a246-012c4f8da59b",
+    "name": "The UMMA Trust - Muslim Youth",
+    "city": "Auckland",
+    "address": "1025",
+    "booking_url": "https://www.facebook.com/theummatrust/"
+  },
+  {
+    "id": "80493b05-3ffc-418a-8a44-fedfef20bec9",
+    "name": "Shotokan Karate-do",
+    "city": "Auckland",
+    "address": "13 Pūriri Street",
+    "booking_url": "https://shotokantimes.com/2019/08/15/hirokazu-kanazawa-the-life-of-a-shotokan-legend"
+  },
+  {
+    "id": "86e7f46b-02a2-4ebf-b172-e94f169163bc",
+    "name": "Point Erin Pool",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.clmnz.co.nz/pt-erin-pool/bookings/"
+  },
+  {
+    "id": "a0451af5-b13e-46d7-a279-14f3f1d4b69e",
+    "name": "Onehunga War Memorial Pool",
+    "city": "Auckland",
+    "address": "1 Park Gardens, Onehunga, Auckland, 1061",
+    "booking_url": "https://www.ymcanorth.org.nz/programmes-listing/venue-hire/"
+  },
+  {
+    "id": "2ac3c449-a210-4637-984a-13a26f2e6dc7",
+    "name": "Blastacars Auckland",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://bookings.racefacer.com/blastacarsauckland"
+  },
+  {
+    "id": "66ebc4bf-7c89-4f99-9106-b9949ff0dc5a",
+    "name": "Birkenhead Pool and Leisure Centre",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://aucklandleisure.co.nz/css/leisurestyle.css"
+  },
+  {
+    "id": "73c6ecfa-3414-4472-8906-0fc9627997dd",
+    "name": "Extreme Edge",
+    "city": "Auckland",
+    "address": "32 Morrin Road, 1072",
+    "booking_url": "https://www.facebook.com/extremeedgepanmure/"
+  },
+  {
+    "id": "a00d46fc-8f03-4ec0-91ea-0ccf4ae791b6",
+    "name": "Active Badminton Centre",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.bnh.org.nz/play-badminton/court-hire/"
+  },
+  {
+    "id": "0468435e-9625-4902-b610-051ea9abd816",
+    "name": "Skateland",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.skateland.co.nz/contact-us/"
+  },
+  {
+    "id": "e40345ac-6fd0-49e7-8063-6c979521450d",
+    "name": "Waiheke Bowling Club",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://waihekebowlingclub.co.nz/#"
+  },
+  {
+    "id": "2b940116-45b3-4ee6-ba63-c7c229169597",
+    "name": "Waterhole Swimming Centre",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://waterholeswimcentre.kiwi/book-online"
+  },
+  {
+    "id": "b4bb3977-4a0e-4854-9c38-d3af6dc122f1",
+    "name": "AUT Millennium",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.eventbrite.com/e/empowering-young-women-through-strength-training-tickets-1554936199029?aff=oddtdtcreator"
+  },
+  {
+    "id": "1aa54cdd-9370-47ce-a7e8-aa622e14f974",
+    "name": "New Lynn Bowls",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://newlynnbowls.co.nz/facilities"
+  },
+  {
+    "id": "8c31c941-f666-4775-bfbc-09202521b389",
+    "name": "Swimtastic",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.swimtastic.co.nz/booking-portal-how-to-use"
+  },
+  {
+    "id": "abab05a7-7179-4757-91af-7e9e6f2cc836",
+    "name": "Tawa Pool",
+    "city": "Wellington",
+    "address": "Wellington, New Zealand",
+    "booking_url": "https://wellington.govt.nz/recreation/facilities-and-centres/swimming-pools/pool-rules-and-safety#lane-or-pool-hire"
+  },
+  {
+    "id": "6107a0f6-8eaa-40df-85c1-011976038cbe",
+    "name": "Laser Strike",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://www.laserstrike.co.nz/groups/"
+  },
+  {
+    "id": "aeb9fc7c-7ae7-4392-a286-e0f03f7b194f",
+    "name": "Seido Karate",
+    "city": "Christchurch",
+    "address": "174 Barbadoes Street, Christchurch Central, Christchurch, 8011",
+    "booking_url": "https://www.trybooking.com/nz/VYX"
+  },
+  {
+    "id": "2b6b86dd-66dd-422d-9dd6-022d76c468fc",
+    "name": "Cashmere Croquet Club",
+    "city": "Christchurch",
+    "address": "3A Valley Road",
+    "booking_url": "https://www.sporty.co.nz/cashmerecroquet"
+  },
+  {
+    "id": "6fbee502-e323-4fc2-9f1a-821bc7c01725",
+    "name": "Bishopdale Recreation Centre",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://thekindfoundation.org.nz/our-places/bishopdale-recreation-centre/#hire"
+  },
+  {
+    "id": "c0f73b73-6f4f-425a-9093-fc289ca13fef",
+    "name": "Battle Axe Throwing",
+    "city": "Christchurch",
+    "address": "105 Orbell Street, Christchurch, 8023",
+    "booking_url": "https://sportscarnival.com/clubs/battle_axe_throwing/schedules/714"
+  },
+  {
+    "id": "5aade92b-8e46-434e-947d-6861077a36c6",
+    "name": "Burnside Rugby Football Club",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://prodcdn.sporty.co.nz/cms/18302/favicon.png"
+  },
+  {
+    "id": "54deafe4-4fc9-4bbe-9647-45d5f2f10d5b",
+    "name": "Jellie Park Recreation and Sport Centre",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://ccc.govt.nz/pool-hire/"
+  },
+  {
+    "id": "dbe1e925-113f-48f0-a845-89d332836d55",
+    "name": "Wharenui Sports Centre",
+    "city": "Christchurch",
+    "address": "73 Elizabeth Street, Christchurch, 8041",
+    "booking_url": "https://wharenuisc.friendlymanager.com/login"
+  },
+  {
+    "id": "e229533a-806f-4a76-abd8-5e27b3d23ae5",
+    "name": "Y Adventure Centre",
+    "city": "Christchurch",
+    "address": "239 Waltham Road, Sydenham, Christchurch, 8023",
+    "booking_url": "https://ymcachch.org.nz/fitness-and-climbing/adventurecentre/#spaces-for-hire"
+  },
+  {
+    "id": "ee9a8d41-adf5-46db-82a4-8a582e5b5054",
+    "name": "Supa Karts",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://www.facebook.com/Supakartschch/"
+  },
+  {
+    "id": "1eed619b-fa15-4505-bed5-8284ec9e2190",
+    "name": "Southland Cricket Indoor Facility",
+    "city": "Invercargill",
+    "address": "Gala Street, 9810",
+    "booking_url": "https://www.southlandcricket.co.nz/facility-hire"
+  },
+  {
+    "id": "222972dc-ce79-4299-938b-99235679f5d6",
+    "name": "Adrenalin Forest Christchurch",
+    "city": "Christchurch",
+    "address": "105 Heyders Road, Spencerville, Christchurch, 8083",
+    "booking_url": "https://adrenalin-forest-nz.appointedd.com/app/6604ad87ab9ef8b90c0816b4"
+  },
+  {
+    "id": "19b6c16f-815e-401a-b9d3-7ffd3ecaf06b",
+    "name": "Canterbury Table Tennis",
+    "city": "Christchurch",
+    "address": "294 Blenheim Road, Upper Riccarton, Christchurch, 8041",
+    "booking_url": "https://ttcanterbury.org.nz/bookings"
+  },
+  {
+    "id": "d8ee0ac1-211b-4764-bbc3-94669ab15958",
+    "name": "Ngā Puna Wai Sports Hub",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://www.sporty.co.nz/sissjuniornetball/Home?em=0"
+  },
+  {
+    "id": "ed053d7d-0eeb-4562-ac9b-6a4f46e29176",
+    "name": "AquaGym Swim Centre",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://portal.iclasspro.com/aquagym/classes"
+  },
+  {
+    "id": "954617c8-01c9-4da7-8668-bafb6be97e78",
+    "name": "Flips & Tumbles",
+    "city": "Christchurch",
+    "address": "12 Musgrove Close, Wigram, Christchurch, 8025",
+    "booking_url": "https://www.flipsandtumblesnz.com/bookpersession"
+  },
+  {
+    "id": "f591b16f-a813-4de3-9562-b26975a88cc5",
+    "name": "Waikato Equestrian Centre",
+    "city": "Hamilton",
+    "address": "1340 Pukete Road, 3288",
+    "booking_url": "https://horses.net.nz/index.php/the-venue/"
+  },
+  {
+    "id": "fed3e8ab-0a76-476a-b300-9f1b681b59c8",
+    "name": "The Peak",
+    "city": "Hamilton",
+    "address": "60 Kimbrae Drive, 3210",
+    "booking_url": "https://rototunarec.skedda.com/booking"
+  },
+  {
+    "id": "3a703440-5b6f-464f-88fb-5fb280ee8f5b",
+    "name": "Blastacars Hamilton",
+    "city": "Hamilton",
+    "address": "Hamilton, New Zealand",
+    "booking_url": "https://bookings.racefacer.com/blastacarshamilton?fbclid=IwAR36ZriE4tG37uUsDAJJ6-aWpgV8fG6owKhadd19DbubdRAmKlVsb3qUpYE"
+  },
+  {
+    "id": "c37a43dc-7a0f-49d3-8cee-252e814d7dfe",
+    "name": "Hamilton Yacht Club",
+    "city": "Hamilton",
+    "address": "Hamilton, New Zealand",
+    "booking_url": "https://hamiltonyachtclub.friendlymanager.com/login?forgot=1"
+  },
+  {
+    "id": "a44af73f-be90-402b-99d6-7895e8a54b68",
+    "name": "BayActive",
+    "city": "Tauranga",
+    "address": "Tauranga, New Zealand",
+    "booking_url": "https://bayactive.co.nz/find-a-venue"
+  },
+  {
+    "id": "67e76c62-4128-4b5d-948c-416846c37443",
+    "name": "Skatescool Tauranga",
+    "city": "Tauranga",
+    "address": "2 Roxanne Place, Poike, Tauranga, 3112",
+    "booking_url": "https://www.facebook.com/skatescooltauranga"
+  },
+  {
+    "id": "7b096298-e464-4c51-92e2-3daa60727b58",
+    "name": "Resistance Climbing",
+    "city": "Dunedin",
+    "address": "Moray Place, Dunedin",
+    "booking_url": "https://www.resistanceclimbing.co.nz/booking"
+  },
+  {
+    "id": "a4f27f32-905e-4454-9144-33cfce45e7b4",
+    "name": "Todd Energy Aquatic Centre",
+    "city": "New Plymouth",
+    "address": "8-10 Tisch Avenue, New Plymouth",
+    "booking_url": "https://www.npdc.govt.nz/todd-energy-aquatic-centre/facilities/book/"
+  },
+  {
+    "id": "26df2961-8fc2-47ee-9872-0e3cbe3ab033",
+    "name": "The Gravity Well",
+    "city": "Nelson",
+    "address": "Nelson, New Zealand",
+    "booking_url": "https://thegravitywell.gymmasteronline.com/portal/enquiry?session=eyJjb250ZXh0X2NvbXBhbnlpZCI6MiwibGFuZ3VhZ2UiOiJlbl9HQiIsImlwX2FkZHIiOiIxMjEuOTguMjI4LjIxIn0.ZMtLJg.vVoxMsekjkhHLB-clE99rk4oN5g"
+  },
+  {
+    "id": "0be17190-ce15-4f9d-b162-00a9ef56990b",
+    "name": "Pole Artistry",
+    "city": "Nelson",
+    "address": "120 Hardy Street, Nelson, Nelson, 7011",
+    "booking_url": "https://poleartistry.gymmasteronline.com/portal/account/classcalendar"
+  },
+  {
+    "id": "cabfab25-113f-4a71-8da7-e7e7ad6e13a9",
+    "name": "Woodhill Mountain Bike Park",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.bikeparks.co.nz/bike-hire"
+  },
+  {
+    "id": "b9f8f6e2-d590-46fb-8df9-749c2dcc2d4f",
+    "name": "Pukekohe Park",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.pukekohepark.co.nz/#"
+  },
+  {
+    "id": "ede9c827-e256-47bb-96eb-8ed1b0113734",
+    "name": "Fourforty Mountain Bike Park",
+    "city": "Auckland",
+    "address": "Auckland, New Zealand",
+    "booking_url": "https://www.fourfortymtbpark.co.nz/page/book-now/"
+  },
+  {
+    "id": "15ee728a-b8ef-44b6-b833-95b0ee40a1a4",
+    "name": "Burnside Squash club",
+    "city": "Christchurch",
+    "address": "Christchurch, New Zealand",
+    "booking_url": "https://www.burnsidesquash.com/book"
+  },
+  {
+    "id": "de6d95fc-f6aa-4261-8613-1b160ed65e9b",
+    "name": "Kartsport Hamilton",
+    "city": "Hamilton",
+    "address": "Hamilton, New Zealand",
+    "booking_url": "https://prodcdn.sporty.co.nz/cms/147048/favicon.png"
+  },
+  {
+    "id": "8a910897-623d-42d9-bc73-f61b8e35114b",
+    "name": "Ocean Spa",
+    "city": "Napier",
+    "address": "Napier, New Zealand",
+    "booking_url": "https://www.facebook.com/oceanspanapier/"
+  },
+  {
+    "id": "77117e8e-85b8-4725-a1cd-53ff8c2bf55d",
+    "name": "Richmond Aquatic Centre",
+    "city": "Nelson",
+    "address": "Nelson, New Zealand",
+    "booking_url": "https://www.clmnz.co.nz/richmond/bookings/"
+  },
+  {
+    "id": "430cdfa6-65cc-41e3-b1b3-98dd1c5707d5",
+    "name": "Queenstown Indoor Climbing",
+    "city": "Queenstown",
+    "address": "Queenstown, New Zealand",
+    "booking_url": "https://www.basecampadventures.co.nz/book-outdoor-climbing-clip-n-climb/"
+  },
+  {
+    "id": "73cfb93d-45f6-47e9-b3d5-e0710d60152e",
+    "name": "The Remarkables Ski Area",
+    "city": "Queenstown",
+    "address": "Queenstown, New Zealand",
+    "booking_url": "https://shop.theremarkables.co.nz/shop/product/336"
+  },
+  {
+    "id": "7b4e4884-36f5-4b02-b85d-9c93fac30a29",
+    "name": "Cockle Bay Tennis Club",
+    "city": "Manukau",
+    "address": "41 Meadowland Drive, Manukau, 2014",
+    "booking_url": "https://www.cocklebaytennis.co.nz/about-us/court-bookings/"
+  },
+  {
+    "id": "c47f43e0-9f80-4ede-aa23-c7bc129042fc",
+    "name": "Te Pai Centre",
+    "city": "Henderson",
+    "address": "31-35 Te Pai Place, Henderson",
+    "booking_url": "https://www.tepaicentre.co.nz/blank-2"
+  },
+  {
+    "id": "08ccc576-8cd4-4c98-a2df-1ca589103c20",
+    "name": "Paradice Ice Skating",
+    "city": "Golflands",
+    "address": "490 Ti Rakau Drive, Golflands",
+    "booking_url": "https://www.paradice.co.nz/book"
+  },
+  {
+    "id": "20a31e4d-a057-43c6-8bec-9daa78771a62",
+    "name": "Tepid Baths",
+    "city": "auckland",
+    "address": "100 Customs Street West, auckland, 1010",
+    "booking_url": "https://www.aucklandleisure.co.nz/css/leisurestyle.css"
+  },
+  {
+    "id": "7a334ccb-ad31-4b3b-bffa-b21f03630f9e",
+    "name": "Snowplanet",
+    "city": "Silverdale",
+    "address": "91 Small Road, Silverdale",
+    "booking_url": "https://bookings.snowplanet.co.nz/book"
+  },
+  {
+    "id": "3be8c4d0-bdaf-486b-b338-696390095ad9",
+    "name": "Mount Maunganui Sports Centre",
+    "city": "2 Hull Road",
+    "address": "2 Hull Road, Mount Maunganui",
+    "booking_url": "https://www.bayvenues.co.nz/assets/downloadables/Terms-and-Conditions-of-Hire.pdf"
+  }
+]

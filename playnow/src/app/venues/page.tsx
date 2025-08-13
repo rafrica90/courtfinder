@@ -103,6 +103,8 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
             sports: venue.sports,
             address: venue.address,
             city: venue.city,
+            state: venue.state,
+            country: venue.country,
             latitude: venue.latitude,
             longitude: venue.longitude,
             hours: venue.hours ?? undefined,

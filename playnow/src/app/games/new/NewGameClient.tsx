@@ -170,6 +170,11 @@ export default function NewGameClient() {
     return s.filter(Boolean);
   }, [selectedVenue]);
 
+  const formatSportLabel = (raw: string) => {
+    const spaced = String(raw || '').replace(/[_-]+/g, ' ');
+    return spaced.replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
   useEffect(() => {
     if (venueSports.length === 1) {
       setSelectedSport(venueSports[0]);
@@ -266,7 +271,7 @@ export default function NewGameClient() {
                       >
                         <option value="" disabled>Select sport</option>
                         {venueSports.map((s) => (
-                          <option key={s} value={s}>{s}</option>
+                          <option key={s} value={s}>{formatSportLabel(s)}</option>
                         ))}
                       </select>
                     </div>

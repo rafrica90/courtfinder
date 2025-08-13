@@ -25,6 +25,7 @@ export default function NewGameClient() {
   const [notes, setNotes] = useState('');
   const [costPerPlayer, setCostPerPlayer] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
+  const [selectedSport, setSelectedSport] = useState('');
   const [sportFilter, setSportFilter] = useState(preselectedSport);
   const [locationFilter, setLocationFilter] = useState(preselectedLocation);
   const [allVenues, setAllVenues] = useState<any[]>([]);
@@ -98,6 +99,12 @@ export default function NewGameClient() {
     setError(null);
     
     try {
+      if (!selectedSport) {
+        setError('Please select the sport for this game.');
+        setSubmitting(false);
+        return;
+      }
+
       const { data, error } = await api.games.create({
         venueId,
         startTime,
@@ -105,6 +112,7 @@ export default function NewGameClient() {
         maxPlayers,
         visibility,
         skillLevel,
+        sport: selectedSport,
         notes,
         costInstructions: costPerPlayer ? `$${costPerPlayer} per player` : undefined
       });
@@ -156,6 +164,25 @@ export default function NewGameClient() {
   }, [normalizedSport, normalizedLocation, allVenues]);
 
   const selectedVenue = allVenues.find((v: any) => v.id === venueId);
+  const venueSports = useMemo(() => {
+    if (!selectedVenue) return [] as string[];
+    const s = Array.isArray(selectedVenue.sports) ? selectedVenue.sports : [];
+    return s.filter(Boolean);
+  }, [selectedVenue]);
+
+  useEffect(() => {
+    if (venueSports.length === 1) {
+      setSelectedSport(venueSports[0]);
+      return;
+    }
+    if (venueSports.length > 1) {
+      if (!venueSports.includes(selectedSport)) {
+        setSelectedSport('');
+      }
+    } else if (venueSports.length === 0) {
+      setSelectedSport('');
+    }
+  }, [venueId, venueSports]);
 
   return (
     <div className="min-h-screen py-8">
@@ -228,6 +255,22 @@ export default function NewGameClient() {
                     <p className="font-medium text-white">{selectedVenue.name}</p>
                     <p className="text-[#b8c5d6]">{selectedVenue.address}, {selectedVenue.city}</p>
                   </div>
+                  {venueSports.length > 0 && (
+                    <div className="mt-3">
+                      <label className="block text-xs font-medium mb-1 text-[#00d9ff]">Sport for this game *</nlabel>
+                      <select
+                        value={selectedSport}
+                        onChange={(e)=>setSelectedSport(e.target.value)}
+                        required
+                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff] focus:bg-white/20"
+                      >
+                        <option value="" disabled>Select sport</option>
+                        {venueSports.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

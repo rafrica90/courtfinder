@@ -108,6 +108,7 @@ export async function POST(req: NextRequest) {
       maxPlayers,
       visibility,
       skillLevel,
+      sport: submittedSport,
       notes,
       costInstructions
     } = body;
@@ -116,7 +117,7 @@ export async function POST(req: NextRequest) {
     const hostUserId = authenticatedUserId;
 
     // Basic validation
-    if (!venueId || !startTime || !minPlayers || !maxPlayers || !visibility || !skillLevel) {
+    if (!venueId || !startTime || !minPlayers || !maxPlayers || !visibility || !skillLevel || !submittedSport) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
     
@@ -161,7 +162,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get venue details to extract sport (with error handling)
-    let sport = 'Tennis'; // Default sport
+    let sport = submittedSport || 'Tennis';
     let venueName = '';
     
     try {
@@ -172,8 +173,11 @@ export async function POST(req: NextRequest) {
         .single();
       
       if (venue) {
-        // Get the first sport from the venue or use default
-        sport = venue.sports?.[0] || 'Tennis';
+        // Validate submitted sport against venue's sports if provided
+        const allowed = Array.isArray(venue.sports) ? venue.sports : [];
+        if (allowed.length && !allowed.includes(sport)) {
+          return NextResponse.json({ error: 'Selected sport is not available at this venue.' }, { status: 400 });
+        }
         venueName = venue.name || '';
       }
     } catch (venueError) {

@@ -151,6 +151,7 @@ export const api = {
       maxPlayers: number;
       visibility: string;
       skillLevel: string;
+      sport: string;
       notes?: string;
       costInstructions?: string;
     }) => apiClient.post('/api/games', data),

@@ -187,4 +187,10 @@ export const api = {
       return apiClient.get(`/api/profiles/public?ids=${param}`, { requireAuth: false });
     }
   },
+  favorites: {
+    list: () => apiClient.get<{ favorites: string[] }>("/api/favorites"),
+    toggle: (venueId: string) => apiClient.post<{ favorites: string[] }>("/api/favorites", { venueId, action: "toggle" }),
+    add: (venueId: string) => apiClient.post<{ favorites: string[] }>("/api/favorites", { venueId, action: "add" }),
+    remove: (venueId: string) => apiClient.post<{ favorites: string[] }>("/api/favorites", { venueId, action: "remove" }),
+  },
 };

@@ -139,28 +139,6 @@ export default function SearchBar({ variant = "hero" }: SearchBarProps) {
             </div>
           )}
         </div>
-        <select
-          value={sport}
-          onChange={(e) => setSport(e.target.value)}
-          className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00d9ff] focus:border-transparent text-white"
-        >
-          <option value="">All sports</option>
-          {availableSports.map((s) => (
-            <option key={s.slug} value={s.slug}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00d9ff] focus:border-transparent text-white"
-        >
-          <option value="">All locations</option>
-          {availableCities.map((city) => (
-            <option key={city} value={city}>{city}</option>
-          ))}
-        </select>
         <button
           type="submit"
           className="px-6 py-2 bg-[#00d9ff] text-[#0a1628] rounded-md hover:bg-[#00a8cc] transition-colors font-semibold"

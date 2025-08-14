@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/lib/api-client";
 import VenueCard from "./VenueCard";
-import VenueSort from "./VenueSort";
 import VenueFilters, { FilterState } from "./VenueFilters";
 
 interface Venue {
@@ -12,6 +13,8 @@ interface Venue {
   sports?: string[];
   address: string;
   city?: string;
+  state?: string;
+  country?: string;
   latitude?: number;
   longitude?: number;
   hours?: unknown;
@@ -37,6 +40,8 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
   const [venues, setVenues] = useState<Venue[]>(initialVenues);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const [favoriteVenueIds, setFavoriteVenueIds] = useState<string[] | null>(null);
 
   // Apply server-provided name query again on the client to guarantee filtering
   useEffect(() => {
@@ -44,16 +49,23 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     
     // Get filter states from URL (consistent with VenueFilters.tsx)
     const params = new URLSearchParams(window.location.search);
-    const urlVenueTypes = params.get('venueTypes')?.split(',') || [];
+    const urlVenueTypes = params.get('venueTypes')?.split(',').filter(Boolean) || [];
+    const urlSports = params.get('sports')?.split(',').filter(Boolean) || [];
+    const legacySport = sport ? [sport] : [];
+    const combinedSports = Array.from(new Set([...(urlSports || []), ...legacySport]));
+    const country = params.get('country') || undefined;
+    const state = params.get('state') || undefined;
+    const suburb = params.get('suburb') || undefined;
 
     let currentFilteredVenues = initialVenues;
 
-    // Apply sport filter (be resilient to null/undefined/non-array sports)
-    if (sport) {
+    // Apply sport filter (multi-select)
+    if (combinedSports.length > 0) {
+      const wanted = new Set(combinedSports.map(s => String(s).toLowerCase()));
       currentFilteredVenues = currentFilteredVenues.filter((venue) => {
         const sportsArray = Array.isArray(venue.sports) ? venue.sports : [];
         const normalized = sportsArray.map((s) => String(s).toLowerCase());
-        return normalized.includes(sport.toLowerCase());
+        return normalized.some(s => wanted.has(s));
       });
     }
 
@@ -69,9 +81,15 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     }
 
     // Apply other filters from URL
+    const favoritesOnly = params.get('favorites') === '1';
     const activeFilters: FilterState = {
-      venueTypes: urlVenueTypes
-    };
+      sports: combinedSports,
+      venueTypes: urlVenueTypes,
+      favoritesOnly,
+      country,
+      state,
+      suburb,
+    } as FilterState;
 
     const newlyFiltered = applyFilters(currentFilteredVenues, activeFilters);
     
@@ -79,22 +97,55 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     setVenues(newlyFiltered);
   }, [searchedVenueName, sport, initialVenues]);
 
-  // Removed price parsing utilities
-
-  
+  // Load favorites when user logs in
+  useEffect(() => {
+    (async () => {
+      if (!user) {
+        setFavoriteVenueIds(null);
+        return;
+      }
+      const { data } = await api.favorites.list();
+      setFavoriteVenueIds(data?.favorites || []);
+    })();
+  }, [user]);
 
   const applyFilters = (venues: Venue[], filters: FilterState): Venue[] => {
     return venues.filter(venue => {
+      // Country/State/Suburb
+      if (filters.country && String(venue.country || "").toLowerCase() !== String(filters.country).toLowerCase()) {
+        return false;
+      }
+      if (filters.state && String(venue.state || "").toLowerCase() !== String(filters.state).toLowerCase()) {
+        return false;
+      }
+      if (filters.suburb && String(venue.city || "").toLowerCase() !== String(filters.suburb).toLowerCase()) {
+        return false;
+      }
+
+      // Sports
+      if (filters.sports && filters.sports.length > 0) {
+        const wanted = new Set(filters.sports.map(s => String(s).toLowerCase()));
+        const sportsArray = Array.isArray(venue.sports) ? venue.sports : [];
+        const normalized = sportsArray.map((s) => String(s).toLowerCase());
+        if (!normalized.some(s => wanted.has(s))) return false;
+      }
+
       // Venue type filter
       if (filters.venueTypes.length > 0) {
         const matchesVenueType = filters.venueTypes.some(type => {
           if (!venue.indoorOutdoor) return false;
-          return venue.indoorOutdoor.toLowerCase() === type.toLowerCase();
+          const venueType = venue.indoorOutdoor.toLowerCase();
+          if (venueType === 'both') return true; // 'both' should match any selection
+          return venueType === type.toLowerCase();
         });
         if (!matchesVenueType) return false;
       }
 
-      
+      // Favorites-only filter
+      if (filters.favoritesOnly) {
+        if (!Array.isArray(favoriteVenueIds)) return false;
+        if (!favoriteVenueIds.includes(venue.id)) return false;
+      }
 
       return true;
     });
@@ -143,21 +194,31 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     setVenues(sortedVenues);
   };
 
+  // Derive available geo options from venues
+  const availableCountries = Array.from(new Set(allVenues.map(v => v.country).filter(Boolean) as string[])).sort();
+  const availableStates = Array.from(new Set(allVenues.map(v => v.state).filter(Boolean) as string[])).sort();
+  const availableSuburbs = Array.from(new Set(allVenues.map(v => v.city).filter(Boolean) as string[])).sort();
+
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
-      <VenueFilters 
-        currentSport={sport} 
-        onFiltersChange={handleFiltersChange} 
+    <div className="flex flex-col gap-6">
+      {/* Horizontal Filter Bar under search */}
+      <VenueFilters
+        currentSport={sport}
+        onFiltersChange={handleFiltersChange}
+        availableCountries={availableCountries}
+        availableStates={availableStates}
+        availableSuburbs={availableSuburbs}
+        sortVenues={{ venues: filteredVenues, onSortedVenues: handleSortedVenues, userLocation: userLocation ?? undefined }}
       />
-      
+
       <div className="flex-1">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-white">
-              {searchedVenueName 
+              {searchedVenueName
                 ? `Search results for "${searchedVenueName}"`
-                : sport 
-                  ? `${sport.charAt(0).toUpperCase() + sport.slice(1)} Venues` 
+                : sport
+                  ? `${sport.charAt(0).toUpperCase() + sport.slice(1)} Venues`
                   : "All Venues"}
             </h1>
             <p className="text-[#b8c5d6] mt-1">
@@ -178,11 +239,9 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
               )}
             </div>
           </div>
-
-          <VenueSort venues={filteredVenues} onSortedVenues={handleSortedVenues} userLocation={userLocation ?? undefined} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">
           {venues.map((venue) => (
             <VenueCard key={venue.id} venue={venue} />
           ))}

@@ -12,6 +12,7 @@ const PROTECTED_ROUTES = [
   '/api/games',
   '/api/games/[id]',
   '/api/games/[id]/join',
+  '/api/favorites',
 ];
 
 export async function middleware(request: NextRequest) {

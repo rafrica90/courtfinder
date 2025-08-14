@@ -61,13 +61,6 @@ export default function Nav() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <Link
-              href="/venues"
-              className={`${baseLinkClass} ${isVenues ? activeLinkClass : ""}`}
-              aria-current={isVenues ? "page" : undefined}
-            >
-              Find a Court
-            </Link>
-            <Link
               href="/games"
               className={`${baseLinkClass} ${isFindGames ? activeLinkClass : ""}`}
               aria-current={isFindGames ? "page" : undefined}
@@ -80,6 +73,13 @@ export default function Nav() {
               aria-current={isHostGame ? "page" : undefined}
             >
               Host a Game
+            </Link>
+            <Link
+              href="/venues"
+              className={`${baseLinkClass} ${isVenues ? activeLinkClass : ""}`}
+              aria-current={isVenues ? "page" : undefined}
+            >
+              Find a Court
             </Link>
           </div>
 
@@ -124,16 +124,6 @@ export default function Nav() {
         <div className="md:hidden border-t border-white/10 animate-slide-down bg-[#0a1628]/95 backdrop-blur-md">
           <div className="px-4 py-3 space-y-2">
             <Link
-              href="/venues"
-              className={`block py-2 ${
-                isVenues ? "text-[#00d9ff]" : "text-[#b8c5d6] hover:text-[#00d9ff]"
-              } transition-colors`}
-              onClick={() => setMobileMenuOpen(false)}
-              aria-current={isVenues ? "page" : undefined}
-            >
-              Find a Court
-            </Link>
-            <Link
               href="/games"
               className={`block py-2 ${
                 isFindGames
@@ -154,6 +144,16 @@ export default function Nav() {
               aria-current={isHostGame ? "page" : undefined}
             >
               Host a Game
+            </Link>
+            <Link
+              href="/venues"
+              className={`block py-2 ${
+                isVenues ? "text-[#00d9ff]" : "text-[#b8c5d6] hover:text-[#00d9ff]"
+              } transition-colors`}
+              onClick={() => setMobileMenuOpen(false)}
+              aria-current={isVenues ? "page" : undefined}
+            >
+              Find a Court
             </Link>
             <Link
               href="/bookings"

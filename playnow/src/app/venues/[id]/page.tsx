@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
-import { MapPin, Clock, Users, Heart, Share2 } from "lucide-react";
+import { MapPin, Clock, Users, ExternalLink } from "lucide-react";
+import VenueActionIcons from "@/components/VenueActionIcons";
 import { getPrimarySport } from "@/lib/sport-images";
 
 export default async function VenueDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -30,6 +31,24 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
     ? primarySport.charAt(0).toUpperCase() + primarySport.slice(1)
     : "Sport";
 
+  // Build a Google Maps link prioritizing place_id, then coords, then address/name
+  const mapsUrl = (() => {
+    if (venue?.place_id) {
+      // Direct to the specific place details page
+      return `https://www.google.com/maps/place/?q=place_id:${encodeURIComponent(venue.place_id)}`;
+    }
+    if (typeof venue?.latitude === "number" && typeof venue?.longitude === "number") {
+      return `https://www.google.com/maps/search/?api=1&query=${venue.latitude},${venue.longitude}`;
+    }
+    const queryParts = [venue?.name, venue?.address, venue?.city, venue?.state, venue?.country]
+      .filter(Boolean)
+      .join(" ");
+    if (queryParts) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryParts)}`;
+    }
+    return undefined;
+  })();
+
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -48,16 +67,20 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
             <div className="flex items-center gap-2 text-white/90">
               <MapPin className="h-4 w-4 text-[#00d9ff]" />
               <span>{venue.address}{venue.city ? `, ${venue.city}` : ""}</span>
+              {mapsUrl && (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[#00d9ff] hover:underline ml-3"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span>View on Google Maps</span>
+                </a>
+              )}
             </div>
           </div>
-          <div className="flex gap-2">
-            <button className="p-3 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#00d9ff]/20 transition-colors border border-white/20">
-              <Heart className="h-5 w-5 text-white" />
-            </button>
-            <button className="p-3 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#00d9ff]/20 transition-colors border border-white/20">
-              <Share2 className="h-5 w-5 text-white" />
-            </button>
-          </div>
+          {/* Action icons removed */}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
@@ -112,6 +135,9 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
           {/* Booking Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 sticky top-24">
+              {/* Action Icons */}
+              <VenueActionIcons venueId={venue.id} venueName={venue.name} />
+
               {/* Hourly rate removed from sidebar */}
 
               {/* Book Now button - handle both bookingUrl (camelCase) and booking_url (snake_case) */}
@@ -131,6 +157,18 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
                 >
                   Booking Not Available
                 </button>
+              )}
+
+              {mapsUrl && (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 text-center px-6 py-3 border border-[#00d9ff] text-[#00d9ff] rounded-lg hover:bg-[#00d9ff]/10 transition-colors font-semibold mb-3"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Open in Google Maps
+                </a>
               )}
 
               <Link

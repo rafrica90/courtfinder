@@ -1,150 +1,305 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { SlidersHorizontal } from "lucide-react";
-import { sports } from "@/lib/mockData";
+import { Star, Volleyball, MapPin, ChevronDown, Building2 } from "lucide-react";
+import { sports as allSports } from "@/lib/mockData";
+import VenueSort from "./VenueSort";
 
 interface VenueFiltersProps {
   currentSport?: string;
   onFiltersChange: (filters: FilterState) => void;
+  availableCountries: string[];
+  availableStates: string[];
+  availableSuburbs: string[];
+  // Sort control props
+  sortVenues: {
+    venues: Array<{ id: string; name: string; latitude?: number; longitude?: number }>;
+    onSortedVenues: (sorted: Array<{ id: string; name: string; latitude?: number; longitude?: number }>) => void;
+    userLocation?: { lat: number; lng: number };
+  };
 }
 
 export interface FilterState {
+  sports: string[];
   venueTypes: string[];
+  favoritesOnly?: boolean;
+  country?: string;
+  state?: string;
+  suburb?: string;
 }
 
-export default function VenueFilters({ currentSport, onFiltersChange }: VenueFiltersProps) {
+export default function VenueFilters({ currentSport, onFiltersChange, availableCountries, availableStates, availableSuburbs, sortVenues }: VenueFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  
+
   const [filters, setFilters] = useState<FilterState>({
-    venueTypes: []
+    sports: [],
+    venueTypes: [],
+    favoritesOnly: false,
+    country: undefined,
+    state: undefined,
+    suburb: undefined,
   });
+
+  const sports = useMemo(() => allSports, []);
 
   // Initialize filters from URL params whenever the URL changes
   useEffect(() => {
-    const urlVenueTypes = searchParams.get('venueTypes')?.split(',') || [];
-    
-    const initialFilters = {
-      venueTypes: urlVenueTypes
+    const urlVenueTypes = searchParams.get('venueTypes')?.split(',').filter(Boolean) || [];
+    const favoritesOnly = searchParams.get('favorites') === '1';
+    const sportsFromParam = searchParams.get('sports')?.split(',').filter(Boolean) || [];
+    const legacySport = searchParams.get('sport') || currentSport || undefined;
+    const mergedSports = Array.from(new Set([...(sportsFromParam || []), ...(legacySport ? [legacySport] : [])]));
+
+    const country = searchParams.get('country') || undefined;
+    const state = searchParams.get('state') || undefined;
+    const suburb = searchParams.get('suburb') || undefined;
+
+    const initialFilters: FilterState = {
+      sports: mergedSports,
+      venueTypes: urlVenueTypes,
+      favoritesOnly,
+      country,
+      state,
+      suburb,
     };
-    
+
     setFilters(initialFilters);
     onFiltersChange(initialFilters);
-  }, [searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, currentSport]);
 
   const updateFilters = (newFilters: FilterState) => {
     setFilters(newFilters);
     onFiltersChange(newFilters);
-    
+
     // Update URL params
     const params = new URLSearchParams(searchParams);
-    
+
     if (newFilters.venueTypes.length > 0) {
       params.set('venueTypes', newFilters.venueTypes.join(','));
     } else {
       params.delete('venueTypes');
     }
-    
+    if (newFilters.favoritesOnly) {
+      params.set('favorites', '1');
+    } else {
+      params.delete('favorites');
+    }
+    if (newFilters.sports.length > 0) {
+      params.set('sports', newFilters.sports.join(','));
+    } else {
+      params.delete('sports');
+    }
+    params.delete('sport'); // remove legacy single-sport param
+
+    if (newFilters.country) params.set('country', newFilters.country); else params.delete('country');
+    if (newFilters.state) params.set('state', newFilters.state); else params.delete('state');
+    if (newFilters.suburb) params.set('suburb', newFilters.suburb); else params.delete('suburb');
+
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const buildQueryObject = (modify: (p: URLSearchParams) => void) => {
-    const p = new URLSearchParams(searchParams);
-    modify(p);
-    return Object.fromEntries(p.entries());
+  const toggleSport = (slug: string) => {
+    const isSelected = filters.sports.includes(slug);
+    const updated = isSelected ? filters.sports.filter(s => s !== slug) : [...filters.sports, slug];
+    updateFilters({ ...filters, sports: updated });
   };
 
   const handleVenueTypeChange = (venueType: string, checked: boolean) => {
-    const newVenueTypes = checked 
+    const newVenueTypes = checked
       ? [...filters.venueTypes, venueType]
       : filters.venueTypes.filter(v => v !== venueType);
-    
-    updateFilters({
-      ...filters,
-      venueTypes: newVenueTypes
-    });
+    updateFilters({ ...filters, venueTypes: newVenueTypes });
   };
 
-  
+  const handleFavoritesOnlyChange = (checked: boolean) => {
+    updateFilters({ ...filters, favoritesOnly: checked });
+  };
+
+  const [open, setOpen] = useState<null | 'sports' | 'locations' | 'types'>(null);
+
+  const renderTagText = (items: string[], empty: string) => {
+    if (items.length === 0) return empty;
+    if (items.length === 1) return items[0];
+    if (items.length === 2) return items.join(', ');
+    return `${items[0]}, ${items[1]} +${items.length - 2}`;
+  };
+
+  const selectedSportLabels = filters.sports.map((s) => allSports.find((o) => o.slug === s)?.name || s);
+  const selectedLocations = [filters.suburb, filters.state, filters.country].filter(Boolean) as string[];
+
+  const [locationQuery, setLocationQuery] = useState<string>(selectedLocations[0] || '');
+  const [showLocationSuggest, setShowLocationSuggest] = useState<boolean>(false);
+  const locationOptions = useMemo(() => {
+    const opts: Array<{ label: string; kind: 'country' | 'state' | 'suburb' }> = [];
+    for (const c of availableCountries) opts.push({ label: c, kind: 'country' });
+    for (const s of availableStates) opts.push({ label: s, kind: 'state' });
+    for (const s of availableSuburbs) opts.push({ label: s, kind: 'suburb' });
+    return opts;
+  }, [availableCountries, availableStates, availableSuburbs]);
+
+  const matchedLocationOptions = useMemo(() => {
+    const q = locationQuery.trim().toLowerCase();
+    if (!q) return locationOptions.slice(0, 50);
+    return locationOptions.filter((o) => o.label.toLowerCase().includes(q)).slice(0, 50);
+  }, [locationQuery, locationOptions]);
+
+  useEffect(() => {
+    // keep input in sync with active filter
+    const active = [filters.suburb, filters.state, filters.country].find(Boolean) || '';
+    setLocationQuery(active);
+  }, [filters.country, filters.state, filters.suburb]);
 
   return (
-    <aside className="lg:w-64 shrink-0">
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 sticky top-32">
-        <div className="flex items-center gap-2 mb-6">
-          <SlidersHorizontal className="h-5 w-5 text-[#00d9ff]" />
-          <h3 className="font-semibold text-lg text-white">Filters</h3>
-        </div>
-
-        {/* Sport Filter */}
-        <div className="mb-6">
-          <h4 className="font-medium mb-3 text-[#00d9ff]">Sport</h4>
-          <div className="space-y-2">
-            <Link
-              href={{ pathname: "/venues", query: buildQueryObject((p) => {
-                p.delete("sport");
-              }) }}
-              className={`block px-3 py-2 rounded-lg transition-colors ${
-                !currentSport ? "bg-[#00ff88] text-[#0a1628] font-semibold" : "text-[#b8c5d6] hover:bg-white/10"
-              }`}
-            >
-              All Sports
-            </Link>
-            {sports.map((s) => (
-              <Link
-                key={s.id}
-                href={{ pathname: "/venues", query: buildQueryObject((p) => {
-                  p.set("sport", s.slug);
-                }) }}
-                className={`block px-3 py-2 rounded-lg transition-colors ${
-                  currentSport === s.slug ? "bg-[#00ff88] text-[#0a1628] font-semibold" : "text-[#b8c5d6] hover:bg-white/10"
-                }`}
-              >
-                {s.name}
-              </Link>
-            ))}
+    <div className="bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10 sticky top-32 z-30">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 items-start">
+          {/* Sort */}
+          <div className="min-w-0">
+            <VenueSort venues={sortVenues.venues as any} onSortedVenues={sortVenues.onSortedVenues as any} userLocation={sortVenues.userLocation} />
           </div>
-        </div>
 
-        {/* Price Range removed */}
-
-        {/* Indoor/Outdoor */}
-        <div className="mb-6">
-          <h4 className="font-medium mb-3 text-[#00d9ff]">Venue Type</h4>
-          <div className="space-y-2">
-            {[
-              { value: "indoor", label: "Indoor" },
-              { value: "outdoor", label: "Outdoor" },
-              { value: "both", label: "Both" }
-            ].map((type) => (
-              <label key={type.value} className="flex items-center gap-2 text-[#b8c5d6] hover:text-white cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  className="rounded bg-white/10 border-white/20 text-[#00ff88] focus:ring-[#00d9ff]" 
-                  checked={filters.venueTypes.includes(type.value)}
-                  onChange={(e) => handleVenueTypeChange(type.value, e.target.checked)}
-                />
-                <span className="text-sm">{type.label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Clear Filters */}
-        {(filters.venueTypes.length > 0) && (
-          <div className="mt-6 pt-6 border-t border-white/10">
+          {/* Sports dropdown */}
+          <div className="min-w-0" onKeyDown={(e)=>{ if(e.key==='Escape') setOpen(null); }}>
             <button
-              onClick={() => updateFilters({ venueTypes: [] })}
-              className="w-full px-4 py-2 text-sm text-[#00d9ff] hover:text-[#00ff88] transition-colors"
+              type="button"
+              onClick={() => setOpen((o) => (o === 'sports' ? null : 'sports'))}
+              className="w-full h-10 px-3 rounded-md bg-white/5 border border-white/10 text-white flex items-center justify-between"
+              aria-expanded={open === 'sports'}
             >
-              Clear All Filters
+              <span className="flex items-center gap-2">
+                <Volleyball className="h-4 w-4 text-[#00d9ff]" />
+                <span className="truncate">{renderTagText(selectedSportLabels, 'All sports')}</span>
+              </span>
+              <ChevronDown className={`h-4 w-4 transition-transform ${open === 'sports' ? 'rotate-180' : ''}`} />
+            </button>
+            {open === 'sports' && (
+              <div className="absolute z-50 mt-2 w-[calc(100%-1rem)] sm:w-auto bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-64 overflow-auto p-2">
+                {sports.map((opt) => {
+                  const checked = filters.sports.includes(opt.slug);
+                  return (
+                    <label key={opt.slug} className="flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer text-white">
+                      <input
+                        type="checkbox"
+                        className="accent-[#00d9ff]"
+                        checked={checked}
+                        onChange={(e) => toggleSport(opt.slug)}
+                      />
+                      <span>{opt.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Locations searchable field */}
+          <div className="min-w-0 relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <MapPin className="h-4 w-4 text-[#00d9ff]" />
+            </div>
+            <input
+              type="text"
+              value={locationQuery}
+              placeholder="All locations"
+              onChange={(e) => { setLocationQuery(e.target.value); setShowLocationSuggest(true); }}
+              onFocus={() => setShowLocationSuggest(true)}
+              onBlur={() => setTimeout(()=> setShowLocationSuggest(false), 150)}
+              className="w-full h-10 pl-9 pr-8 rounded-md bg-white/5 border border-white/10 text-white placeholder-[#7a8b9a]"
+            />
+            {(filters.country || filters.state || filters.suburb) && (
+              <button
+                aria-label="Clear location"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#7a8b9a] hover:text-white"
+                onClick={() => { updateFilters({ ...filters, country: undefined, state: undefined, suburb: undefined }); setLocationQuery(''); }}
+              >
+                ×
+              </button>
+            )}
+            {showLocationSuggest && matchedLocationOptions.length > 0 && (
+              <div className="absolute z-50 mt-2 w-full bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-72 overflow-auto">
+                {matchedLocationOptions.map((opt) => (
+                  <button
+                    key={`${opt.kind}:${opt.label}`}
+                    type="button"
+                    onClick={() => {
+                      const nf = { ...filters, country: undefined, state: undefined, suburb: undefined } as FilterState;
+                      nf[opt.kind] = opt.label as any;
+                      updateFilters(nf);
+                      setLocationQuery(opt.label);
+                      setShowLocationSuggest(false);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-white/5 text-white"
+                  >
+                    {opt.label}
+                    <span className="ml-2 text-xs text-[#7a8b9a]">{opt.kind}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Venue Type dropdown */}
+          <div className="min-w-0">
+            <button
+              type="button"
+              onClick={() => setOpen((o) => (o === 'types' ? null : 'types'))}
+              className="w-full h-10 px-3 rounded-md bg-white/5 border border-white/10 text-white flex items-center justify-between"
+              aria-expanded={open === 'types'}
+            >
+              <span className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-[#00d9ff]" />
+                <span className="truncate">{renderTagText(filters.venueTypes.map((t)=> t[0].toUpperCase()+t.slice(1)), 'Venue type')}</span>
+              </span>
+              <ChevronDown className={`h-4 w-4 transition-transform ${open === 'types' ? 'rotate-180' : ''}`} />
+            </button>
+            {open === 'types' && (
+              <div className="absolute z-50 mt-2 bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-64 overflow-auto p-2 min-w-[16rem]">
+                {[
+                  { value: 'indoor', label: 'Indoor' },
+                  { value: 'outdoor', label: 'Outdoor' },
+                ].map((opt) => (
+                  <label key={opt.value} className="flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer text-white">
+                    <input
+                      type="checkbox"
+                      className="accent-[#00d9ff]"
+                      checked={filters.venueTypes.includes(opt.value)}
+                      onChange={() => handleVenueTypeChange(opt.value, !filters.venueTypes.includes(opt.value))}
+                    />
+                    <span>{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Favorites toggle */}
+          <div className="min-w-0">
+            <button
+              onClick={() => handleFavoritesOnlyChange(!filters.favoritesOnly)}
+              className={`w-full h-10 px-3 rounded-md border flex items-center justify-center gap-2 transition-colors ${filters.favoritesOnly ? 'bg-[#00ff88] text-[#0a1628] border-transparent' : 'bg-white/5 text-white border-white/10 hover:bg-white/10'}`}
+            >
+              <Star className="h-4 w-4" />
+              <span className="text-sm">Favorites</span>
             </button>
           </div>
-        )}
+
+          {/* Clear link */}
+          {(filters.sports.length > 0 || filters.venueTypes.length > 0 || filters.favoritesOnly || filters.country || filters.state || filters.suburb) && (
+            <div className="sm:col-span-5">
+              <button
+                onClick={() => updateFilters({ sports: [], venueTypes: [], favoritesOnly: false, country: undefined, state: undefined, suburb: undefined })}
+                className="text-sm text-[#00d9ff] hover:text-[#00ff88]"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-    </aside>
+    </div>
   );
 }

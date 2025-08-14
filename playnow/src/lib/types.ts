@@ -65,6 +65,7 @@ export type Profile = {
   location?: string;
   city?: string;
   countryCode?: string; // ISO-3166-1 alpha-2
+  favoriteVenues?: string[];
 };
 
 export type Click = {

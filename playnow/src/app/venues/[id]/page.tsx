@@ -32,36 +32,33 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
 
   return (
     <div className="min-h-screen">
-      {/* Compact header without image */}
-      <div className="bg-[#0f2847]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center gap-2 text-white/90 mb-2">
-            <span className="px-3 py-1 bg-[#00ff88] text-[#0a1628] rounded-full text-sm font-bold">
-              {venue.indoorOutdoor === "indoor" ? "Indoor" : venue.indoorOutdoor === "outdoor" ? "Outdoor" : "Indoor & Outdoor"}
-            </span>
-            <span className="px-3 py-1 bg-[#00d9ff] text-[#0a1628] rounded-full text-sm font-bold">
-              {displaySport}
-            </span>
-            <div className="ml-auto flex gap-2">
-              <button className="p-3 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#00d9ff]/20 transition-colors border border-white/20">
-                <Heart className="h-5 w-5 text-white" />
-              </button>
-              <button className="p-3 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#00d9ff]/20 transition-colors border border-white/20">
-                <Share2 className="h-5 w-5 text-white" />
-              </button>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header content inline (no full-width background) */}
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <div className="flex items-center gap-2 text-white/90 mb-2">
+              <span className="px-3 py-1 bg-[#00ff88] text-[#0a1628] rounded-full text-sm font-bold">
+                {venue.indoorOutdoor === "indoor" ? "Indoor" : venue.indoorOutdoor === "outdoor" ? "Outdoor" : "Indoor & Outdoor"}
+              </span>
+              <span className="px-3 py-1 bg-[#00d9ff] text-[#0a1628] rounded-full text-sm font-bold">
+                {displaySport}
+              </span>
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-1">{venue.name}</h1>
+            <div className="flex items-center gap-2 text-white/90">
+              <MapPin className="h-4 w-4 text-[#00d9ff]" />
+              <span>{venue.address}{venue.city ? `, ${venue.city}` : ""}</span>
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-1">{venue.name}</h1>
-          <div className="flex items-center gap-4 text-white/90">
-            <div className="flex items-center gap-1">
-              <MapPin className="h-4 w-4 text-[#00d9ff]" />
-               <span>{venue.address}{venue.city ? `, ${venue.city}` : ""}</span>
-            </div>
+          <div className="flex gap-2">
+            <button className="p-3 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#00d9ff]/20 transition-colors border border-white/20">
+              <Heart className="h-5 w-5 text-white" />
+            </button>
+            <button className="p-3 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#00d9ff]/20 transition-colors border border-white/20">
+              <Share2 className="h-5 w-5 text-white" />
+            </button>
           </div>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">

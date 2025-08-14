@@ -38,7 +38,9 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
   // If no Places photo, use curated stock image matched to sport
   const mainImage: string | undefined = heroSrc || getStockImageForVenue(venue);
   const fallbackImage = GENERIC_PLACEHOLDER;
-  const isTrustedCdn = typeof mainImage === 'string' && /(images\.unsplash\.com|images\.pexels\.com)/i.test(mainImage);
+  // Treat Google Place Photos as trusted (must not be proxied), along with Unsplash/Pexels
+  const isTrustedCdn =
+    typeof mainImage === 'string' && /(images\.unsplash\.com|images\.pexels\.com|maps\.googleapis\.com)/i.test(mainImage);
   const imageSrc = mainImage && !isTrustedCdn ? `/api/image?url=${encodeURIComponent(mainImage)}` : mainImage;
 
   // Determine primary sport for display badge

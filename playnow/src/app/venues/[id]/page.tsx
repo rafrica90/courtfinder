@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 import { MapPin, Clock, Users, Heart, Share2 } from "lucide-react";
 import VenueImage from "@/components/VenueImage";
-import { getPlacePhotoInfo } from "@/lib/google-places";
 import { getStockImageForVenue, GENERIC_PLACEHOLDER, getPrimarySport } from "@/lib/sport-images";
 
 export default async function VenueDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -24,23 +23,10 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
     if (!venue) return notFound();
   }
 
-  // Attempt Google Places photo first if we have a place_id on the venue
-  let heroSrc: string | undefined;
-  let photoAuthorAttributions: { name: string; url: string }[] = [];
-  if (venue.place_id && process.env.GOOGLE_MAPS_API_KEY) {
-    const placePhoto = await getPlacePhotoInfo(String(venue.place_id), 1200);
-    if (placePhoto) {
-      heroSrc = placePhoto.photoUrl;
-      photoAuthorAttributions = placePhoto.authorAttributions;
-    }
-  }
-
-  // If no Places photo, use curated stock image matched to sport
-  const mainImage: string | undefined = heroSrc || getStockImageForVenue(venue);
+  // Use curated stock image matched to sport
+  const mainImage: string | undefined = getStockImageForVenue(venue);
   const fallbackImage = GENERIC_PLACEHOLDER;
-  // Treat Google Place Photos as trusted (must not be proxied), along with Unsplash/Pexels
-  const isTrustedCdn =
-    typeof mainImage === 'string' && /(images\.unsplash\.com|images\.pexels\.com|maps\.googleapis\.com)/i.test(mainImage);
+  const isTrustedCdn = typeof mainImage === 'string' && /(images\.unsplash\.com|images\.pexels\.com)/i.test(mainImage);
   const imageSrc = mainImage && !isTrustedCdn ? `/api/image?url=${encodeURIComponent(mainImage)}` : mainImage;
 
   // Determine primary sport for display badge
@@ -59,20 +45,6 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
             fallbackSrc={fallbackImage}
             className="w-full h-full object-cover opacity-90"
           />
-          {(heroSrc && (photoAuthorAttributions.length > 0 || true)) && (
-            <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-              {photoAuthorAttributions.length > 0 && (
-                <>
-                  Photo by {photoAuthorAttributions.map((a, idx) => (
-                    <a key={idx} href={a.url} target="_blank" rel="nofollow noopener noreferrer" className="underline">
-                      {a.name}
-                    </a>
-                  )).reduce((prev, curr) => [prev, ', ', curr] as any)} · 
-                </>
-              )}
-              <span>Google Maps</span>
-            </div>
-          )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         
         {/* Action buttons */}

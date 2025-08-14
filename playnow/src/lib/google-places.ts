@@ -25,7 +25,7 @@ function parseHtmlAttributions(htmlAttributions: string[] | undefined): PhotoAtt
  * direct Place Photos URL plus author attributions. This uses only official
  * Google Places endpoints and does not rehost the image.
  */
-export async function getPlacePhotoInfo(placeId: string, maxWidth: number = 1200): Promise<PlacePhotoInfo | null> {
+export async function getPlacePhotoInfo(placeId: string, maxWidth: number = 1200, preferredPhotoRef?: string | null): Promise<PlacePhotoInfo | null> {
   const serverKey = process.env.GOOGLE_MAPS_API_KEY;
   const browserKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY;
   if (!serverKey && !browserKey) return null;
@@ -36,12 +36,28 @@ export async function getPlacePhotoInfo(placeId: string, maxWidth: number = 1200
     const resp = await fetch(detailsUrl, { cache: 'no-store' });
     if (!resp.ok) return null;
     const json = await resp.json();
-    const photos = json?.result?.photos as Array<{ photoreference?: string; photo_reference?: string; html_attributions?: string[] }> | undefined;
+    const photos = json?.result?.photos as Array<{
+      photoreference?: string;
+      photo_reference?: string;
+      html_attributions?: string[];
+      width?: number;
+      height?: number;
+    }> | undefined;
     if (!photos || photos.length === 0) return null;
-    const first = photos[0];
-    const photoRef = (first as any).photoreference || (first as any).photo_reference;
+
+    // Prefer landscape photos of reasonable width; fall back to first if none match
+    let preferred = preferredPhotoRef
+      ? photos.find(p => (p as any).photoreference === preferredPhotoRef || (p as any).photo_reference === preferredPhotoRef) || null
+      : null;
+    if (!preferred) preferred = photos.find(p => {
+      const width = (p as any).width || 0;
+      const height = (p as any).height || 0;
+      return width >= 800 && width >= height * 1.2; // simple landscape heuristic
+    }) || photos[0];
+
+    const photoRef = (preferred as any).photoreference || (preferred as any).photo_reference;
     if (!photoRef) return null;
-    const authorAttributions = parseHtmlAttributions(first.html_attributions);
+    const authorAttributions = parseHtmlAttributions(preferred.html_attributions);
     // Use browser key for the final photo URL when available; else fall back to server key
     const effectivePhotoKey = browserKey || serverKey;
     const photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photoreference=${encodeURIComponent(photoRef)}&key=${effectivePhotoKey}`;

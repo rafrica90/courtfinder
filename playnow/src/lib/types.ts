@@ -29,6 +29,7 @@ export type Venue = {
   indoorOutdoor?: "indoor" | "outdoor" | "both";
   isPublic: boolean;
   notes?: string;
+  preferred_photo_ref?: string;
 };
 
 export type Game = {

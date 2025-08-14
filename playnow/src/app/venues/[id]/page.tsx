@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 import { MapPin, Clock, Users, Heart, Share2 } from "lucide-react";
-import VenueImage from "@/components/VenueImage";
-import { getStockImageForVenue, GENERIC_PLACEHOLDER, getPrimarySport } from "@/lib/sport-images";
+import { getPrimarySport } from "@/lib/sport-images";
 
 export default async function VenueDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -23,11 +22,7 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
     if (!venue) return notFound();
   }
 
-  // Use curated stock image matched to sport
-  const mainImage: string | undefined = getStockImageForVenue(venue);
-  const fallbackImage = GENERIC_PLACEHOLDER;
-  const isTrustedCdn = typeof mainImage === 'string' && /(images\.unsplash\.com|images\.pexels\.com)/i.test(mainImage);
-  const imageSrc = mainImage && !isTrustedCdn ? `/api/image?url=${encodeURIComponent(mainImage)}` : mainImage;
+  // No hero image banner
 
   // Determine primary sport for display badge
   const primarySport = getPrimarySport(venue);
@@ -37,43 +32,30 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
 
   return (
     <div className="min-h-screen">
-      {/* Hero Image Section */}
-      <div className="relative h-96 bg-[#0f2847]">
-          <VenueImage
-            src={imageSrc || fallbackImage}
-            alt={venue.name}
-            fallbackSrc={fallbackImage}
-            className="w-full h-full object-cover opacity-90"
-          />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-        
-        {/* Action buttons */}
-        <div className="absolute top-4 right-4 flex gap-2">
-          <button className="p-3 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#00d9ff]/20 transition-colors border border-white/20">
-            <Heart className="h-5 w-5 text-white" />
-          </button>
-          <button className="p-3 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#00d9ff]/20 transition-colors border border-white/20">
-            <Share2 className="h-5 w-5 text-white" />
-          </button>
-        </div>
-
-        {/* Venue name overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center gap-2 text-white/90 mb-2">
-              <span className="px-3 py-1 bg-[#00ff88] text-[#0a1628] rounded-full text-sm font-bold">
-                {venue.indoorOutdoor === "indoor" ? "Indoor" : venue.indoorOutdoor === "outdoor" ? "Outdoor" : "Indoor & Outdoor"}
-              </span>
-              <span className="px-3 py-1 bg-[#00d9ff] text-[#0a1628] rounded-full text-sm font-bold">
-                {displaySport}
-              </span>
+      {/* Compact header without image */}
+      <div className="bg-[#0f2847]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center gap-2 text-white/90 mb-2">
+            <span className="px-3 py-1 bg-[#00ff88] text-[#0a1628] rounded-full text-sm font-bold">
+              {venue.indoorOutdoor === "indoor" ? "Indoor" : venue.indoorOutdoor === "outdoor" ? "Outdoor" : "Indoor & Outdoor"}
+            </span>
+            <span className="px-3 py-1 bg-[#00d9ff] text-[#0a1628] rounded-full text-sm font-bold">
+              {displaySport}
+            </span>
+            <div className="ml-auto flex gap-2">
+              <button className="p-3 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#00d9ff]/20 transition-colors border border-white/20">
+                <Heart className="h-5 w-5 text-white" />
+              </button>
+              <button className="p-3 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#00d9ff]/20 transition-colors border border-white/20">
+                <Share2 className="h-5 w-5 text-white" />
+              </button>
             </div>
-            <h1 className="text-4xl font-bold text-white mb-2">{venue.name}</h1>
-            <div className="flex items-center gap-4 text-white/90">
-              <div className="flex items-center gap-1">
-                <MapPin className="h-4 w-4 text-[#00d9ff]" />
-                 <span>{venue.address}{venue.city ? `, ${venue.city}` : ""}</span>
-              </div>
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-1">{venue.name}</h1>
+          <div className="flex items-center gap-4 text-white/90">
+            <div className="flex items-center gap-1">
+              <MapPin className="h-4 w-4 text-[#00d9ff]" />
+               <span>{venue.address}{venue.city ? `, ${venue.city}` : ""}</span>
             </div>
           </div>
         </div>

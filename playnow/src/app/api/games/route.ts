@@ -161,8 +161,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Get venue details to extract sport (with error handling)
-    let sport = submittedSport || 'Tennis';
+    // Get venue details to validate the sport selection (no defaults allowed)
+    const sport = String(submittedSport).trim();
+    if (!sport) {
+      return NextResponse.json({ error: 'Sport is required for hosting a game.' }, { status: 400 });
+    }
     let venueName = '';
     
     try {
@@ -175,7 +178,10 @@ export async function POST(req: NextRequest) {
       if (venue) {
         // Validate submitted sport against venue's sports if provided
         const allowed = Array.isArray(venue.sports) ? venue.sports : [];
-        if (allowed.length && !allowed.includes(sport)) {
+        if (allowed.length === 0) {
+          return NextResponse.json({ error: 'This venue does not have any sports configured. Please choose a different venue.' }, { status: 400 });
+        }
+        if (!allowed.includes(sport)) {
           return NextResponse.json({ error: 'Selected sport is not available at this venue.' }, { status: 400 });
         }
         venueName = venue.name || '';

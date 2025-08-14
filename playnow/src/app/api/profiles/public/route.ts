@@ -31,11 +31,15 @@ export async function GET(req: NextRequest) {
       display_name: string | null;
       sports_preferences: string[] | null;
       skill_level: string | null;
+      sport_skill_levels: Record<string, string> | null;
+      city: string | null;
+      state: string | null;
+      country_code: string | null;
     };
 
     const { data, error } = await supabase
       .from("profiles")
-      .select("user_id, display_name, sports_preferences, skill_level")
+      .select("user_id, display_name, sports_preferences, skill_level, sport_skill_levels, city, state, country_code")
       .in("user_id", userIds);
 
     if (error) {
@@ -50,6 +54,10 @@ export async function GET(req: NextRequest) {
       displayName: row.display_name,
       sports: row.sports_preferences || [],
       skillLevel: row.skill_level || "All Levels",
+      sportSkillLevels: row.sport_skill_levels || {},
+      city: row.city || null,
+      state: row.state || null,
+      countryCode: row.country_code || null,
     }));
 
     return NextResponse.json({ profiles });

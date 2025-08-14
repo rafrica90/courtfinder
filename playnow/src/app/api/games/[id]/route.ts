@@ -77,7 +77,8 @@ export async function PUT(
       maxPlayers,
       visibility,
       notes,
-      costInstructions
+      costInstructions,
+      sport: submittedSport
     } = body;
 
     const supabase = getSupabaseServiceClient();
@@ -88,7 +89,7 @@ export async function PUT(
     // First verify the user is the host
     const { data: existingGame, error: fetchError } = await supabase
       .from('games')
-      .select('host_user_id')
+      .select('host_user_id, sport')
       .eq('id', id)
       .single();
 
@@ -100,7 +101,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized - only the host can update the game' }, { status: 403 });
     }
 
-    // Update the game
+    // Prepare update payload
     const updatePayload: any = {
       start_time: startTime,
       min_players: minPlayers,
@@ -112,6 +113,38 @@ export async function PUT(
 
     if (venueId) {
       updatePayload.venue_id = venueId;
+    }
+
+    // Handle sport changes/validation
+    let normalizedSport = typeof submittedSport === 'string' ? submittedSport.trim() : '';
+    const targetVenueId = venueId || undefined;
+
+    if (normalizedSport) {
+      // Validate provided sport is allowed at the (possibly new) venue
+      const venueLookupId = targetVenueId || undefined;
+      if (venueLookupId) {
+        const { data: venue } = await supabase
+          .from('venues')
+          .select('sports')
+          .eq('id', venueLookupId)
+          .single();
+        const allowed = Array.isArray(venue?.sports) ? venue?.sports : [];
+        if (allowed.length === 0 || !allowed.includes(normalizedSport)) {
+          return NextResponse.json({ error: 'Selected sport is not available at this venue.' }, { status: 400 });
+        }
+      }
+      updatePayload.sport = normalizedSport;
+    } else if (venueId) {
+      // Venue changed but sport not provided; ensure existing sport still valid
+      const { data: venue } = await supabase
+        .from('venues')
+        .select('sports')
+        .eq('id', venueId)
+        .single();
+      const allowed = Array.isArray(venue?.sports) ? venue?.sports : [];
+      if (allowed.length === 0 || !allowed.includes(existingGame.sport)) {
+        return NextResponse.json({ error: 'Please select a sport that is available at the new venue.' }, { status: 400 });
+      }
     }
 
     const { data: game, error } = await supabase

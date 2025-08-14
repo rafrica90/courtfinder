@@ -28,6 +28,7 @@ export default function EditGamePage({ params }: { params: Promise<{ id: string 
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [notes, setNotes] = useState("");
   const [costInstructions, setCostInstructions] = useState("");
+  const [selectedSport, setSelectedSport] = useState<string>("");
 
   // Fetch game data on mount
   useEffect(() => {
@@ -77,6 +78,7 @@ export default function EditGamePage({ params }: { params: Promise<{ id: string 
           setVisibility(game.visibility || "public");
           setNotes(game.notes || "");
           setCostInstructions(game.cost_instructions || "");
+          setSelectedSport(game.sport || "");
         }
       } catch (error) {
         console.error('Error fetching game:', error);
@@ -155,7 +157,8 @@ export default function EditGamePage({ params }: { params: Promise<{ id: string 
         maxPlayers,
         visibility,
         notes,
-        costInstructions
+        costInstructions,
+        sport: selectedSport,
       });
 
       if (error) {
@@ -265,6 +268,29 @@ export default function EditGamePage({ params }: { params: Promise<{ id: string 
                 })()}
               </div>
             )}
+
+            {(() => {
+              const selected = allVenues.find((v: any) => v.id === venueId) || gameData.venues;
+              const sports: string[] = Array.isArray(selected?.sports) ? selected.sports : [];
+              if (sports.length === 0) return null;
+              const formatSport = (raw: string) => String(raw || '').replace(/[_-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+              return (
+                <div className="mt-4">
+                  <label className="block text-sm font-medium mb-2 text-[#b8c5d6]">Sport for this game</label>
+                  <select
+                    value={selectedSport}
+                    onChange={(e) => setSelectedSport(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 bg-[#0f1f39] border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d9ff]/50"
+                  >
+                    <option value="" disabled>Select sport</option>
+                    {sports.map((s) => (
+                      <option key={s} value={s}>{formatSport(s)}</option>
+                    ))}
+                  </select>
+                </div>
+              );
+            })()}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

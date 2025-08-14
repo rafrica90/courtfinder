@@ -91,4 +91,71 @@ export async function PUT(
   }
 }
 
+// DELETE /api/games/[id]/participants/[participantId] - Host removes a participant
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string; participantId: string }> }
+) {
+  const { id: gameId, participantId } = await params;
+
+  try {
+    const authenticatedUserId = req.headers.get('x-user-id');
+    if (!authenticatedUserId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    const supabase = getSupabaseServiceClient();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
+    // Verify the requester is the host
+    const { data: game, error: gameError } = await supabase
+      .from('games')
+      .select('host_user_id')
+      .eq('id', gameId)
+      .single();
+
+    if (gameError || !game) {
+      return NextResponse.json({ error: 'Game not found' }, { status: 404 });
+    }
+
+    if (game.host_user_id !== authenticatedUserId) {
+      return NextResponse.json({ error: 'Unauthorized - only the host can remove participants' }, { status: 403 });
+    }
+
+    // Ensure participant exists and belongs to this game; prevent removing host
+    const { data: participant, error: partErr } = await supabase
+      .from('participants')
+      .select('id, user_id')
+      .eq('id', participantId)
+      .eq('game_id', gameId)
+      .single();
+
+    if (partErr || !participant) {
+      return NextResponse.json({ error: 'Participant not found' }, { status: 404 });
+    }
+
+    if (participant.user_id === game.host_user_id) {
+      return NextResponse.json({ error: 'Cannot remove the host from the game' }, { status: 400 });
+    }
+
+    const { error: delErr } = await supabase
+      .from('participants')
+      .delete()
+      .eq('id', participantId);
+
+    if (delErr) {
+      return NextResponse.json({ error: 'Failed to remove participant' }, { status: 500 });
+    }
+
+    return NextResponse.json({ message: 'Participant removed' });
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error in DELETE /api/games/[id]/participants/[participantId]:', error);
+    }
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 

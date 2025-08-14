@@ -75,7 +75,7 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
   const [isJoined, setIsJoined] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [publicProfiles, setPublicProfiles] = useState<Record<string, { sports: string[]; skillLevel: string }>>({});
+  const [publicProfiles, setPublicProfiles] = useState<Record<string, { sports: string[]; skillLevel: string; displayName?: string; city?: string | null; state?: string | null; countryCode?: string | null; sportSkillLevels?: Record<string, string> }>>({});
   const [showSkillPrompt, setShowSkillPrompt] = useState(false);
   const [pendingSkill, setPendingSkill] = useState('');
   const [existingLevels, setExistingLevels] = useState<Record<string, string>>({});
@@ -243,18 +243,22 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
         ...((gameData as any).pending || []).map((p: any) => p.userId)
       ]));
       if (userIds.length === 0) return;
-      const { data, error } = await api.profiles.getPublic(userIds);
-      if (!error && data?.profiles) {
-        type PublicProfile = { userId: string; sports: string[]; skillLevel: string };
-        const map: Record<string, { sports: string[]; skillLevel: string }> = {};
-        for (const p of (data.profiles as PublicProfile[])) {
-          map[p.userId] = {
-            sports: Array.isArray(p.sports) ? p.sports : [],
-            skillLevel: typeof p.skillLevel === 'string' ? p.skillLevel : 'All Levels'
-          };
+        const { data, error } = await api.profiles.getPublic(userIds);
+        if (!error && data?.profiles) {
+          const map: Record<string, { sports: string[]; skillLevel: string; displayName?: string; city?: string | null; state?: string | null; countryCode?: string | null; sportSkillLevels?: Record<string, string> }> = {};
+          for (const p of (data.profiles as any[])) {
+            map[p.userId] = {
+              sports: Array.isArray(p.sports) ? p.sports : [],
+              skillLevel: typeof p.skillLevel === 'string' ? p.skillLevel : 'All Levels',
+              displayName: typeof p.displayName === 'string' ? p.displayName : undefined,
+              city: p.city ?? null,
+              state: p.state ?? null,
+              countryCode: p.countryCode ?? null,
+              sportSkillLevels: (p.sportSkillLevels && typeof p.sportSkillLevels === 'object') ? p.sportSkillLevels as Record<string, string> : {}
+            };
+          }
+          setPublicProfiles(map);
         }
-        setPublicProfiles(map);
-      }
     };
     fetchProfiles();
   }, [gameData]);
@@ -262,6 +266,31 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
   const normalizedSportSlug = () => {
     const raw = String(gameData?.sport || '').toLowerCase();
     return raw.replace(/\s+/g, '_');
+  };
+
+  const SkillPromptModal = () => {
+    if (!showSkillPrompt) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/60" onClick={() => setShowSkillPrompt(false)} />
+        <div className="relative z-10 w-full max-w-md bg-[#0f1f3a] border border-white/10 rounded-xl shadow-xl p-6">
+          <h3 className="text-lg font-bold text-white mb-2">Set your skill level</h3>
+          <p className="text-sm text-[#b8c5d6] mb-4">Select your level for {gameData?.sport} before joining.</p>
+          <div className="flex flex-col gap-2 mb-4">
+            {['beginner','intermediate','advanced','pro'].map((lvl) => (
+              <label key={lvl} className={`px-3 py-2 rounded border ${pendingSkill===lvl? 'border-[#00d9ff] text-white' : 'border-white/10 text-[#b8c5d6]'} hover:border-[#00d9ff] cursor-pointer`}>
+                <input type="radio" className="mr-2" name="skill" value={lvl} checked={pendingSkill===lvl} onChange={(e)=>setPendingSkill(e.target.value)} />
+                {lvl.charAt(0).toUpperCase()+lvl.slice(1)}
+              </label>
+            ))}
+          </div>
+          <div className="flex justify-end gap-2">
+            <button onClick={()=>setShowSkillPrompt(false)} className="px-3 py-2 border border-white/20 text-[#b8c5d6] rounded">Cancel</button>
+            <button onClick={handleSaveSkillAndJoin} disabled={!pendingSkill} className="px-3 py-2 bg-[#00ff88] text-[#0a1628] rounded font-bold disabled:opacity-50">Save & Join</button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const performJoin = async () => {
@@ -325,7 +354,7 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
       router.push('/sign-in');
       return;
     }
-    // Optional skill-level check (non-blocking): proceed with join even if missing
+    // Enforce skill-level for this sport before allowing join
     try {
       const supabase = getSupabaseBrowserClient();
       const sportSlug = normalizedSportSlug();
@@ -338,7 +367,8 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
         const levels = (row?.sport_skill_levels as Record<string, string>) || {};
         if (!levels[sportSlug]) {
           setExistingLevels(levels);
-          // Do not block join; we can prompt user later to set skill level
+          setShowSkillPrompt(true);
+          return; // block until user sets level
         }
       }
     } catch {}
@@ -382,12 +412,16 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
       setIsJoined(false);
         
       // Update local game data to remove the user
-      setGameData(prev => ({
-        ...prev,
-        participants: prev.participants.filter(p => p.userId !== currentUserId),
-        waitlist: prev.waitlist.filter(p => p.userId !== currentUserId),
-        ...(prev as any).pending ? { pending: ((prev as any).pending).filter((p: any) => p.userId !== currentUserId) } : {}
-      } as any));
+      setGameData(prev => {
+        if (!prev) return prev;
+        const next: any = { ...prev };
+        next.participants = prev.participants.filter(p => p.userId !== currentUserId);
+        next.waitlist = prev.waitlist.filter(p => p.userId !== currentUserId);
+        if ((prev as any).pending) {
+          next.pending = ((prev as any).pending).filter((p: any) => p.userId !== currentUserId);
+        }
+        return next;
+      });
       
       // Optionally refresh the page to get latest data
       router.refresh();
@@ -676,10 +710,10 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                     <p className="text-sm text-[#7a8b9a]">{gameData.venue.address}</p>
                   </div>
                 </div>
-                {gameData.venue.notes && (
+                {(gameData as any).venue?.notes && (
                   <div>
                     <h3 className="font-medium text-white mb-2">About this venue</h3>
-                    <p className="text-[#b8c5d6] leading-relaxed">{gameData.venue.notes}</p>
+                    <p className="text-[#b8c5d6] leading-relaxed">{(gameData as any).venue.notes}</p>
                   </div>
                 )}
               </div>
@@ -699,13 +733,15 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                   <div className="space-y-3">
                     {((gameData as any).pending as any[]).map((participant: any) => {
                       const pub = publicProfiles[participant.userId];
-                      const sportsText = pub && pub.sports.length > 0 ? pub.sports.join(', ') : 'Sports not set';
-                      const levelText = pub ? pub.skillLevel : 'All Levels';
+                      const sportName = gameData?.sport || 'Sport';
+                      const sportSlug = normalizedSportSlug();
+                      const levelText = pub ? ((pub.sportSkillLevels && sportSlug ? pub.sportSkillLevels[sportSlug] : undefined) || pub.skillLevel || 'All Levels') : 'All Levels';
+                      const locationText = pub ? [pub.city, pub.state, pub.countryCode].filter(Boolean).join(', ') : '';
                       return (
                         <div key={participant.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                           <div>
-                            <div className="text-white font-medium">{sportsText}</div>
-                            <div className="text-xs text-[#7a8b9a]">{levelText}</div>
+                            <div className="text-white font-medium">{pub?.displayName || 'Player'}</div>
+                            <div className="text-xs text-[#7a8b9a]">{sportName} • {levelText}{locationText ? ` • ${locationText}` : ''}</div>
                           </div>
                           <div className="flex items-center gap-2">
                             <button
@@ -750,18 +786,19 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
               <div className="space-y-3">
                 {gameData.participants.map((participant) => {
                   const pub = publicProfiles[participant.userId];
-                  const sportsText = pub && pub.sports.length > 0 ? pub.sports.join(', ') : 'Sports not set';
-                  const levelText = pub ? pub.skillLevel : 'All Levels';
+                  const sportName = gameData?.sport || 'Sport';
+                  const sportSlug = normalizedSportSlug();
+                  const levelText = pub ? ((pub.sportSkillLevels && sportSlug ? pub.sportSkillLevels[sportSlug] : undefined) || pub.skillLevel || 'All Levels') : 'All Levels';
                   return (
                     <div key={participant.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-[#00d9ff]/20 rounded-full flex items-center justify-center">
                           <span className="text-sm font-medium text-[#00d9ff]">
-                            {(pub && pub.sports[0] ? pub.sports[0] : 'P').charAt(0).toUpperCase()}
+                            {(sportName || 'P').charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div>
-                          <p className="text-white font-medium">{sportsText}</p>
+                          <p className="text-white font-medium">{sportName}</p>
                           <p className="text-xs text-[#7a8b9a]">{levelText}
                             {participant.userId === gameData.hostUserId && (
                               <span className="text-xs text-[#00ff88] ml-1">(Host)</span>
@@ -772,6 +809,21 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                           </p>
                         </div>
                       </div>
+                      {isHost && participant.userId !== gameData.hostUserId && (
+                        <button
+                          className="px-2 py-1 border border-red-500 text-red-400 rounded hover:bg-red-500/10 text-xs"
+                          onClick={async () => {
+                            const gameId = (await params).id;
+                            const { error } = await api.games.removeParticipant(gameId, participant.id);
+                            if (!error) {
+                              setGameData((prev: any) => ({
+                                ...prev,
+                                participants: prev.participants.filter((p: any) => p.id !== participant.id)
+                              }));
+                            }
+                          }}
+                        >Remove</button>
+                      )}
                     </div>
                   );
                 })}
@@ -787,18 +839,19 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                 <div className="space-y-3">
                   {gameData.waitlist.map((participant) => {
                     const pub = publicProfiles[participant.userId];
-                    const sportsText = pub && pub.sports.length > 0 ? pub.sports.join(', ') : 'Sports not set';
-                    const levelText = pub ? pub.skillLevel : 'All Levels';
+                    const sportName = gameData?.sport || 'Sport';
+                    const sportSlug = normalizedSportSlug();
+                    const levelText = pub ? ((pub.sportSkillLevels && sportSlug ? pub.sportSkillLevels[sportSlug] : undefined) || pub.skillLevel || 'All Levels') : 'All Levels';
                     return (
                       <div key={participant.id} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
                             <span className="text-sm font-medium text-orange-400">
-                              {(pub && pub.sports[0] ? pub.sports[0] : 'W').charAt(0).toUpperCase()}
+                              {(sportName || 'W').charAt(0).toUpperCase()}
                             </span>
                           </div>
                           <div>
-                            <p className="text-white font-medium">{sportsText}</p>
+                            <p className="text-white font-medium">{sportName}</p>
                             <p className="text-xs text-[#7a8b9a]">{levelText}
                               {participant.userId === currentUserId && (
                                 <span className="text-xs text-[#00d9ff] ml-1">(You)</span>
@@ -811,18 +864,19 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                 <div className="space-y-3">
                   {((gameData as any).pending as any[]).map((participant: any) => {
                     const pub = publicProfiles[participant.userId];
-                    const sportsText = pub && pub.sports.length > 0 ? pub.sports.join(', ') : 'Sports not set';
-                    const levelText = pub ? pub.skillLevel : 'All Levels';
+                    const sportName = gameData?.sport || 'Sport';
+                    const sportSlug = normalizedSportSlug();
+                    const levelText = pub ? ((pub.sportSkillLevels && sportSlug ? pub.sportSkillLevels[sportSlug] : undefined) || pub.skillLevel || 'All Levels') : 'All Levels';
                     return (
                       <div key={participant.id} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center">
                             <span className="text-sm font-medium text-yellow-400">
-                              {(pub && pub.sports[0] ? pub.sports[0] : 'R').charAt(0).toUpperCase()}
+                              {(sportName || 'R').charAt(0).toUpperCase()}
                             </span>
                           </div>
                           <div>
-                            <p className="text-white font-medium">{sportsText}</p>
+                            <p className="text-white font-medium">{sportName}</p>
                             <p className="text-xs text-[#7a8b9a]">{levelText}</p>
                           </div>
                         </div>
@@ -872,6 +926,7 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
           </div>
         </div>
       </div>
+      <SkillPromptModal />
     </div>
   );
 }

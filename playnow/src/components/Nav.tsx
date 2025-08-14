@@ -72,22 +72,28 @@ export default function Nav() {
               href="/games"
               className={`${baseLinkClass} ${isFindGames ? activeLinkClass : inactiveLinkClass}`}
               aria-current={isFindGames ? "page" : undefined}
+              aria-label="Join a Game"
             >
-              Join a Game
+              <span className="hidden lg:inline">Join a Game</span>
+              <span className="inline lg:hidden">Join</span>
             </Link>
             <Link
               href="/games/new"
               className={`${baseLinkClass} ${isHostGame ? activeLinkClass : inactiveLinkClass}`}
               aria-current={isHostGame ? "page" : undefined}
+              aria-label="Host a Game"
             >
-              Host a Game
+              <span className="hidden lg:inline">Host a Game</span>
+              <span className="inline lg:hidden">Host</span>
             </Link>
             <Link
               href="/venues"
               className={`${baseLinkClass} ${isVenues ? activeLinkClass : inactiveLinkClass}`}
               aria-current={isVenues ? "page" : undefined}
+              aria-label="Find a Court"
             >
-              Find a Court
+              <span className="hidden lg:inline">Find a Court</span>
+              <span className="inline lg:hidden">Venues</span>
             </Link>
           </div>
 

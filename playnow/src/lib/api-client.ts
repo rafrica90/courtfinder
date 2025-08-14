@@ -179,6 +179,10 @@ export const api = {
     // Deny participant
     denyParticipant: (gameId: string, participantId: string) =>
       apiClient.put(`/api/games/${gameId}/participants/${participantId}`, { action: 'deny' }),
+
+    // Remove participant (host only)
+    removeParticipant: (gameId: string, participantId: string) =>
+      apiClient.delete(`/api/games/${gameId}/participants/${participantId}`),
   },
   
   clicks: {

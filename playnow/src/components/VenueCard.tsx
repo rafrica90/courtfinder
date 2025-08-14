@@ -104,12 +104,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
             {displayName}
           </h3>
           
-          {/* Indoor/Outdoor moved below image */}
-          <div className="mb-2">
-            <span className="inline-block bg-white/10 text-[#b8c5d6] border border-white/10 px-2 py-0.5 rounded text-xs font-medium">
-              {venue.indoorOutdoor === "indoor" ? "Indoor" : venue.indoorOutdoor === "outdoor" ? "Outdoor" : "Indoor & Outdoor"}
-            </span>
-          </div>
+          {/* Venue type removed from card */}
 
           {/* Sports badges (multi-sport support) */}
           {(() => {

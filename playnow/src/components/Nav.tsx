@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, User, Calendar } from "lucide-react";
+import { Menu, User, Calendar, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
@@ -13,9 +13,11 @@ export default function Nav() {
   const { user, signOut } = useAuth();
   const pathname = usePathname();
 
-  const baseLinkClass =
-    "transition-colors font-medium text-[#b8c5d6] hover:text-[#00d9ff]";
-
+  // Note: In Tailwind v4, when multiple conflicting utilities are present (e.g., two text colors),
+  // the generated CSS order, not the runtime class order, determines which one wins. To ensure the
+  // active color always applies, avoid including both text colors at once.
+  const baseLinkClass = "transition-colors font-medium";
+  const inactiveLinkClass = "text-[#b8c5d6] hover:text-[#00d9ff]";
   const activeLinkClass = "text-[#00d9ff]";
 
   const isVenues = pathname.startsWith("/venues");
@@ -31,6 +33,12 @@ export default function Nav() {
     await signOut();
     setMobileMenuOpen(false);
   };
+
+  const adminEmails = [
+    'ramiafeich@gmail.com',
+    ...((process.env.NEXT_PUBLIC_ADMIN_EMAILS || '').split(',').map(s => s.trim()).filter(Boolean)),
+  ];
+  const isAdmin = !!user?.email && adminEmails.includes(user.email);
 
   return (
     <nav className="w-full bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
@@ -62,21 +70,21 @@ export default function Nav() {
           <div className="hidden md:flex items-center gap-8">
             <Link
               href="/games"
-              className={`${baseLinkClass} ${isFindGames ? activeLinkClass : ""}`}
+              className={`${baseLinkClass} ${isFindGames ? activeLinkClass : inactiveLinkClass}`}
               aria-current={isFindGames ? "page" : undefined}
             >
               Join a Game
             </Link>
             <Link
               href="/games/new"
-              className={`${baseLinkClass} ${isHostGame ? activeLinkClass : ""}`}
+              className={`${baseLinkClass} ${isHostGame ? activeLinkClass : inactiveLinkClass}`}
               aria-current={isHostGame ? "page" : undefined}
             >
               Host a Game
             </Link>
             <Link
               href="/venues"
-              className={`${baseLinkClass} ${isVenues ? activeLinkClass : ""}`}
+              className={`${baseLinkClass} ${isVenues ? activeLinkClass : inactiveLinkClass}`}
               aria-current={isVenues ? "page" : undefined}
             >
               Find a Court
@@ -96,6 +104,17 @@ export default function Nav() {
               <span className="text-sm font-medium">My Bookings</span>
             </Link>
             
+            {isAdmin && (
+              <Link
+                href="/admin/reports"
+                className="hidden md:flex items-center gap-2 px-3 py-2 border border-white/20 rounded-lg hover:bg-white/10 text-[#b8c5d6]"
+                title="Admin"
+              >
+                <ShieldCheck className="h-4 w-4 text-[#00ff88]" />
+                <span className="text-sm">Admin</span>
+              </Link>
+            )}
+
             {user ? (
               <AccountMenu />
             ) : (
@@ -126,9 +145,7 @@ export default function Nav() {
             <Link
               href="/games"
               className={`block py-2 ${
-                isFindGames
-                  ? "text-[#00d9ff]"
-                  : "text-[#b8c5d6] hover:text-[#00d9ff]"
+                isFindGames ? "text-[#00d9ff]" : "text-[#b8c5d6] hover:text-[#00d9ff]"
               } transition-colors`}
               onClick={() => setMobileMenuOpen(false)}
               aria-current={isFindGames ? "page" : undefined}
@@ -182,6 +199,15 @@ export default function Nav() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sign In
+              </Link>
+            )}
+            {isAdmin && (
+              <Link
+                href="/admin/reports"
+                className="block py-2 text-[#b8c5d6] hover:text-[#00d9ff]"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Admin
               </Link>
             )}
           </div>

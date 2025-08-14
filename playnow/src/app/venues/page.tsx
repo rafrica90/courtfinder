@@ -1,5 +1,6 @@
 import VenuesClient from "@/components/VenuesClient";
 import SearchBar from "@/components/SearchBar";
+import VenueFilters from "@/components/VenueFilters";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 
 export default async function VenuesPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[]>> }) {
@@ -91,6 +92,15 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
       <div className="bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10 sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <SearchBar variant="compact" />
+        </div>
+        {/* Sticky horizontal filter bar directly under search */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+          <VenueFilters
+            currentSport={sport}
+            availableCountries={Array.from(new Set((filtered ?? []).map((v:any)=> v.country).filter(Boolean))).sort()}
+            availableStates={Array.from(new Set((filtered ?? []).map((v:any)=> v.state).filter(Boolean))).sort()}
+            availableSuburbs={Array.from(new Set((filtered ?? []).map((v:any)=> v.city).filter(Boolean))).sort()}
+          />
         </div>
       </div>
 

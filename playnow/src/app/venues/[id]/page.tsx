@@ -56,9 +56,6 @@ export default async function VenueDetail({ params }: { params: Promise<{ id: st
         <div className="flex items-start justify-between mb-6">
           <div>
             <div className="flex items-center gap-2 text-white/90 mb-2">
-              <span className="px-3 py-1 bg-[#00ff88] text-[#0a1628] rounded-full text-sm font-bold">
-                {venue.indoorOutdoor === "indoor" ? "Indoor" : venue.indoorOutdoor === "outdoor" ? "Outdoor" : "Indoor & Outdoor"}
-              </span>
               <span className="px-3 py-1 bg-[#00d9ff] text-[#0a1628] rounded-full text-sm font-bold">
                 {displaySport}
               </span>

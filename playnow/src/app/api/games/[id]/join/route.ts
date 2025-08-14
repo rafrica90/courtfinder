@@ -23,7 +23,7 @@ export async function POST(
       return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
-    // First check if the game exists and get current participant count
+    // First check if the game exists
     const { data: game, error: gameError } = await supabase
       .from('games')
       .select(`
@@ -52,17 +52,13 @@ export async function POST(
       }, { status: 400 });
     }
 
-    // Count current participants with 'joined' status
-    const joinedParticipants = game.participants.filter((p: any) => p.status === 'joined').length;
-    const status = joinedParticipants < game.max_players ? 'joined' : 'waitlist';
-
-    // Add the participant
+    // Add the participant as pending approval by host
     const { data: participant, error } = await supabase
       .from('participants')
       .insert({
         game_id: gameId,
         user_id: userId,
-        status
+        status: 'pending'
       })
       .select()
       .single();
@@ -76,7 +72,7 @@ export async function POST(
 
     return NextResponse.json({ 
       participant,
-      message: status === 'joined' ? 'Successfully joined game!' : 'Added to waitlist'
+      message: 'Join request sent to host for approval'
     }, { status: 201 });
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {

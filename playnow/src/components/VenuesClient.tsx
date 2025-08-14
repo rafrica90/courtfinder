@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api-client";
 import VenueCard from "./VenueCard";
-import VenueFilters, { FilterState } from "./VenueFilters";
+import type { FilterState } from "./VenueFilters";
 
 interface Venue {
   id: string;
@@ -42,13 +43,14 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
   const [locationError, setLocationError] = useState<string | null>(null);
   const { user } = useAuth();
   const [favoriteVenueIds, setFavoriteVenueIds] = useState<string[] | null>(null);
+  const searchParams = useSearchParams();
 
   // Apply server-provided name query again on the client to guarantee filtering
   useEffect(() => {
     const query = (searchedVenueName ?? "").toString().trim().toLowerCase().replace(/\+/g, " ");
     
     // Get filter states from URL (consistent with VenueFilters.tsx)
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(searchParams?.toString());
     const urlVenueTypes = params.get('venueTypes')?.split(',').filter(Boolean) || [];
     const urlSports = params.get('sports')?.split(',').filter(Boolean) || [];
     const legacySport = sport ? [sport] : [];
@@ -95,7 +97,7 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     
     setFilteredVenues(newlyFiltered);
     setVenues(newlyFiltered);
-  }, [searchedVenueName, sport, initialVenues]);
+  }, [searchedVenueName, sport, initialVenues, searchParams]);
 
   // Load favorites when user logs in
   useEffect(() => {
@@ -130,16 +132,7 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
         if (!normalized.some(s => wanted.has(s))) return false;
       }
 
-      // Venue type filter
-      if (filters.venueTypes.length > 0) {
-        const matchesVenueType = filters.venueTypes.some(type => {
-          if (!venue.indoorOutdoor) return false;
-          const venueType = venue.indoorOutdoor.toLowerCase();
-          if (venueType === 'both') return true; // 'both' should match any selection
-          return venueType === type.toLowerCase();
-        });
-        if (!matchesVenueType) return false;
-      }
+      // Venue type filter removed
 
       // Favorites-only filter
       if (filters.favoritesOnly) {
@@ -194,23 +187,10 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     setVenues(sortedVenues);
   };
 
-  // Derive available geo options from venues
-  const availableCountries = Array.from(new Set(allVenues.map(v => v.country).filter(Boolean) as string[])).sort();
-  const availableStates = Array.from(new Set(allVenues.map(v => v.state).filter(Boolean) as string[])).sort();
-  const availableSuburbs = Array.from(new Set(allVenues.map(v => v.city).filter(Boolean) as string[])).sort();
+  // Derive available geo options moved to page header when rendering filter bar
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Horizontal Filter Bar under search */}
-      <VenueFilters
-        currentSport={sport}
-        onFiltersChange={handleFiltersChange}
-        availableCountries={availableCountries}
-        availableStates={availableStates}
-        availableSuburbs={availableSuburbs}
-        sortVenues={{ venues: filteredVenues, onSortedVenues: handleSortedVenues, userLocation: userLocation ?? undefined }}
-      />
-
       <div className="flex-1">
         <div className="flex justify-between items-start md:items-center gap-4">
           <div>
@@ -239,6 +219,17 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
               )}
             </div>
           </div>
+        </div>
+
+        {/* Sort selector below the bar */}
+        <div className="mt-3">
+          {/* Reuse existing sort component */}
+          {/** We inline import to avoid circular deps at runtime **/}
+          {require('./VenueSort').default({
+            venues: filteredVenues as any,
+            onSortedVenues: handleSortedVenues as any,
+            userLocation: userLocation ?? undefined,
+          })}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">

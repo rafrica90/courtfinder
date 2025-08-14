@@ -4,39 +4,30 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Star, Volleyball, MapPin, ChevronDown, Building2 } from "lucide-react";
 import { sports as allSports } from "@/lib/mockData";
-import VenueSort from "./VenueSort";
 
 interface VenueFiltersProps {
   currentSport?: string;
-  onFiltersChange: (filters: FilterState) => void;
+  onFiltersChange?: (filters: FilterState) => void;
   availableCountries: string[];
   availableStates: string[];
   availableSuburbs: string[];
-  // Sort control props
-  sortVenues: {
-    venues: Array<{ id: string; name: string; latitude?: number; longitude?: number }>;
-    onSortedVenues: (sorted: Array<{ id: string; name: string; latitude?: number; longitude?: number }>) => void;
-    userLocation?: { lat: number; lng: number };
-  };
 }
 
 export interface FilterState {
   sports: string[];
-  venueTypes: string[];
   favoritesOnly?: boolean;
   country?: string;
   state?: string;
   suburb?: string;
 }
 
-export default function VenueFilters({ currentSport, onFiltersChange, availableCountries, availableStates, availableSuburbs, sortVenues }: VenueFiltersProps) {
+export default function VenueFilters({ currentSport, onFiltersChange, availableCountries, availableStates, availableSuburbs }: VenueFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
   const [filters, setFilters] = useState<FilterState>({
     sports: [],
-    venueTypes: [],
     favoritesOnly: false,
     country: undefined,
     state: undefined,
@@ -47,7 +38,6 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
 
   // Initialize filters from URL params whenever the URL changes
   useEffect(() => {
-    const urlVenueTypes = searchParams.get('venueTypes')?.split(',').filter(Boolean) || [];
     const favoritesOnly = searchParams.get('favorites') === '1';
     const sportsFromParam = searchParams.get('sports')?.split(',').filter(Boolean) || [];
     const legacySport = searchParams.get('sport') || currentSport || undefined;
@@ -59,7 +49,6 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
 
     const initialFilters: FilterState = {
       sports: mergedSports,
-      venueTypes: urlVenueTypes,
       favoritesOnly,
       country,
       state,
@@ -67,22 +56,17 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
     };
 
     setFilters(initialFilters);
-    onFiltersChange(initialFilters);
+    if (onFiltersChange) onFiltersChange(initialFilters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, currentSport]);
 
   const updateFilters = (newFilters: FilterState) => {
     setFilters(newFilters);
-    onFiltersChange(newFilters);
+    if (onFiltersChange) onFiltersChange(newFilters);
 
     // Update URL params
     const params = new URLSearchParams(searchParams);
 
-    if (newFilters.venueTypes.length > 0) {
-      params.set('venueTypes', newFilters.venueTypes.join(','));
-    } else {
-      params.delete('venueTypes');
-    }
     if (newFilters.favoritesOnly) {
       params.set('favorites', '1');
     } else {
@@ -108,18 +92,13 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
     updateFilters({ ...filters, sports: updated });
   };
 
-  const handleVenueTypeChange = (venueType: string, checked: boolean) => {
-    const newVenueTypes = checked
-      ? [...filters.venueTypes, venueType]
-      : filters.venueTypes.filter(v => v !== venueType);
-    updateFilters({ ...filters, venueTypes: newVenueTypes });
-  };
+  // Venue type removed
 
   const handleFavoritesOnlyChange = (checked: boolean) => {
     updateFilters({ ...filters, favoritesOnly: checked });
   };
 
-  const [open, setOpen] = useState<null | 'sports' | 'locations' | 'types'>(null);
+  const [open, setOpen] = useState<null | 'sports' | 'locations'>(null);
 
   const renderTagText = (items: string[], empty: string) => {
     if (items.length === 0) return empty;
@@ -155,13 +134,8 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
 
   return (
     <div className="bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10 sticky top-32 z-30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 items-start">
-          {/* Sort */}
-          <div className="min-w-0">
-            <VenueSort venues={sortVenues.venues as any} onSortedVenues={sortVenues.onSortedVenues as any} userLocation={sortVenues.userLocation} />
-          </div>
-
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 overflow-x-auto">
+        <div className="min-w-max flex items-start gap-3">
           {/* Sports dropdown */}
           <div className="min-w-0" onKeyDown={(e)=>{ if(e.key==='Escape') setOpen(null); }}>
             <button
@@ -242,39 +216,7 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
             )}
           </div>
 
-          {/* Venue Type dropdown */}
-          <div className="min-w-0">
-            <button
-              type="button"
-              onClick={() => setOpen((o) => (o === 'types' ? null : 'types'))}
-              className="w-full h-10 px-3 rounded-md bg-white/5 border border-white/10 text-white flex items-center justify-between"
-              aria-expanded={open === 'types'}
-            >
-              <span className="flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-[#00d9ff]" />
-                <span className="truncate">{renderTagText(filters.venueTypes.map((t)=> t[0].toUpperCase()+t.slice(1)), 'Venue type')}</span>
-              </span>
-              <ChevronDown className={`h-4 w-4 transition-transform ${open === 'types' ? 'rotate-180' : ''}`} />
-            </button>
-            {open === 'types' && (
-              <div className="absolute z-50 mt-2 bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-64 overflow-auto p-2 min-w-[16rem]">
-                {[
-                  { value: 'indoor', label: 'Indoor' },
-                  { value: 'outdoor', label: 'Outdoor' },
-                ].map((opt) => (
-                  <label key={opt.value} className="flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer text-white">
-                    <input
-                      type="checkbox"
-                      className="accent-[#00d9ff]"
-                      checked={filters.venueTypes.includes(opt.value)}
-                      onChange={() => handleVenueTypeChange(opt.value, !filters.venueTypes.includes(opt.value))}
-                    />
-                    <span>{opt.label}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
+        {/* Venue type removed */}
 
           {/* Favorites toggle */}
           <div className="min-w-0">
@@ -288,10 +230,10 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
           </div>
 
           {/* Clear link */}
-          {(filters.sports.length > 0 || filters.venueTypes.length > 0 || filters.favoritesOnly || filters.country || filters.state || filters.suburb) && (
+          {(filters.sports.length > 0 || filters.favoritesOnly || filters.country || filters.state || filters.suburb) && (
             <div className="sm:col-span-5">
               <button
-                onClick={() => updateFilters({ sports: [], venueTypes: [], favoritesOnly: false, country: undefined, state: undefined, suburb: undefined })}
+                onClick={() => updateFilters({ sports: [], favoritesOnly: false, country: undefined, state: undefined, suburb: undefined })}
                 className="text-sm text-[#00d9ff] hover:text-[#00ff88]"
               >
                 Clear all filters

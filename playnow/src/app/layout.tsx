@@ -15,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <a className="mx-3 underline text-[var(--primary)] hover:text-[var(--primary-hover)]" href="/privacy">Privacy Policy</a>
               <a className="mx-3 underline text-[var(--primary)] hover:text-[var(--primary-hover)]" href="/terms">Terms</a>
               <a className="mx-3 underline text-[var(--primary)] hover:text-[var(--primary-hover)]" href="/cookie">Cookie Policy</a>
+              <a className="mx-3 underline text-[var(--primary)] hover:text-[var(--primary-hover)]" href="/about">About</a>
             </nav>
           </footer>
         </AuthProvider>

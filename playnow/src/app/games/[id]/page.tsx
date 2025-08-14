@@ -79,10 +79,12 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
   const [showSkillPrompt, setShowSkillPrompt] = useState(false);
   const [pendingSkill, setPendingSkill] = useState('');
   const [existingLevels, setExistingLevels] = useState<Record<string, string>>({});
+  const [isRequestsOpen, setIsRequestsOpen] = useState(false);
   
   const isHost = gameData?.hostUserId === currentUserId;
-  const currentParticipant = gameData ? [...gameData.participants, ...gameData.waitlist]
+  const currentParticipant = gameData ? [...gameData.participants, ...gameData.waitlist, ...(gameData as any).pending || []]
     .find(p => p.userId === currentUserId) : null;
+  const myJoinStatus = (currentParticipant?.status as 'joined' | 'waitlist' | 'pending' | undefined) || undefined;
   const spotsLeft = gameData ? gameData.maxPlayers - gameData.participants.length : 0;
 
   // Fetch actual game data on mount
@@ -122,6 +124,16 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
               userId: p.user_id,
               name: `Player ${p.id.slice(0, 4)}`,
               status: 'waitlist' as const,
+              joinedAt: p.created_at
+            }));
+
+          const pendingParticipants = (game.participants || [])
+            .filter((p: RawParticipant) => p.status === 'pending')
+            .map((p: RawParticipant) => ({
+              id: p.id,
+              userId: p.user_id,
+              name: `Player ${p.id.slice(0, 4)}`,
+              status: 'pending' as const,
               joinedAt: p.created_at
             }));
           
@@ -194,14 +206,15 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
             costInstructions: game.cost_instructions || (game.cost_per_player ? `$${game.cost_per_player} per person` : ''),
             level: game.skill_level || 'All Levels',
             participants: joinedParticipants,
-            waitlist: waitlistParticipants
+            waitlist: waitlistParticipants,
+            pending: pendingParticipants
           };
           
           setGameData(transformedData);
           
           // Check if current user is joined
           if (currentUserId) {
-            const isUserJoined = game.participants?.some((p: any) => p.user_id === currentUserId);
+            const isUserJoined = game.participants?.some((p: any) => p.user_id === currentUserId && (p.status === 'joined' || p.status === 'waitlist' || p.status === 'pending'));
             setIsJoined(isUserJoined || false);
           }
           
@@ -224,9 +237,10 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
   useEffect(() => {
     const fetchProfiles = async () => {
       if (!gameData) return;
-      const userIds = Array.from(new Set([
+    const userIds = Array.from(new Set([
         ...gameData.participants.map(p => p.userId),
-        ...gameData.waitlist.map(p => p.userId)
+        ...gameData.waitlist.map(p => p.userId),
+        ...((gameData as any).pending || []).map((p: any) => p.userId)
       ]));
       if (userIds.length === 0) return;
       const { data, error } = await api.profiles.getPublic(userIds);
@@ -275,7 +289,7 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
               joinedAt: new Date().toISOString()
             }]
           }));
-        } else {
+        } else if (data.participant?.status === 'waitlist') {
           setGameData(prev => ({
             ...prev!,
             waitlist: [...(prev?.waitlist || []), {
@@ -283,6 +297,17 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
               userId: currentUserId || '',
               name: "You",
               status: 'waitlist' as const,
+              joinedAt: new Date().toISOString()
+            }]
+          }));
+        } else if (data.participant?.status === 'pending') {
+          setGameData(prev => ({
+            ...prev!,
+            pending: [...(((prev as any)?.pending) || []), {
+              id: data.participant.id,
+              userId: currentUserId || '',
+              name: "You",
+              status: 'pending' as const,
               joinedAt: new Date().toISOString()
             }]
           }));
@@ -300,7 +325,7 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
       router.push('/sign-in');
       return;
     }
-    // Check if user has skill level for this sport
+    // Optional skill-level check (non-blocking): proceed with join even if missing
     try {
       const supabase = getSupabaseBrowserClient();
       const sportSlug = normalizedSportSlug();
@@ -309,12 +334,11 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
           .from('profiles')
           .select('sport_skill_levels')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
         const levels = (row?.sport_skill_levels as Record<string, string>) || {};
         if (!levels[sportSlug]) {
           setExistingLevels(levels);
-          setShowSkillPrompt(true);
-          return; // wait for user to set level, then join
+          // Do not block join; we can prompt user later to set skill level
         }
       }
     } catch {}
@@ -361,8 +385,9 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
       setGameData(prev => ({
         ...prev,
         participants: prev.participants.filter(p => p.userId !== currentUserId),
-        waitlist: prev.waitlist.filter(p => p.userId !== currentUserId)
-      }));
+        waitlist: prev.waitlist.filter(p => p.userId !== currentUserId),
+        ...(prev as any).pending ? { pending: ((prev as any).pending).filter((p: any) => p.userId !== currentUserId) } : {}
+      } as any));
       
       // Optionally refresh the page to get latest data
       router.refresh();
@@ -403,6 +428,10 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const scrollToJoinRequests = async () => {
+    setIsRequestsOpen(true);
   };
 
   // Show loading state
@@ -508,6 +537,11 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
             <div className="flex flex-col gap-3 lg:w-48">
               {isHost ? (
                 <>
+                  {(gameData as any)?.pending && ((gameData as any).pending.length > 0) && (
+                    <button onClick={scrollToJoinRequests} className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-400 transition-colors font-bold text-center">
+                      Review Requests ({(gameData as any).pending.length})
+                    </button>
+                  )}
                   <button 
                     onClick={handleEditGame}
                     disabled={isLoading}
@@ -525,7 +559,14 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                 </>
               ) : (
                 <>
-                  {isJoined ? (
+                  {myJoinStatus === 'pending' ? (
+                    <button 
+                      disabled
+                      className="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold flex items-center justify-center gap-2 cursor-default"
+                    >
+                      Pending approval
+                    </button>
+                  ) : isJoined ? (
                     <button 
                       onClick={handleLeaveGame}
                       disabled={isLoading}
@@ -647,6 +688,60 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {isHost && isRequestsOpen && (gameData as any).pending && ((gameData as any).pending.length > 0) && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/60" onClick={() => setIsRequestsOpen(false)} />
+                <div className="relative z-10 w-full max-w-lg bg-[#0f1f3a] border border-white/10 rounded-xl shadow-xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-white">Join Requests</h3>
+                    <button onClick={() => setIsRequestsOpen(false)} className="text-[#b8c5d6] hover:text-white">Close</button>
+                  </div>
+                  <div className="space-y-3">
+                    {((gameData as any).pending as any[]).map((participant: any) => {
+                      const pub = publicProfiles[participant.userId];
+                      const sportsText = pub && pub.sports.length > 0 ? pub.sports.join(', ') : 'Sports not set';
+                      const levelText = pub ? pub.skillLevel : 'All Levels';
+                      return (
+                        <div key={participant.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                          <div>
+                            <div className="text-white font-medium">{sportsText}</div>
+                            <div className="text-xs text-[#7a8b9a]">{levelText}</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              className="px-3 py-1 bg-[#00ff88] text-[#0a1628] rounded hover:bg-[#00cc6a] text-sm font-bold"
+                              onClick={async () => {
+                                const gameId = (await params).id;
+                                const { data, error } = await api.games.approveParticipant(gameId, participant.id);
+                                if (!error && data?.participant) {
+                                  setGameData((prev: any) => {
+                                    const rest = (prev.pending || []).filter((p: any) => p.id !== participant.id);
+                                    if (data.participant.status === 'joined') {
+                                      return { ...prev, pending: rest, participants: [...prev.participants, { ...participant, status: 'joined' }] };
+                                    }
+                                    return { ...prev, pending: rest, waitlist: [...prev.waitlist, { ...participant, status: 'waitlist' }] };
+                                  });
+                                }
+                              }}
+                            >Approve</button>
+                            <button
+                              className="px-3 py-1 border border-red-500 text-red-400 rounded hover:bg-red-500/10 text-sm"
+                              onClick={async () => {
+                                const gameId = (await params).id;
+                                const { data, error } = await api.games.denyParticipant(gameId, participant.id);
+                                if (!error && data?.participant) {
+                                  setGameData((prev: any) => ({ ...prev, pending: (prev.pending || []).filter((p: any) => p.id !== participant.id) }));
+                                }
+                              }}
+                            >Deny</button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Participants */}
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
               <h2 className="text-xl font-bold text-white mb-4">
@@ -708,6 +803,63 @@ export default function GameDetailPage({ params }: { params: Promise<{ id: strin
                               {participant.userId === currentUserId && (
                                 <span className="text-xs text-[#00d9ff] ml-1">(You)</span>
                               )}
+
+            {/* Pending approvals (host only) */}
+            {isHost && (gameData as any).pending && ((gameData as any).pending.length > 0) && (
+              <div id="join-requests" tabIndex={-1} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                <h2 className="text-xl font-bold text-white mb-4">Join Requests ({(gameData as any).pending.length})</h2>
+                <div className="space-y-3">
+                  {((gameData as any).pending as any[]).map((participant: any) => {
+                    const pub = publicProfiles[participant.userId];
+                    const sportsText = pub && pub.sports.length > 0 ? pub.sports.join(', ') : 'Sports not set';
+                    const levelText = pub ? pub.skillLevel : 'All Levels';
+                    return (
+                      <div key={participant.id} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-yellow-400">
+                              {(pub && pub.sports[0] ? pub.sports[0] : 'R').charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-white font-medium">{sportsText}</p>
+                            <p className="text-xs text-[#7a8b9a]">{levelText}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            className="px-3 py-1 bg-[#00ff88] text-[#0a1628] rounded hover:bg-[#00cc6a] text-sm font-bold"
+                            onClick={async () => {
+                              const gameId = (await params).id;
+                              const { data, error } = await api.games.approveParticipant(gameId, participant.id);
+                              if (!error && data?.participant) {
+                                setGameData((prev: any) => {
+                                  const rest = (prev.pending || []).filter((p: any) => p.id !== participant.id);
+                                  if (data.participant.status === 'joined') {
+                                    return { ...prev, pending: rest, participants: [...prev.participants, { ...participant, status: 'joined' }] };
+                                  }
+                                  return { ...prev, pending: rest, waitlist: [...prev.waitlist, { ...participant, status: 'waitlist' }] };
+                                });
+                              }
+                            }}
+                          >Approve</button>
+                          <button
+                            className="px-3 py-1 border border-red-500 text-red-400 rounded hover:bg-red-500/10 text-sm"
+                            onClick={async () => {
+                              const gameId = (await params).id;
+                              const { data, error } = await api.games.denyParticipant(gameId, participant.id);
+                              if (!error && data?.participant) {
+                                setGameData((prev: any) => ({ ...prev, pending: (prev.pending || []).filter((p: any) => p.id !== participant.id) }));
+                              }
+                            }}
+                          >Deny</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
                             </p>
                           </div>
                         </div>

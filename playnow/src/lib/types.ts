@@ -49,7 +49,7 @@ export type Participant = {
   id: string;
   gameId: string;
   userId: string;
-  status: "joined" | "waitlist";
+  status: "pending" | "joined" | "waitlist" | "denied";
 };
 
 export type Profile = {

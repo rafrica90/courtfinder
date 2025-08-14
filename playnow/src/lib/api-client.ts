@@ -16,15 +16,15 @@ class ApiClient {
     this.baseUrl = '';
   }
 
-  private async getAuthHeaders(): Promise<HeadersInit> {
+  private async getAuthHeaders(): Promise<Record<string, string>> {
     const supabase = getSupabaseBrowserClient();
     if (!supabase) {
-      return {};
+      return {} as Record<string, string>;
     }
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
-      return {};
+      return {} as Record<string, string>;
     }
 
     return {
@@ -40,7 +40,7 @@ class ApiClient {
 
     try {
       // Get auth headers if required
-      const authHeaders = requireAuth ? await this.getAuthHeaders() : {};
+      const authHeaders = requireAuth ? await this.getAuthHeaders() : {} as Record<string, string>;
 
       // Check if we have auth when required
       if (requireAuth && !authHeaders['Authorization']) {
@@ -171,6 +171,14 @@ export const api = {
     // Leave game
     leave: (id: string) => 
       apiClient.delete(`/api/games/${id}/join`),
+
+    // Approve participant
+    approveParticipant: (gameId: string, participantId: string) =>
+      apiClient.put(`/api/games/${gameId}/participants/${participantId}`, { action: 'approve' }),
+
+    // Deny participant
+    denyParticipant: (gameId: string, participantId: string) =>
+      apiClient.put(`/api/games/${gameId}/participants/${participantId}`, { action: 'deny' }),
   },
   
   clicks: {
@@ -192,5 +200,18 @@ export const api = {
     toggle: (venueId: string) => apiClient.post<{ favorites: string[] }>("/api/favorites", { venueId, action: "toggle" }),
     add: (venueId: string) => apiClient.post<{ favorites: string[] }>("/api/favorites", { venueId, action: "add" }),
     remove: (venueId: string) => apiClient.post<{ favorites: string[] }>("/api/favorites", { venueId, action: "remove" }),
+  },
+  reports: {
+    submit: (payload: { venueId?: string | null; message: string; category?: string | null; pageUrl?: string | null }) =>
+      apiClient.post('/api/reports', payload),
+    list: (opts?: { status?: string; limit?: number }) => {
+      const params = new URLSearchParams();
+      if (opts?.status) params.set('status', opts.status);
+      if (opts?.limit) params.set('limit', String(opts.limit));
+      const q = params.toString();
+      return apiClient.get<{ reports: any[] }>(`/api/reports${q ? `?${q}` : ''}`);
+    },
+    updateStatus: (id: string, status: 'open' | 'reviewing' | 'resolved' | 'dismissed') =>
+      apiClient.put(`/api/reports/${id}`, { status }),
   },
 };

@@ -26,7 +26,7 @@ interface GamesClientProps {
 }
 
 export default function GamesClient({ games }: GamesClientProps) {
-  const [filters, setFilters] = useState<GamesFilters>({ sort: 'distance', sports: [], locations: [], venueTypes: [], favoritesOnly: false, date: 'any' });
+  const [filters, setFilters] = useState<GamesFilters>({ sort: 'distance', sports: [], locations: [], favoritesOnly: false, date: 'any' });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const { user } = useAuth();
   const [favoriteVenueIds, setFavoriteVenueIds] = useState<string[] | null>(null);
@@ -55,14 +55,7 @@ export default function GamesClient({ games }: GamesClientProps) {
       const locSet = new Set(filters.locations.map((l) => l.toLowerCase()));
       list = list.filter((g) => (g.city ? locSet.has(g.city.toLowerCase()) : false));
     }
-    if (filters.venueTypes && filters.venueTypes.length > 0) {
-      list = list.filter((g) => {
-        const t = (g as any).indoorOutdoor?.toLowerCase?.() as string | undefined;
-        if (!t) return false;
-        if (t === 'both') return true;
-        return filters.venueTypes!.some((v) => v.toLowerCase() === t);
-      });
-    }
+    // venue type filter removed
     if (filters.favoritesOnly) {
       if (Array.isArray(favoriteVenueIds)) {
         list = list.filter((g) => favoriteVenueIds.includes((g as any).venueId || ''));

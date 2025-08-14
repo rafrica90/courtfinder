@@ -2,6 +2,26 @@ import { createClient } from '@supabase/supabase-js';
 import fs from 'fs/promises';
 import path from 'path';
 
+async function loadEnvLocal() {
+  const envPath = path.join(process.cwd(), 'playnow', '.env.local');
+  try {
+    const content = await fs.readFile(envPath, 'utf8');
+    for (const line of content.split(/\r?\n/)) {
+      const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
+      if (m) {
+        const key = m[1];
+        let value = m[2];
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.slice(1, -1);
+        }
+        if (!process.env[key]) process.env[key] = value;
+      }
+    }
+  } catch (_) {
+    // ignore if missing
+  }
+}
+
 function getEnv(name, required = true) {
   const val = process.env[name];
   if (required && !val) throw new Error(`Missing required env var: ${name}`);
@@ -28,6 +48,7 @@ function normalizeUrl(url) {
 }
 
 async function main() {
+  await loadEnvLocal();
   const nameArg = process.argv.slice(2).join(' ').trim();
   if (!nameArg) throw new Error('Usage: node scripts/delete-venue-by-name.mjs "<venue name>"');
   const target = nameArg.toLowerCase();

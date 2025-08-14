@@ -12,6 +12,8 @@ type EnvConfig = {
   ALLOWED_IMAGE_DOMAINS?: string;
   ALLOWED_REDIRECT_DOMAINS?: string;
   HERE_API_KEY?: string; // server-side only
+  GOOGLE_MAPS_API_KEY?: string; // server-side only for Places
+  NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY?: string; // browser-restricted key for Place Photos URLs
 };
 
 class EnvValidationError extends Error {
@@ -94,6 +96,8 @@ export function validateEnv(): EnvConfig {
     ALLOWED_IMAGE_DOMAINS: process.env.ALLOWED_IMAGE_DOMAINS,
     ALLOWED_REDIRECT_DOMAINS: process.env.ALLOWED_REDIRECT_DOMAINS,
     HERE_API_KEY: process.env.HERE_API_KEY,
+    GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
+    NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY,
   };
 }
 

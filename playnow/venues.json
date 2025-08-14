@@ -614,13 +614,13 @@
     },
     {
       "venue_name": "Hensley Athletic Field",
-      "address": "Dunc Gray Velodrome, Bass Hill NSW 2197",
+      "address": "Wentworth Avenue, Pagewood NSW 2035",
       "sports": [
         "soccer",
         "athletics"
       ],
       "indoor_outdoor": "outdoor",
-      "booking_url": "https://www.bankstown.nsw.gov.au/hensley-field",
+      "booking_url": "https://www.bayside.nsw.gov.au/explore/recreation-parks/hensley-athletic-field",
       "image_urls": [
         "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=800&q=80"
       ],

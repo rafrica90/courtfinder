@@ -10,6 +10,7 @@
     "import:venues": "node -r dotenv/config scripts/import-venues.mjs",
     "geocode:venues": "node -r dotenv/config scripts/geocode-venues.mjs",
     "import:csv": "node -r dotenv/config scripts/import-csv-venues.mjs",
+    "update:booking": "node -r dotenv/config scripts/update-booking-links.mjs",
     "report:coords": "node -r dotenv/config scripts/report-venue-coords.mjs",
     "report:dupes": "node -r dotenv/config scripts/report-venue-dupes.mjs",
     "export:venues": "node -r dotenv/config scripts/export-venues.mjs",
@@ -18,6 +19,7 @@
     "update:cities": "node -r dotenv/config scripts/update-venue-cities.mjs",
     "normalize:locations": "node -r dotenv/config scripts/normalize-venues-location.mjs",
     "discover:nz": "node -r dotenv/config scripts/discover-nz-venues.mjs",
+    "backfill:placeids": "node -r dotenv/config scripts/backfill-place-ids.mjs",
     "combine:csvs": "node scripts/combine-csvs.mjs",
     "security:check": "npm audit && npm run lint && npm run build",
     "deploy:prepare": "chmod +x railway-deploy.sh && ./railway-deploy.sh"

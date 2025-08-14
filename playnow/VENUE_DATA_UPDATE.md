@@ -12,7 +12,10 @@ This guide explains how to push updated venue data to the database safely and re
 - macOS example:
 ```bash
 cd /Users/ram/FINDDDDDD/playnow
-cp ENV_EXAMPLE.md .env.local  # then edit values
+# Create .env.local and populate with values shown in ENV_EXAMPLE.md
+touch .env.local
+# Open .env.local and paste the keys from ENV_EXAMPLE.md with real values
+open -e .env.local
 ```
 
 ### 2) Quick reference: scripts

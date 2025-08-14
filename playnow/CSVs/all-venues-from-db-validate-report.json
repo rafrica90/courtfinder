@@ -1,0 +1,788 @@
+{
+  "inputPath": "/Users/ram/FINDDDDDD/playnow/CSVs/all-venues-from-db.csv",
+  "outputPath": "/Users/ram/FINDDDDDD/playnow/CSVs/all-venues-from-db-validated.csv",
+  "failedCount": 78,
+  "total": 394,
+  "failures": [
+    {
+      "index": 1,
+      "venue": "Clifton Hill Tennis Club – Pickleball Sessions",
+      "city": "Abbotsford",
+      "state": "VIC",
+      "sports": "pickleball, tennis",
+      "originalUrl": "https://cliftonhilltc.org.au",
+      "normalizedUrl": "https://cliftonhilltc.org.au",
+      "error": "fetch failed"
+    },
+    {
+      "index": 11,
+      "venue": "Perry Park Recreation Centre",
+      "city": "Alexandria",
+      "state": "",
+      "sports": "futsal, pickleball",
+      "originalUrl": "https://www.cityofsydney.nsw.gov.au/venues-facilities/perry-park-recreation-centre",
+      "normalizedUrl": "https://www.cityofsydney.nsw.gov.au/venues-facilities/perry-park-recreation-centre",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 6,
+      "venue": "Melbourne Sports & Aquatic Centre (MSAC) – Stadium Courts",
+      "city": "Albert Park",
+      "state": "VIC",
+      "sports": "futsal, soccer",
+      "originalUrl": "https://msac.perfectgym.com.au/clientportal2",
+      "normalizedUrl": "https://msac.perfectgym.com.au/clientportal2",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 23,
+      "venue": "Gladstone Park",
+      "city": "Balmain",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/gladstone-park",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/gladstone-park",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 22,
+      "venue": "Easton Park",
+      "city": "Balmain",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/easton-park",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/easton-park",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 10,
+      "venue": "Kikoff Football Alexandria",
+      "city": "Alexandria",
+      "state": "",
+      "sports": "futsal, soccer",
+      "originalUrl": "https://kikoff.com.au/alexandria",
+      "normalizedUrl": "https://kikoff.com.au/alexandria",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 27,
+      "venue": "Hensley Athletic Field",
+      "city": "Pagewood",
+      "state": "NSW",
+      "sports": "soccer",
+      "originalUrl": "https://www.bayside.nsw.gov.au/explore/recreation-parks/hensley-athletic-field",
+      "normalizedUrl": "https://www.bayside.nsw.gov.au/explore/recreation-parks/hensley-athletic-field",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 34,
+      "venue": "Bendigo Regional Tennis Centre",
+      "city": "Bendigo",
+      "state": "VIC",
+      "sports": "tennis",
+      "originalUrl": "https://play.tennis.com.au/BendigoRegionalTennisCentre",
+      "normalizedUrl": "https://play.tennis.com.au/BendigoRegionalTennisCentre",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 39,
+      "venue": "Birchgrove Oval",
+      "city": "Birchgrove",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/birchgrove-oval",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/birchgrove-oval",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 31,
+      "venue": "Cooper Park Tennis",
+      "city": "Bellevue Hill",
+      "state": "NSW",
+      "sports": "tennis",
+      "originalUrl": "https://cooperparktennis.com.au/book-a-court",
+      "normalizedUrl": "https://cooperparktennis.com.au/book-a-court",
+      "error": "fetch failed"
+    },
+    {
+      "index": 55,
+      "venue": "Futsal Oz – Brunswick",
+      "city": "Brunswick",
+      "state": "VIC",
+      "sports": "futsal",
+      "originalUrl": "https://futsaloz.com/",
+      "normalizedUrl": "https://futsaloz.com/",
+      "error": "fetch failed"
+    },
+    {
+      "index": 42,
+      "venue": "Blackburn Tennis Club (Morton Park)",
+      "city": "Blackburn",
+      "state": "",
+      "sports": "tennis",
+      "originalUrl": "tennisvenues.com.au/venue/blackburn-vic-tc",
+      "normalizedUrl": "https://tennisvenues.com.au/venue/blackburn-vic-tc",
+      "error": "fetch failed"
+    },
+    {
+      "index": 48,
+      "venue": "Club Marconi Synthetic Fields",
+      "city": "Bossley Park",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.clubmarconi.com.au/field-hire",
+      "normalizedUrl": "https://www.clubmarconi.com.au/field-hire",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 28,
+      "venue": "City of Bayswater - The Rise",
+      "city": "Bayswater WA",
+      "state": "",
+      "sports": "futsal",
+      "originalUrl": "https://bayswaterrec.wa.gov.au/the-rise/social-sports-court-hire/",
+      "normalizedUrl": "https://bayswaterrec.wa.gov.au/the-rise/social-sports-court-hire/",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 29,
+      "venue": "City of Bayswater - The Rise (Pickleball)",
+      "city": "Bayswater WA",
+      "state": "",
+      "sports": "pickleball",
+      "originalUrl": "https://bayswaterrec.wa.gov.au/the-rise/social-sports-court-hire/",
+      "normalizedUrl": "https://bayswaterrec.wa.gov.au/the-rise/social-sports-court-hire/",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 63,
+      "venue": "Burwood Tennis Courts",
+      "city": "Burwood",
+      "state": "",
+      "sports": "tennis",
+      "originalUrl": "https://www.burwood.nsw.gov.au/tennis",
+      "normalizedUrl": "https://www.burwood.nsw.gov.au/tennis",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 69,
+      "venue": "5Sports Caringbah",
+      "city": "Caringbah",
+      "state": "NSW",
+      "sports": "soccer",
+      "originalUrl": "https://5sports.com.au/pitch-booking/",
+      "normalizedUrl": "https://5sports.com.au/pitch-booking/",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 71,
+      "venue": "Jubilee Oval",
+      "city": "Carlton",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.georgesriver.nsw.gov.au/jubilee-oval",
+      "normalizedUrl": "https://www.georgesriver.nsw.gov.au/jubilee-oval",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 77,
+      "venue": "Kingston Pickleball Centre",
+      "city": "Chelsea Heights",
+      "state": "VIC",
+      "sports": "pickleball",
+      "originalUrl": "https://kingstonpickleball.com.au",
+      "normalizedUrl": "https://kingstonpickleball.com.au",
+      "error": "fetch failed"
+    },
+    {
+      "index": 65,
+      "venue": "Camellia Indoor Sports Centre",
+      "city": "Camellia",
+      "state": "",
+      "sports": "futsal, pickleball",
+      "originalUrl": "https://www.cityofparramatta.nsw.gov.au/camellia-indoor",
+      "normalizedUrl": "https://www.cityofparramatta.nsw.gov.au/camellia-indoor",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 80,
+      "venue": "Monash Sport – Clayton (Recreation Hall & Games Hall)",
+      "city": "Clayton",
+      "state": "",
+      "sports": "futsal, soccer",
+      "originalUrl": "monash.edu/sport/facilities-and-court-hire/clayton",
+      "normalizedUrl": "https://monash.edu/sport/facilities-and-court-hire/clayton",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 88,
+      "venue": "Concord Oval Recreation Centre",
+      "city": "Concord",
+      "state": "",
+      "sports": "pickleball",
+      "originalUrl": "https://www.canadabay.nsw.gov.au/concord-oval",
+      "normalizedUrl": "https://www.canadabay.nsw.gov.au/concord-oval",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 89,
+      "venue": "Majors Bay Reserve – Synthetic Fields (Concord)",
+      "city": "Concord",
+      "state": "NSW",
+      "sports": "soccer",
+      "originalUrl": "https://www.canadabay.nsw.gov.au/majors-bay-reserve",
+      "normalizedUrl": "https://www.canadabay.nsw.gov.au/majors-bay-reserve",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 94,
+      "venue": "Hume Tennis & Community Centre",
+      "city": "Craigieburn",
+      "state": "VIC",
+      "sports": "tennis",
+      "originalUrl": "https://play.tennis.com.au/HumeTennisCommunityCentre",
+      "normalizedUrl": "https://play.tennis.com.au/HumeTennisCommunityCentre",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 114,
+      "venue": "Arlington Recreation Ground",
+      "city": "Dulwich Hill",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/arlington",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/arlington",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 115,
+      "venue": "Johnson Park",
+      "city": "Dulwich Hill",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/johnson-park",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/johnson-park",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 116,
+      "venue": "Beaman Park",
+      "city": "Earlwood",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.canterbury-bankstown.nsw.gov.au/beaman-park",
+      "normalizedUrl": "https://www.canterbury-bankstown.nsw.gov.au/beaman-park",
+      "error": "fetch failed"
+    },
+    {
+      "index": 121,
+      "venue": "Henley Park Synthetic Field (Enfield)",
+      "city": "Enfield",
+      "state": "NSW",
+      "sports": "futsal, soccer",
+      "originalUrl": "https://www.burwood.nsw.gov.au/Community/Sport-and-Recreation/Henley-Park",
+      "normalizedUrl": "https://www.burwood.nsw.gov.au/Community/Sport-and-Recreation/Henley-Park",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 131,
+      "venue": "Five Dock & Concord Oval Recreation Centres – Futsal",
+      "city": "Five Dock / Concord NSW",
+      "state": "",
+      "sports": "futsal",
+      "originalUrl": "https://www.canadabay.nsw.gov.au/recreation-centres",
+      "normalizedUrl": "https://www.canadabay.nsw.gov.au/recreation-centres",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 134,
+      "venue": "Lightwood Park Complex (Grounds 1",
+      "city": "Futuro Nogalar",
+      "state": "NL",
+      "sports": "",
+      "originalUrl": "Soccer (outdoor)",
+      "normalizedUrl": "https://Soccer (outdoor)",
+      "error": "Failed to parse URL from https://Soccer (outdoor)"
+    },
+    {
+      "index": 125,
+      "venue": "Ultimate Soccer Fairfield",
+      "city": "Fairfield",
+      "state": "",
+      "sports": "futsal, soccer",
+      "originalUrl": "https://www.ultimatesoccer.com.au/fairfield",
+      "normalizedUrl": "https://www.ultimatesoccer.com.au/fairfield",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 135,
+      "venue": "St Mary’s Tennis Club (Geelong)",
+      "city": "Geelong",
+      "state": "VIC",
+      "sports": "tennis",
+      "originalUrl": "https://portal.bookcourt.com.au/?from=cfd3668f0f4e4756a6e0e024298e4a07",
+      "normalizedUrl": "https://portal.bookcourt.com.au/?from=cfd3668f0f4e4756a6e0e024298e4a07",
+      "error": "fetch failed"
+    },
+    {
+      "index": 148,
+      "venue": "Bathurst Street Park Tennis (Greystanes)",
+      "city": "Greystanes",
+      "state": "NSW",
+      "sports": "tennis",
+      "originalUrl": "https://play.tennis.com.au/bathurststreetparktenniscourts/Booking/BookByDate",
+      "normalizedUrl": "https://play.tennis.com.au/bathurststreetparktenniscourts/Booking/BookByDate",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 150,
+      "venue": "Algie Park",
+      "city": "Haberfield",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/algie-park",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/algie-park",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 153,
+      "venue": "Robson Park",
+      "city": "Haberfield",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/robson-park",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/robson-park",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 156,
+      "venue": "Hamlyn Park Tennis Club (Geelong)",
+      "city": "Hamlyn Heights",
+      "state": "VIC",
+      "sports": "tennis",
+      "originalUrl": "https://portal.bookcourt.com.au",
+      "normalizedUrl": "https://portal.bookcourt.com.au",
+      "error": "fetch failed"
+    },
+    {
+      "index": 155,
+      "venue": "Hamlyn Park Tennis Club (Geelong)",
+      "city": "Hamlyn Heights",
+      "state": "VIC",
+      "sports": "tennis",
+      "originalUrl": "https://portal.bookcourt.com.au/court-bookings/hamlyn-park-tennis-club",
+      "normalizedUrl": "https://portal.bookcourt.com.au/court-bookings/hamlyn-park-tennis-club",
+      "error": "fetch failed"
+    },
+    {
+      "index": 170,
+      "venue": "Bernie Mullane Sports Complex",
+      "city": "Kellyville",
+      "state": "",
+      "sports": "pickleball",
+      "originalUrl": "https://www.thehills.nsw.gov.au/bernie-mullane",
+      "normalizedUrl": "https://www.thehills.nsw.gov.au/bernie-mullane",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 177,
+      "venue": "Kialla Park Tennis Club",
+      "city": "Kialla",
+      "state": "VIC",
+      "sports": "tennis",
+      "originalUrl": "https://play.tennis.com.au/KiallaParkOldStudentsTennisClub",
+      "normalizedUrl": "https://play.tennis.com.au/KiallaParkOldStudentsTennisClub",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 181,
+      "venue": "Kingston Tennis Club",
+      "city": "Kingston",
+      "state": "TAS",
+      "sports": "tennis",
+      "originalUrl": "https://play.tennis.com.au/kingstonTennisClub/legacy-booking?id=3b1efab1-5de8-4323-87a6-fdffe5b52e77",
+      "normalizedUrl": "https://play.tennis.com.au/kingstonTennisClub/legacy-booking?id=3b1efab1-5de8-4323-87a6-fdffe5b52e77",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 202,
+      "venue": "Keirle Park Tennis Centre (Manly)",
+      "city": "Manly",
+      "state": "NSW",
+      "sports": "tennis",
+      "originalUrl": "https://www.keirleparktennis.com.au/bookings",
+      "normalizedUrl": "https://www.keirleparktennis.com.au/bookings",
+      "error": "fetch failed"
+    },
+    {
+      "index": 195,
+      "venue": "Blackmore Oval",
+      "city": "Leichhardt",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/blackmore-oval",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/blackmore-oval",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 196,
+      "venue": "Pioneers Memorial Park",
+      "city": "Leichhardt",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/pioneers-park",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/pioneers-park",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 198,
+      "venue": "Leichhardt Oval",
+      "city": "Lilyfield",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/leichhardt-oval",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/leichhardt-oval",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 208,
+      "venue": "Marrickville Park",
+      "city": "Marrickville",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/marrickville-park",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/marrickville-park",
+      "error": "HTTP 429"
+    },
+    {
+      "index": 162,
+      "venue": "Huon Valley PCYC",
+      "city": "Huonville",
+      "state": "TAS",
+      "sports": "futsal",
+      "originalUrl": "https://www.hobartpcyc.org.au/huon-valley-pcyc-book-online/",
+      "normalizedUrl": "https://www.hobartpcyc.org.au/huon-valley-pcyc-book-online/",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 219,
+      "venue": "Mona Vale Tennis Club",
+      "city": "Mona Vale",
+      "state": "NSW",
+      "sports": "tennis",
+      "originalUrl": "https://www.monavaletennis.com.au/bookings",
+      "normalizedUrl": "https://www.monavaletennis.com.au/bookings",
+      "error": "fetch failed"
+    },
+    {
+      "index": 183,
+      "venue": "Eastern Indoor Pickleball Club (Knoxfield)",
+      "city": "Knoxfield",
+      "state": "",
+      "sports": "pickleball",
+      "originalUrl": "easternindoorpickleballclub.playbypoint.com",
+      "normalizedUrl": "https://easternindoorpickleballclub.playbypoint.com",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 72,
+      "venue": "Michael Clarke Recreation Centre",
+      "city": "Carnes Hill",
+      "state": "",
+      "sports": "pickleball",
+      "originalUrl": "https://www.liverpool.nsw.gov.au/michael-clarke",
+      "normalizedUrl": "https://www.liverpool.nsw.gov.au/michael-clarke",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 231,
+      "venue": "Mosman Lawn Tennis Club",
+      "city": "Mosman",
+      "state": "",
+      "sports": "tennis",
+      "originalUrl": "https://www.mosmanlawntennis.com.au/book",
+      "normalizedUrl": "https://www.mosmanlawntennis.com.au/book",
+      "error": "fetch failed"
+    },
+    {
+      "index": 228,
+      "venue": "UTS Moore Park Tennis",
+      "city": "Moore Park",
+      "state": "",
+      "sports": "futsal, tennis",
+      "originalUrl": "https://www.uts.edu.au/about/sport-and-recreation/facilities/moore-park",
+      "normalizedUrl": "https://www.uts.edu.au/about/sport-and-recreation/facilities/moore-park",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 234,
+      "venue": "Futsal Oz – Mt Evelyn",
+      "city": "Mount Evelyn",
+      "state": "VIC",
+      "sports": "futsal",
+      "originalUrl": "https://futsaloz.com/",
+      "normalizedUrl": "https://futsaloz.com/",
+      "error": "fetch failed"
+    },
+    {
+      "index": 200,
+      "venue": "Lane Cove Tennis Club",
+      "city": "Longueville",
+      "state": "NSW",
+      "sports": "tennis",
+      "originalUrl": "https://tennisbcs.com.au/book-court/",
+      "normalizedUrl": "https://tennisbcs.com.au/book-court/",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 233,
+      "venue": "Mount Annan Leisure Centre",
+      "city": "Mount Annan",
+      "state": "",
+      "sports": "pickleball",
+      "originalUrl": "https://www.camden.nsw.gov.au/mount-annan",
+      "normalizedUrl": "https://www.camden.nsw.gov.au/mount-annan",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 251,
+      "venue": "North Sydney Tennis Centre",
+      "city": "North Sydney",
+      "state": "",
+      "sports": "tennis",
+      "originalUrl": "https://www.northsydneytennis.com.au/book",
+      "normalizedUrl": "https://www.northsydneytennis.com.au/book",
+      "error": "fetch failed"
+    },
+    {
+      "index": 260,
+      "venue": "Trumper Park Tennis Centre",
+      "city": "Paddington",
+      "state": "",
+      "sports": "tennis",
+      "originalUrl": "https://play.tennis.com.au/trumperpark",
+      "normalizedUrl": "https://play.tennis.com.au/trumperpark",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 268,
+      "venue": "Peakhurst Park Synthetic (Georges River)",
+      "city": "Peakhurst",
+      "state": "NSW",
+      "sports": "soccer",
+      "originalUrl": "https://www.georgesriver.nsw.gov.au/Community/Facilities-and-Venues/Sportsgrounds/Peakhurst-Park",
+      "normalizedUrl": "https://www.georgesriver.nsw.gov.au/Community/Facilities-and-Venues/Sportsgrounds/Peakhurst-Park",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 293,
+      "venue": "Lyne Park Tennis Centre",
+      "city": "Rose Bay",
+      "state": "",
+      "sports": "tennis",
+      "originalUrl": "https://lyneparktennis.com.au/book-a-court",
+      "normalizedUrl": "https://lyneparktennis.com.au/book-a-court",
+      "error": "fetch failed"
+    },
+    {
+      "index": 301,
+      "venue": "Callan Park",
+      "city": "Rozelle",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/callan-park",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/callan-park",
+      "error": "HTTP 429"
+    },
+    {
+      "index": 302,
+      "venue": "King George Park",
+      "city": "Rozelle",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/king-george-park",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/king-george-park",
+      "error": "HTTP 429"
+    },
+    {
+      "index": 305,
+      "venue": "Royal Rehab Ryde – Sports Courts",
+      "city": "Ryde",
+      "state": "NSW",
+      "sports": "tennis",
+      "originalUrl": "https://www.rrtc.tennisbcs2.com.au/Applns/Bookings/Bookdisp2.aspx",
+      "normalizedUrl": "https://www.rrtc.tennisbcs2.com.au/Applns/Bookings/Bookdisp2.aspx",
+      "error": "fetch failed"
+    },
+    {
+      "index": 308,
+      "venue": "UTAS Unigym (Sandy Bay) – Sports Hall",
+      "city": "Sandy Bay",
+      "state": "TAS",
+      "sports": "futsal",
+      "originalUrl": "https://www.utas.edu.au/campus-services/venue-hire/available-venues",
+      "normalizedUrl": "https://www.utas.edu.au/campus-services/venue-hire/available-venues",
+      "error": "HTTP 403"
+    },
+    {
+      "index": 312,
+      "venue": "Wakehurst Tennis Club",
+      "city": "Seaforth",
+      "state": "",
+      "sports": "futsal, tennis",
+      "originalUrl": "https://www.wakehursttennis.com.au/book",
+      "normalizedUrl": "https://www.wakehursttennis.com.au/book",
+      "error": "fetch failed"
+    },
+    {
+      "index": 273,
+      "venue": "Alder Park Sports Club",
+      "city": "Perth WA",
+      "state": "",
+      "sports": "futsal",
+      "originalUrl": "https://www.alderparksportsclub.com/futsal-courts",
+      "normalizedUrl": "https://www.alderparksportsclub.com/futsal-courts",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 329,
+      "venue": "Blacktown Leisure Centre Stanhope",
+      "city": "Stanhope Gardens",
+      "state": "NSW",
+      "sports": "futsal, pickleball",
+      "originalUrl": "https://www.blacktown.nsw.gov.au/stanhope",
+      "normalizedUrl": "https://www.blacktown.nsw.gov.au/stanhope",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 338,
+      "venue": "Sydney Football Centre",
+      "city": "Sydney Olympic Park",
+      "state": "",
+      "sports": "futsal, soccer",
+      "originalUrl": "https://www.sydneyolympicpark.com.au/sydney-football-centre",
+      "normalizedUrl": "https://www.sydneyolympicpark.com.au/sydney-football-centre",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 281,
+      "venue": "The Jar Pickleball Club",
+      "city": "Pyrmont",
+      "state": "",
+      "sports": "pickleball",
+      "originalUrl": "https://www.thejar.com.au/pickleball",
+      "normalizedUrl": "https://www.thejar.com.au/pickleball",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 340,
+      "venue": "Sydney Olympic Park Sports Halls",
+      "city": "Sydney Olympic Park",
+      "state": "NSW",
+      "sports": "futsal",
+      "originalUrl": "https://www.sydneyolympicpark.com.au/tennis-coaching/book-online",
+      "normalizedUrl": "https://www.sydneyolympicpark.com.au/tennis-coaching/book-online",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 353,
+      "venue": "Robyn Webster Sports Centre",
+      "city": "Tempe",
+      "state": "",
+      "sports": "pickleball",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/robyn-webster",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/robyn-webster",
+      "error": "HTTP 429"
+    },
+    {
+      "index": 354,
+      "venue": "Tempe Reserve",
+      "city": "Tempe",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/tempe-reserve",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/tempe-reserve",
+      "error": "HTTP 429"
+    },
+    {
+      "index": 357,
+      "venue": "The Crescent Synthetic (Annandale)",
+      "city": "The Crescent",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.innerwest.nsw.gov.au/explore/parks-sport-and-recreation/sporting-grounds/book-a-sporting-ground",
+      "normalizedUrl": "https://www.innerwest.nsw.gov.au/explore/parks-sport-and-recreation/sporting-grounds/book-a-sporting-ground",
+      "error": "HTTP 429"
+    },
+    {
+      "index": 343,
+      "venue": "Tom Wills Community Field",
+      "city": "Sydney Olympic Park",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.sydneyolympicpark.com.au/tom-wills-field",
+      "normalizedUrl": "https://www.sydneyolympicpark.com.au/tom-wills-field",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 362,
+      "venue": "Futsal Oz – Thomastown",
+      "city": "Thomastown",
+      "state": "VIC",
+      "sports": "futsal",
+      "originalUrl": "https://futsaloz.com/",
+      "normalizedUrl": "https://futsaloz.com/",
+      "error": "fetch failed"
+    },
+    {
+      "index": 370,
+      "venue": "Turrella Reserve",
+      "city": "Turrella",
+      "state": "",
+      "sports": "soccer",
+      "originalUrl": "https://www.bayside.nsw.gov.au/sports-grounds",
+      "normalizedUrl": "https://www.bayside.nsw.gov.au/sports-grounds",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 382,
+      "venue": "West End Tennis Club",
+      "city": "West End",
+      "state": "QLD",
+      "sports": "tennis",
+      "originalUrl": "https://www.westendtennisclub.com.au/",
+      "normalizedUrl": "https://www.westendtennisclub.com.au/",
+      "error": "fetch failed"
+    },
+    {
+      "index": 366,
+      "venue": "Toongabbie Sports Complex",
+      "city": "Toongabbie",
+      "state": "",
+      "sports": "pickleball",
+      "originalUrl": "https://www.blacktown.nsw.gov.au/toongabbie",
+      "normalizedUrl": "https://www.blacktown.nsw.gov.au/toongabbie",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 393,
+      "venue": "Gunyama Park Synthetic Sportsfield",
+      "city": "Zetland",
+      "state": "",
+      "sports": "futsal, soccer",
+      "originalUrl": "https://www.cityofsydney.nsw.gov.au/venues-facilities/gunyama-park",
+      "normalizedUrl": "https://www.cityofsydney.nsw.gov.au/venues-facilities/gunyama-park",
+      "error": "HTTP 404"
+    },
+    {
+      "index": 391,
+      "venue": "Wynnum Tennis Centre",
+      "city": "Wynnum",
+      "state": "QLD",
+      "sports": "tennis",
+      "originalUrl": "https://www.tennis.com.au/queensland/clubs/wynnum-tennis-centre",
+      "normalizedUrl": "https://www.tennis.com.au/queensland/clubs/wynnum-tennis-centre",
+      "error": "This operation was aborted"
+    }
+  ]
+}

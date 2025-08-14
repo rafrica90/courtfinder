@@ -29,7 +29,7 @@ function toExportRow(v) {
     'Sport(s)': Array.isArray(v.sports) ? v.sports.join(', ') : '',
     'Address': v.address || '',
     'Suburb/City': v.city || '',
-    'State': '',
+    'State': v.state || '',
     'Postcode': '',
     'Booking URL': v.booking_url || '',
     'Description': v.notes || '',
@@ -43,7 +43,7 @@ async function main() {
 
   const { data, error } = await supabase
     .from('venues')
-    .select('id,name,address,city,booking_url,sports,notes,amenities')
+    .select('id,name,address,city,state,booking_url,sports,notes,amenities')
     .order('city', { ascending: true, nullsFirst: true })
     .order('name', { ascending: true });
 

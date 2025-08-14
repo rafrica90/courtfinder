@@ -17,6 +17,7 @@ export type Venue = {
   country?: string;
   latitude: number;
   longitude: number;
+  place_id?: string;
   // Optional structured operating hours coming from the database (JSONB)
   // We keep it as unknown to support multiple shapes (string, object keyed by weekday, etc.)
   hours?: unknown;

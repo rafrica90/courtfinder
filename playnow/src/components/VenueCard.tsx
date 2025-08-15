@@ -121,7 +121,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
   
 
   return (
-    <div className="group block h-full" onClick={() => router.push(`/venues/${venue.id}`)} style={{ cursor: 'pointer' }}>
+    <div className="group block h-full" onClick={() => router.push('/venues')} style={{ cursor: 'pointer' }}>
       <article className="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-[#00d9ff]/50 hover:shadow-xl hover:shadow-[#00d9ff]/10 transition-all duration-300 h-full">
         <div className="p-4 md:p-6 flex-1 flex items-center justify-between">
           <div>

@@ -1,29 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Venue } from "@/lib/types";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getStockImageForVenue, GENERIC_PLACEHOLDER } from "@/lib/sport-images";
+import { useAuth } from "@/contexts/AuthContext";
+import { api } from "@/lib/api-client";
 
 interface VenueCardProps {
   venue: Venue;
 }
 
 export default function VenueCard({ venue }: VenueCardProps) {
-  // Always use deterministic stock image per venue to avoid broken sources
-  const candidateImages: string[] = useMemo(() => [getStockImageForVenue(venue)], [venue]);
-
-  const stockImage = getStockImageForVenue(venue);
-  const initialRaw = stockImage;
-  const isHttp = typeof initialRaw === "string" && /^(https?:)\/\//i.test(initialRaw);
-  // For well-known image CDNs use direct URL; route others via proxy. We proxy Pixabay to avoid hotlink issues.
-  const isTrustedCdn = typeof initialRaw === "string" && /(images\.unsplash\.com|images\.pexels\.com)/i.test(initialRaw);
-  // Route unknown remote images via our proxy to avoid CORS and noisy network errors
-  const initialSrc = isHttp && !isTrustedCdn ? `/api/image?url=${encodeURIComponent(initialRaw)}` : initialRaw;
-  const [imgSrc, setImgSrc] = useState<string | undefined>(initialSrc);
+  // Card now renders without a large image to align with join-screen list style
+  // Keep index-friendly data (name/address) and an optional sport badge
+  const showSportBadge = venue.sports && Array.isArray(venue.sports) && venue.sports.length > 0;
   const router = useRouter();
+  const { user } = useAuth();
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [favLoading, setFavLoading] = useState<boolean>(false);
 
   // Compute display name without trailing bracketed suburb, e.g. "Ultimate Soccer (Fairfield)" → "Ultimate Soccer"
   const displayName = useMemo(() => {
@@ -56,6 +53,52 @@ export default function VenueCard({ venue }: VenueCardProps) {
     return parts.join(", ");
   }, [venue.city, venue.state, venue.address, venue.country]);
 
+  // Resolve a Google Maps link similar to the venue details page
+  const mapsUrl = useMemo(() => {
+    const v: any = venue as any;
+    if (v?.place_id) {
+      return `https://www.google.com/maps/place/?q=place_id:${encodeURIComponent(v.place_id)}`;
+    }
+    if (typeof v?.latitude === "number" && typeof v?.longitude === "number") {
+      // Open a direct Maps entry for the coordinates, not a generic search
+      return `https://www.google.com/maps/place/${v.latitude},${v.longitude}`;
+    }
+    const queryParts = [v?.name, v?.address, v?.city, v?.state, v?.country].filter(Boolean).join(" ");
+    if (queryParts) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(queryParts)}`;
+    }
+    return undefined;
+  }, [venue]);
+
+  // Load current favorite state (client-only side effect)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!user) return;
+      try {
+        const { data } = await api.favorites.list();
+        const favs = Array.isArray(data?.favorites) ? data.favorites : [];
+        if (!cancelled) setIsFavorite(favs.includes(venue.id));
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [user, venue.id]);
+
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user || favLoading) return;
+    setFavLoading(true);
+    try {
+      const { data } = await api.favorites.toggle(venue.id);
+      if (data?.favorites) setIsFavorite(data.favorites.includes(venue.id));
+    } finally {
+      setFavLoading(false);
+    }
+  };
+
+  // Hours/Capacity removed from cards
+
   const handleBookNow = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -78,85 +121,51 @@ export default function VenueCard({ venue }: VenueCardProps) {
   
 
   return (
-    <Link href={`/venues/${venue.id}`} className="group block h-full">
-      <article className="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-[#00d9ff]/50 hover:shadow-xl hover:shadow-[#00d9ff]/10 transition-all duration-300 hover:-translate-y-1 h-full min-h-[420px] flex flex-col">
-        <div className="relative w-full h-40 md:h-44 lg:h-48 bg-[#0f2847]">
-          {imgSrc ? (
-            <img
-              src={imgSrc}
-              alt={venue.name}
-              className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-              onError={() => {
-                const fallbackRaw = stockImage || GENERIC_PLACEHOLDER;
-                setImgSrc(fallbackRaw);
-              }}
-            />
-          ) : null}
-          {/* Location overlay inside image to free space */}
-          <div className="absolute bottom-3 left-3 right-3 flex items-center gap-1 text-xs font-semibold bg-black/50 text-white px-2 py-1 rounded">
-            <MapPin className="h-3 w-3 text-[#00d9ff]" />
-            <span className="truncate">{locationText}</span>
+    <div className="group block h-full" onClick={() => router.push(`/venues/${venue.id}`)} style={{ cursor: 'pointer' }}>
+      <article className="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-[#00d9ff]/50 hover:shadow-xl hover:shadow-[#00d9ff]/10 transition-all duration-300 h-full">
+        <div className="p-4 md:p-6 flex-1 flex items-center justify-between">
+          <div>
+            <div className="text-white font-semibold text-lg">{displayName}</div>
+            <div className="text-xs text-[#7a8b9a] mt-0.5">{venue.address}</div>
           </div>
+          {showSportBadge && (
+            <span className="px-2 py-0.5 rounded text-xs font-medium bg-white text-black border border-white/10">
+              {String(venue.sports![0]).replace(/[-_]+/g, " ")}
+            </span>
+          )}
         </div>
-        
-        <div className="p-4 flex-1 flex flex-col">
-          <h3 className="font-semibold text-lg mb-1 text-white group-hover:text-[#00d9ff] transition-colors">
-            {displayName}
-          </h3>
-          
-          {/* Venue type removed from card */}
-
-          {/* Sports badges (multi-sport support) */}
-          {(() => {
-            const rawSports = Array.isArray(venue.sports) ? venue.sports : [];
-            const fallback = !rawSports.length && venue.sportId ? [String(venue.sportId)] : [];
-            const uniqueSports = Array.from(
-              new Set(
-                [...rawSports, ...fallback]
-                  .filter(Boolean)
-                  .map((s) => String(s).trim().toLowerCase())
-              )
-            );
-            const toTitle = (s: string) =>
-              s
-                .replace(/[-_]+/g, " ")
-                .replace(/\s+/g, " ")
-                .trim()
-                .replace(/\b\w/g, (c) => c.toUpperCase());
-            return uniqueSports.length > 0 ? (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {uniqueSports.map((sport) => (
-                  <span
-                    key={sport}
-                    className="px-2 py-0.5 rounded text-xs font-medium bg-white/10 text-[#b8c5d6] border border-white/10"
-                  >
-                    {toTitle(sport)}
-                  </span>
-                ))}
-              </div>
-            ) : null;
-          })()}
-          
-          {/* Operating hours removed as requested */}
-          
-          {/* Amenities badges intentionally removed from cards */}
-          <div className="mt-auto pt-2 flex gap-2">
+        <div className="px-4 pb-4 flex items-center gap-3">
+          <button
+            type="button"
+            disabled={!venue.bookingUrl}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!venue.bookingUrl) return;
+              const redirect = `/api/clicks?venueId=${encodeURIComponent(venue.id)}&redirect=${encodeURIComponent(venue.bookingUrl)}`;
+              window.open(redirect, "_blank", "noopener,noreferrer");
+            }}
+            className={`px-3 py-1 rounded-md ${venue.bookingUrl ? 'bg-[#00d9ff] text-[#0a1628] font-semibold text-sm' : 'bg-white/10 text-white/60 border border-white/20 text-sm'}`}
+            aria-label="Book venue"
+          >
+            Book now
+          </button>
+          { (mapsUrl) && (
             <button
-              onClick={handleBookNow}
-              disabled={!venue.bookingUrl}
-              className="flex-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors shadow hover:shadow-[#00d9ff]/20 disabled:opacity-50 disabled:cursor-not-allowed bg-[#00d9ff] text-[#0a1628] hover:bg-[#00c0e6]"
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.open(mapsUrl, "_blank", "noopener,noreferrer");
+              }}
+              aria-label="Open in Google Maps"
+              className="p-1 rounded hover:bg-white/10"
             >
-              Book now
+              <ExternalLink className="h-4 w-4 text-[#00d9ff]" />
             </button>
-            <button
-              onClick={handleCreateGame}
-              className="flex-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors border border-white/20 text-white hover:bg-white/10"
-            >
-              Create game
-            </button>
-          </div>
+          )}
         </div>
       </article>
-    </Link>
+    </div>
   );
 }

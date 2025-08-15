@@ -18,6 +18,8 @@ export type Venue = {
   latitude: number;
   longitude: number;
   place_id?: string;
+  // Canonical Google Maps entry URL or link to the venue on Google Maps
+  maps_url?: string;
   // Optional structured operating hours coming from the database (JSONB)
   // We keep it as unknown to support multiple shapes (string, object keyed by weekday, etc.)
   hours?: unknown;
@@ -28,6 +30,8 @@ export type Venue = {
   terms?: string;
   indoorOutdoor?: "indoor" | "outdoor" | "both";
   isPublic: boolean;
+  // Optional long-form description for display on cards/details
+  description?: string;
   notes?: string;
   preferred_photo_ref?: string;
 };

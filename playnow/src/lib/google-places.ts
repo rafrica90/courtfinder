@@ -67,4 +67,22 @@ export async function getPlacePhotoInfo(placeId: string, maxWidth: number = 1200
   }
 }
 
+// Fetch a direct Google Maps URL for a place using Place Details 'url' field
+export async function getPlaceMapsUrl(placeId: string, maxWidth: number = 1200): Promise<string | null> {
+  const serverKey = process.env.GOOGLE_MAPS_API_KEY;
+  const browserKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY;
+  if (!serverKey && !browserKey) return null;
+
+  try {
+    const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=url&key=${serverKey || browserKey}`;
+    const resp = await fetch(detailsUrl, { cache: 'no-store' });
+    if (!resp.ok) return null;
+    const json = await resp.json();
+    const url = json?.result?.url as string | undefined;
+    return url ?? null;
+  } catch {
+    return null;
+  }
+}
+
 

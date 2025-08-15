@@ -24,7 +24,8 @@ create table if not exists venues (
   -- New fields to support richer venue data and multi-sport
   sports text[] default '{}',
   notes text,
-  image_urls text[] default '{}'
+  image_urls text[] default '{}',
+  maps_url text
 );
 
 create table if not exists games (

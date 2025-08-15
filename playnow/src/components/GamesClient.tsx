@@ -106,7 +106,27 @@ export default function GamesClient({ games }: GamesClientProps) {
     [filtered]
   );
 
-  // Geolocation can be added later with a dedicated control
+  // Request user's current location once on mount
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+              setUserLocation({ lat: latitude, lng: longitude });
+            }
+          },
+          () => {
+            // If permission denied or error occurs, silently ignore
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+        );
+      }
+    } catch {
+      // No-op if any unexpected error occurs
+    }
+  }, []);
 
   return (
     <div className="min-h-screen">

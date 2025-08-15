@@ -36,6 +36,7 @@ export default function GamesMap({ games, userLocation }: GamesMapProps) {
     let map: any;
     let markers: any[] = [];
     let isCancelled = false;
+    let userCircle: any | null = null;
 
     async function init() {
       const L = await import('leaflet');
@@ -73,6 +74,13 @@ export default function GamesMap({ games, userLocation }: GamesMapProps) {
           fillOpacity: 0.6,
         }).addTo(map);
         ul.bindTooltip('You are here');
+        userCircle = L.circle([userLocation.lat, userLocation.lng], {
+          radius: 20000, // 20 km
+          color: '#00d9ff',
+          weight: 1,
+          fillColor: '#00d9ff',
+          fillOpacity: 0.08,
+        }).addTo(map);
       }
 
       markers = games
@@ -103,6 +111,9 @@ export default function GamesMap({ games, userLocation }: GamesMapProps) {
       try {
         // @ts-ignore
         if (map) map.remove();
+      } catch {}
+      try {
+        userCircle?.remove?.();
       } catch {}
     };
   }, [games, center, userLocation]);

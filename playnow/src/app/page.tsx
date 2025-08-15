@@ -29,11 +29,11 @@ export default function Home() {
               {/* Main CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <Link
-                  href="/venues"
+                  href="/games"
                   className="group relative px-8 py-4 bg-[#00d9ff] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00a8cc] transition-all duration-300 shadow-lg hover:shadow-[#00d9ff]/30 hover:shadow-2xl flex items-center justify-center gap-2"
                 >
-                  <MapPin className="h-5 w-5" />
-                  Find a Court
+                  <Users className="h-5 w-5" />
+                  Join Game
                   <span className="absolute inset-0 rounded-xl bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
                 </Link>
                 <Link
@@ -41,7 +41,15 @@ export default function Home() {
                   className="group relative px-8 py-4 bg-[#00ff88] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00cc6a] transition-all duration-300 shadow-lg hover:shadow-[#00ff88]/30 hover:shadow-2xl flex items-center justify-center gap-2"
                 >
                   <Calendar className="h-5 w-5" />
-                  Host a Game
+                  Host Game
+                  <span className="absolute inset-0 rounded-xl bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                </Link>
+                <Link
+                  href="/venues"
+                  className="group relative px-8 py-4 bg-[#00d9ff] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00a8cc] transition-all duration-300 shadow-lg hover:shadow-[#00d9ff]/30 hover:shadow-2xl flex items-center justify-center gap-2"
+                >
+                  <MapPin className="h-5 w-5" />
+                  Find Venue
                   <span className="absolute inset-0 rounded-xl bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
                 </Link>
               </div>

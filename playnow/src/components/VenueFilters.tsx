@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Star, Volleyball, MapPin, ChevronDown, Building2 } from "lucide-react";
 import { sports as allSports } from "@/lib/mockData";
@@ -112,6 +112,8 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
 
   const [locationQuery, setLocationQuery] = useState<string>(selectedLocations[0] || '');
   const [showLocationSuggest, setShowLocationSuggest] = useState<boolean>(false);
+  const inputWrapperRef = useRef<HTMLDivElement | null>(null);
+  const [dropdownRect, setDropdownRect] = useState<{ left: number; top: number; width: number } | null>(null);
   const locationOptions = useMemo(() => {
     const opts: Array<{ label: string; kind: 'country' | 'state' | 'suburb' }> = [];
     for (const c of availableCountries) opts.push({ label: c, kind: 'country' });
@@ -132,9 +134,32 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
     setLocationQuery(active);
   }, [filters.country, filters.state, filters.suburb]);
 
+  // Keep dropdown aligned to input even when header is sticky or page scrolls
+  useEffect(() => {
+    const updatePosition = () => {
+      const el = inputWrapperRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      setDropdownRect({
+        left: rect.left,
+        top: rect.bottom + 8,
+        width: rect.width,
+      });
+    };
+    if (showLocationSuggest) {
+      updatePosition();
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+    }
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [showLocationSuggest]);
+
   return (
-    <div className="bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10 sticky top-32 z-30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 overflow-x-auto">
+    <div className="bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 overflow-visible">
         <div className="min-w-max flex items-start gap-3">
           {/* Sports dropdown */}
           <div className="min-w-0" onKeyDown={(e)=>{ if(e.key==='Escape') setOpen(null); }}>
@@ -151,7 +176,7 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
               <ChevronDown className={`h-4 w-4 transition-transform ${open === 'sports' ? 'rotate-180' : ''}`} />
             </button>
             {open === 'sports' && (
-              <div className="absolute z-50 mt-2 w-[calc(100%-1rem)] sm:w-auto bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-64 overflow-auto p-2">
+              <div className="absolute top-full left-0 z-50 mt-2 w-[calc(100%-1rem)] sm:w-auto bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-64 overflow-auto p-2">
                 {sports.map((opt) => {
                   const checked = filters.sports.includes(opt.slug);
                   return (
@@ -171,7 +196,7 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
           </div>
 
           {/* Locations searchable field */}
-          <div className="min-w-0 relative">
+          <div className="min-w-0 relative" ref={inputWrapperRef}>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <MapPin className="h-4 w-4 text-[#00d9ff]" />
             </div>
@@ -193,8 +218,11 @@ export default function VenueFilters({ currentSport, onFiltersChange, availableC
                 ×
               </button>
             )}
-            {showLocationSuggest && matchedLocationOptions.length > 0 && (
-              <div className="absolute z-50 mt-2 w-full bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-72 overflow-auto">
+            {showLocationSuggest && matchedLocationOptions.length > 0 && dropdownRect && (
+              <div
+                className="absolute z-[1000] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-72 overflow-auto"
+                style={{ left: 0, top: 'calc(100% + 8px)', width: dropdownRect.width }}
+              >
                 {matchedLocationOptions.map((opt) => (
                   <button
                     key={`${opt.kind}:${opt.label}`}

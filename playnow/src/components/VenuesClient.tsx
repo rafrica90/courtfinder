@@ -26,6 +26,7 @@ interface Venue {
   terms?: string;
   indoorOutdoor?: string;
   isPublic: boolean;
+  description?: string;
   notes?: string;
 }
 
@@ -39,13 +40,16 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
   const [allVenues] = useState<Venue[]>(initialVenues);
   const [filteredVenues, setFilteredVenues] = useState<Venue[]>(initialVenues);
   const [venues, setVenues] = useState<Venue[]>(initialVenues);
+  const [displayCount, setDisplayCount] = useState<number>(20);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const { user } = useAuth();
-  const [favoriteVenueIds, setFavoriteVenueIds] = useState<string[] | null>(null);
+  const [favoriteVenueIds, setFavoriteVenueIds] = useState<string[]>([]);
   const searchParams = useSearchParams();
 
   // Apply server-provided name query again on the client to guarantee filtering
+  // Use a stable string representation of searchParams to avoid hydration/update loops
+  const searchParamsString = searchParams?.toString?.() ?? "";
   useEffect(() => {
     const query = (searchedVenueName ?? "").toString().trim().toLowerCase().replace(/\+/g, " ");
     
@@ -94,16 +98,17 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     } as FilterState;
 
     const newlyFiltered = applyFilters(currentFilteredVenues, activeFilters);
-    
+
     setFilteredVenues(newlyFiltered);
     setVenues(newlyFiltered);
-  }, [searchedVenueName, sport, initialVenues, searchParams]);
+    setDisplayCount(20);
+  }, [searchedVenueName, sport, initialVenues, searchParamsString]);
 
   // Load favorites when user logs in
   useEffect(() => {
     (async () => {
       if (!user) {
-        setFavoriteVenueIds(null);
+        setFavoriteVenueIds([]);
         return;
       }
       const { data } = await api.favorites.list();
@@ -181,10 +186,12 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
     const filtered = applyFilters(allVenues, filters);
     setFilteredVenues(filtered);
     setVenues(filtered);
+    setDisplayCount(20);
   };
 
   const handleSortedVenues = (sortedVenues: Venue[]) => {
     setVenues(sortedVenues);
+    setDisplayCount(20);
   };
 
   // Derive available geo options moved to page header when rendering filter bar
@@ -232,11 +239,29 @@ export default function VenuesClient({ initialVenues, sport, searchedVenueName }
           })}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">
-          {venues.map((venue) => (
+        <div className="grid grid-cols-1 gap-6 mt-4">
+          {venues.slice(0, displayCount).map((venue) => (
             <VenueCard key={venue.id} venue={venue} />
           ))}
         </div>
+
+        {/* Show more controls */}
+        {venues.length > displayCount && (
+          <div className="flex items-center justify-center gap-3 mt-2">
+            <button
+              className="px-3 py-1.5 rounded text-sm font-semibold border border-white/20 text-white hover:bg-white/10"
+              onClick={() => setDisplayCount((n) => Math.min(n + 20, venues.length))}
+            >
+              Show more
+            </button>
+            <button
+              className="px-3 py-1.5 rounded text-sm font-semibold border border-white/20 text-white hover:bg-white/10"
+              onClick={() => setDisplayCount(venues.length)}
+            >
+              Show all
+            </button>
+          </div>
+        )}
 
         {venues.length === 0 && (
           <div className="text-center py-12">

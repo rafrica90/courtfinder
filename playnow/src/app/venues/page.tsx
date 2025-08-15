@@ -1,6 +1,4 @@
-import VenuesClient from "@/components/VenuesClient";
-import SearchBar from "@/components/SearchBar";
-import VenueFilters from "@/components/VenueFilters";
+import VenuesClientV2 from "@/components/VenuesClientV2";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 
 export default async function VenuesPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[]>> }) {
@@ -88,25 +86,9 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
 
   return (
     <div className="min-h-screen">
-      {/* Search Header */}
-      <div className="bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10 sticky top-16 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <SearchBar variant="compact" />
-        </div>
-        {/* Sticky horizontal filter bar directly under search */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
-          <VenueFilters
-            currentSport={sport}
-            availableCountries={Array.from(new Set((filtered ?? []).map((v:any)=> v.country).filter(Boolean))).sort()}
-            availableStates={Array.from(new Set((filtered ?? []).map((v:any)=> v.state).filter(Boolean))).sort()}
-            availableSuburbs={Array.from(new Set((filtered ?? []).map((v:any)=> v.city).filter(Boolean))).sort()}
-          />
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <VenuesClient 
-          initialVenues={filtered.map((venue) => ({
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <VenuesClientV2
+          venues={filtered.map((venue) => ({
             id: venue.id,
             name: venue.name,
             sportId: venue.sport_id,
@@ -125,10 +107,9 @@ export default async function VenuesPage({ searchParams }: { searchParams?: Prom
             terms: venue.terms ?? undefined,
             indoorOutdoor: venue.indoor_outdoor ?? undefined,
             isPublic: venue.is_public,
+            description: venue.description ?? venue.notes ?? undefined,
             notes: venue.notes ?? undefined,
           }))}
-          sport={sport}
-          searchedVenueName={venueName}
         />
       </div>
     </div>

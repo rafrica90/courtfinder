@@ -18,9 +18,10 @@
    availableLocations?: string[];
    initialFilters?: GamesFilters;
    onChange: (filters: GamesFilters) => void;
+  hideDate?: boolean;
  }
 
- export default function GamesFilterBar({ availableLocations = [], initialFilters, onChange }: GamesFilterBarProps) {
+export default function GamesFilterBar({ availableLocations = [], initialFilters, onChange, hideDate = false }: GamesFilterBarProps) {
    const [sort] = useState<GamesFilters['sort']>(initialFilters?.sort || 'distance');
    const [sports, setSports] = useState<string[]>(initialFilters?.sports || []);
    const [locations, setLocations] = useState<string[]>(initialFilters?.locations || []);
@@ -32,10 +33,44 @@
 
    const sportsRef = useRef<HTMLDivElement | null>(null);
    const locationsRef = useRef<HTMLDivElement | null>(null);
+   
+   // Location suggestion state (copied from VenueFilters)
+   const [locationQuery, setLocationQuery] = useState<string>(locations[0] || '');
+   const [showLocationSuggest, setShowLocationSuggest] = useState<boolean>(false);
+   const inputWrapperRef = useRef<HTMLDivElement | null>(null);
+   const [dropdownRect, setDropdownRect] = useState<{ left: number; top: number; width: number } | null>(null);
 
    useEffect(() => {
      onChange({ sort, sports, locations, venueTypes, favoritesOnly, date, onDate: date === 'on' ? onDate : undefined });
    }, [sort, sports, locations, venueTypes, favoritesOnly, date, onDate, onChange]);
+
+   // Keep dropdown aligned to input even when header is sticky or page scrolls (copied from VenueFilters)
+   useEffect(() => {
+     const updatePosition = () => {
+       const el = inputWrapperRef.current;
+       if (!el) return;
+       const rect = el.getBoundingClientRect();
+       setDropdownRect({
+         left: rect.left,
+         top: rect.bottom + 8,
+         width: rect.width,
+       });
+     };
+     if (showLocationSuggest) {
+       updatePosition();
+       window.addEventListener('scroll', updatePosition, true);
+       window.addEventListener('resize', updatePosition);
+     }
+     return () => {
+       window.removeEventListener('scroll', updatePosition, true);
+       window.removeEventListener('resize', updatePosition);
+     };
+   }, [showLocationSuggest]);
+
+   // Sync locationQuery with locations state
+   useEffect(() => {
+     setLocationQuery(locations[0] || '');
+   }, [locations]);
 
    useEffect(() => {
      const onKey = (e: KeyboardEvent) => {
@@ -123,36 +158,36 @@
              )}
            </div>
 
-           {/* Locations searchable input */}
-           <div className="min-w-0 relative" ref={locationsRef}>
+           {/* Locations searchable input (copied from VenueFilters) */}
+           <div className="min-w-0 relative" ref={inputWrapperRef}>
              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                <MapPin className="h-4 w-4 text-[#00d9ff]" />
              </div>
              <input
                type="text"
-               value={locations[0] || ''}
+               value={locationQuery}
                placeholder="All locations"
-               onChange={(e) => {
-                 const val = e.target.value;
-                 setLocations(val ? [val] : []);
-               }}
-               onFocus={() => setOpen('locations')}
-               onBlur={() => setTimeout(() => setOpen(null), 150)}
+               onChange={(e) => { setLocationQuery(e.target.value); setShowLocationSuggest(true); }}
+               onFocus={() => setShowLocationSuggest(true)}
+               onBlur={() => setTimeout(() => setShowLocationSuggest(false), 150)}
                className="h-10 pl-9 pr-8 rounded-md bg-white/5 border border-white/10 text-white placeholder-[#7a8b9a] min-w-[220px]"
              />
              {(locations[0]) && (
                <button
                  aria-label="Clear location"
                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#7a8b9a] hover:text-white"
-                 onClick={() => setLocations([])}
+                 onClick={() => { setLocations([]); setLocationQuery(''); }}
                >
                  ×
                </button>
              )}
-             {open === 'locations' && (
-               <div className="absolute z-50 mt-2 w-[220px] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-64 overflow-auto">
+             {showLocationSuggest && dropdownRect && (
+               <div
+                 className="absolute z-[1000] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-72 overflow-auto"
+                 style={{ left: 0, top: 'calc(100% + 8px)', width: dropdownRect.width }}
+               >
                  {availableLocations
-                   .filter((city) => city.toLowerCase().includes((locations[0] || '').toLowerCase()))
+                   .filter((city) => city.toLowerCase().includes(locationQuery.toLowerCase()))
                    .slice(0, 50)
                    .map((city) => (
                      <button
@@ -161,7 +196,8 @@
                        className="w-full text-left px-3 py-2 hover:bg-white/5 text-white"
                        onClick={() => {
                          setLocations([city]);
-                         setOpen(null);
+                         setLocationQuery(city);
+                         setShowLocationSuggest(false);
                        }}
                      >
                        {city}
@@ -184,50 +220,52 @@
              </button>
            </div>
 
-           {/* Date select */}
-           <div className="min-w-0">
-             <div className="relative">
-               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                 <Calendar className="h-4 w-4 text-[#00d9ff]" />
-               </div>
-               <button
-                 type="button"
-                 onClick={() => setOpen((o) => (o === 'date' ? null : 'date'))}
-                 className="h-10 pl-9 pr-3 rounded-md bg-white/5 border border-white/10 text-white min-w-[180px] flex items-center justify-between"
-                 aria-expanded={open === 'date'}
-               >
-                 <span className="truncate">{dateLabel}</span>
-                 <ChevronDown className={`h-4 w-4 transition-transform ${open === 'date' ? 'rotate-180' : ''}`} />
-               </button>
-               {open === 'date' && (
-                 <div className="absolute z-50 mt-2 w-[220px] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg p-2">
-                   <div className="grid gap-1 text-white">
-                     <button className={`text-left px-2 py-1.5 rounded hover:bg-white/5 ${date==='any' ? 'bg-white/5' : ''}`} onClick={() => { setDate('any'); setOnDate(''); }}>
-                       Any date
-                     </button>
-                     <button className={`text-left px-2 py-1.5 rounded hover:bg-white/5 ${date==='today' ? 'bg-white/5' : ''}`} onClick={() => { setDate('today'); setOnDate(''); }}>
-                       Today
-                     </button>
-                     <button className={`text-left px-2 py-1.5 rounded hover:bg-white/5 ${date==='tomorrow' ? 'bg-white/5' : ''}`} onClick={() => { setDate('tomorrow'); setOnDate(''); }}>
-                       Tomorrow
-                     </button>
-                     <button className={`text-left px-2 py-1.5 rounded hover:bg-white/5 ${date==='weekend' ? 'bg-white/5' : ''}`} onClick={() => { setDate('weekend'); setOnDate(''); }}>
-                       This Weekend
-                     </button>
-                     <div className="px-2 pt-1">
-                       <label className="text-xs text-[#7a8b9a]">Choose date</label>
-                       <input
-                         type="date"
-                         value={onDate}
-                         onChange={(e)=> { setOnDate(e.target.value); setDate('on'); }}
-                         className="mt-1 w-full h-9 px-2 rounded-md bg-white/5 border border-white/10 text-white"
-                       />
-                     </div>
-                   </div>
-                 </div>
-               )}
-             </div>
-           </div>
+          {/* Date select (hidden for venues) */}
+          {!hideDate && (
+            <div className="min-w-0">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Calendar className="h-4 w-4 text-[#00d9ff]" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpen((o) => (o === 'date' ? null : 'date'))}
+                  className="h-10 pl-9 pr-3 rounded-md bg-white/5 border border-white/10 text-white min-w-[180px] flex items-center justify-between"
+                  aria-expanded={open === 'date'}
+                >
+                  <span className="truncate">{dateLabel}</span>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${open === 'date' ? 'rotate-180' : ''}`} />
+                </button>
+                {open === 'date' && (
+                  <div className="absolute z-50 mt-2 w-[220px] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg p-2">
+                    <div className="grid gap-1 text-white">
+                      <button className={`text-left px-2 py-1.5 rounded hover:bg-white/5 ${date==='any' ? 'bg-white/5' : ''}`} onClick={() => { setDate('any'); setOnDate(''); }}>
+                        Any date
+                      </button>
+                      <button className={`text-left px-2 py-1.5 rounded hover:bg-white/5 ${date==='today' ? 'bg-white/5' : ''}`} onClick={() => { setDate('today'); setOnDate(''); }}>
+                        Today
+                      </button>
+                      <button className={`text-left px-2 py-1.5 rounded hover:bg-white/5 ${date==='tomorrow' ? 'bg-white/5' : ''}`} onClick={() => { setDate('tomorrow'); setOnDate(''); }}>
+                        Tomorrow
+                      </button>
+                      <button className={`text-left px-2 py-1.5 rounded hover:bg-white/5 ${date==='weekend' ? 'bg-white/5' : ''}`} onClick={() => { setDate('weekend'); setOnDate(''); }}>
+                        This Weekend
+                      </button>
+                      <div className="px-2 pt-1">
+                        <label className="text-xs text-[#7a8b9a]">Choose date</label>
+                        <input
+                          type="date"
+                          value={onDate}
+                          onChange={(e)=> { setOnDate(e.target.value); setDate('on'); }}
+                          className="mt-1 w-full h-9 px-2 rounded-md bg-white/5 border border-white/10 text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
          </div>
        </div>
      </div>

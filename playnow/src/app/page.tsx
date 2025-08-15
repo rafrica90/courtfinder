@@ -27,10 +27,10 @@ export default function Home() {
               </p>
               
               {/* Main CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <div className="flex flex-col gap-4 mb-8">
                 <Link
                   href="/games"
-                  className="group relative px-8 py-4 bg-[#00d9ff] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00a8cc] transition-all duration-300 shadow-lg hover:shadow-[#00d9ff]/30 hover:shadow-2xl flex items-center justify-center gap-2"
+                  className="group relative w-full px-8 py-4 bg-[#00d9ff] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00a8cc] transition-all duration-300 shadow-lg hover:shadow-[#00d9ff]/30 hover:shadow-2xl flex items-center justify-center gap-2"
                 >
                   <Users className="h-5 w-5" />
                   Join Game
@@ -38,7 +38,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/games/new"
-                  className="group relative px-8 py-4 bg-[#00ff88] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00cc6a] transition-all duration-300 shadow-lg hover:shadow-[#00ff88]/30 hover:shadow-2xl flex items-center justify-center gap-2"
+                  className="group relative w-full px-8 py-4 bg-[#00ff88] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00cc6a] transition-all duration-300 shadow-lg hover:shadow-[#00ff88]/30 hover:shadow-2xl flex items-center justify-center gap-2"
                 >
                   <Calendar className="h-5 w-5" />
                   Host Game
@@ -46,7 +46,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/venues"
-                  className="group relative px-8 py-4 bg-[#00d9ff] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00a8cc] transition-all duration-300 shadow-lg hover:shadow-[#00d9ff]/30 hover:shadow-2xl flex items-center justify-center gap-2"
+                  className="group relative w-full px-8 py-4 bg-[#00d9ff] text-[#0a1628] rounded-xl font-bold text-lg hover:bg-[#00a8cc] transition-all duration-300 shadow-lg hover:shadow-[#00d9ff]/30 hover:shadow-2xl flex items-center justify-center gap-2"
                 >
                   <MapPin className="h-5 w-5" />
                   Find Venue

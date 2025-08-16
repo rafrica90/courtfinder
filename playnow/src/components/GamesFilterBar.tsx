@@ -119,7 +119,7 @@ export default function GamesFilterBar({ availableLocations = [], initialFilters
    }, [date, onDate]);
 
    return (
-     <div className="bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10 sticky top-16 z-40">
+     <div className="bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10 sticky top-16 z-50">
        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 overflow-x-auto">
          <div className="min-w-max flex items-start gap-3">
            {/* Sports dropdown */}
@@ -137,7 +137,7 @@ export default function GamesFilterBar({ availableLocations = [], initialFilters
                <ChevronDown className={`h-4 w-4 transition-transform ${open === 'sports' ? 'rotate-180' : ''}`} />
              </button>
              {open === 'sports' && (
-               <div className="absolute z-50 mt-2 w-[220px] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-64 overflow-auto p-2">
+               <div className="absolute z-[60] mt-2 w-[220px] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-64 overflow-auto p-2">
                  {sportOptions.map((opt) => {
                    const checked = sports.includes(opt.value);
                    return (
@@ -181,31 +181,43 @@ export default function GamesFilterBar({ availableLocations = [], initialFilters
                  ×
                </button>
              )}
-             {showLocationSuggest && dropdownRect && (
-               <div
-                 className="absolute z-[1000] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-72 overflow-auto"
-                 style={{ left: 0, top: 'calc(100% + 8px)', width: dropdownRect.width }}
-               >
-                 {availableLocations
-                   .filter((city) => city.toLowerCase().includes(locationQuery.toLowerCase()))
-                   .slice(0, 50)
-                   .map((city) => (
-                     <button
-                       key={city}
-                       type="button"
-                       className="w-full text-left px-3 py-2 hover:bg-white/5 text-white"
-                       onClick={() => {
-                         setLocations([city]);
-                         setLocationQuery(city);
-                         setShowLocationSuggest(false);
-                       }}
-                     >
-                       {city}
-                     </button>
-                   ))}
-               </div>
-             )}
            </div>
+
+           {/* Location suggestions dropdown - moved outside input container for better positioning */}
+           {showLocationSuggest && dropdownRect && (
+             <div
+               className="fixed z-[60] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg max-h-72 overflow-auto"
+               style={{ 
+                 left: dropdownRect.left, 
+                 top: dropdownRect.top, 
+                 width: dropdownRect.width,
+                 maxHeight: 'min(18rem, calc(100vh - ' + dropdownRect.top + 'px - 2rem))'
+               }}
+             >
+               {availableLocations
+                 .filter((city) => city.toLowerCase().includes(locationQuery.toLowerCase()))
+                 .slice(0, 50)
+                 .map((city) => (
+                   <button
+                     key={city}
+                     type="button"
+                     className="w-full text-left px-3 py-2 hover:bg-white/5 text-white"
+                     onClick={() => {
+                       setLocations([city]);
+                       setLocationQuery(city);
+                       setShowLocationSuggest(false);
+                     }}
+                   >
+                     {city}
+                   </button>
+                 ))}
+               {availableLocations
+                 .filter((city) => city.toLowerCase().includes(locationQuery.toLowerCase()))
+                 .length === 0 && (
+                 <div className="px-3 py-2 text-[#7a8b9a] text-sm">No locations found</div>
+               )}
+             </div>
+           )}
 
            {/* Venue type removed */}
 
@@ -237,7 +249,7 @@ export default function GamesFilterBar({ availableLocations = [], initialFilters
                   <ChevronDown className={`h-4 w-4 transition-transform ${open === 'date' ? 'rotate-180' : ''}`} />
                 </button>
                 {open === 'date' && (
-                  <div className="absolute z-50 mt-2 w-[220px] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg p-2">
+                  <div className="absolute z-[60] mt-2 w-[220px] bg-[#0e1a2b] border border-white/10 rounded-md shadow-lg p-2">
                     <div className="grid gap-1 text-white">
                       <button className={`text-left px-2 py-1.5 rounded hover:bg-white/5 ${date==='any' ? 'bg-white/5' : ''}`} onClick={() => { setDate('any'); setOnDate(''); }}>
                         Any date
